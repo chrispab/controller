@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+   <head>
+       <link rel="stylesheet" href='/static/style.css' />
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+      <title>{{ title }}</title>
+   </head>
+
+   <body>
+      <h1>Home Page</h1>
+      <h2>The date and time on the server is: {{ time }}</h2>
+      <font size="6">
+	<a href="http://192.168.0.50:5000/status">Status Page</a>
+	</font>
+   </body>
+</html>

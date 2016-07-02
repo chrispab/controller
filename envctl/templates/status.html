@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href='/static/style.css' />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+	<title>Current Status</title>
+</head>
+
+<body >
+	<center>
+	<h1>Device Listing and Status</h1>
+	
+    <font size="5" color="red">
+	<p>Temp:  {{ temp }}
+	Humidity : {{ humi}}
+	</p>
+	</font>
+	<font size="5" color="red">
+	<p>The {{ relays['gpio3'].name }}
+	{% if relays['gpio3'].state == true %}
+		is currently on !  (<a href="/{{ 'gpio3' }}/off">turn off</a>)
+	{% else %}
+		is currently off !  (<a href="/{{ 'gpio3' }}/on">turn on</a>)		
+	{% endif %}
+	</p>
+	</font>
+
+	<font size="5" color="blue"
+	<p>The {{ relays['gpio4'].name }}
+	{% if relays['gpio4'].state == true %}
+		is currently on !  (<a href="/{{ 'gpio4' }}/off">turn off</a>)
+	{% else %}
+		is currently off !  (<a href="/{{ 'gpio4' }}/on">turn on</a>)		
+	{% endif %}
+	</p>
+	</font>
+	
+	{% if message %}
+	<h2>{{ message }}</h2>
+	{% endif %}
+	
+
+	<hr>
+	<font size="6">
+	<a href="http://192.168.0.50:5000">Home</a>
+	</font>
+	</center>
+
+</body>
+</html>

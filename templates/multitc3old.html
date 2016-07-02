@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+
+{% block title %}RPi2 - Data Log - {{timePeriod}} Hours{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  <!-- Load c3.css -->
+<link href="/home/pi/bower_components/c3/c3.css" rel="stylesheet" type="text/css">
+
+
+
+        <script>
+            var startTime = (new Date()).getTime();
+        </script>
+
+
+        
+        <script type="text/JavaScript">
+            <!--
+            function timedRefresh(timeoutPeriod) {
+                setTimeout("location.reload(true);",timeoutPeriod);
+            }
+
+        </script>
+                <script type='text/javascript'>
+        function gotoNewURL() {
+                hoursVal = document.getElementById('hours').value;
+                //redirecturl = 'http://192.168.0.8:5000/chart/'+hoursVal;
+                redirecturl = 'http://192.168.0.8:5000/chart/'+hoursVal;
+                document.location.href=redirecturl;
+        }
+</script>
+<style>
+        canvas {
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+        }
+</style>
+{% endblock %}
+
+{% block header %}
+  {{ super() }}
+    <div class="loadtime"></div>
+
+{% endblock %}
+
+{% block content %}
+    <div id="chart"></div>
+    <!-- Load d3.js and c3.js -->
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../home/pi/bower_components/c3/c3.min.js"></script>
+    
+    Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
+    <input type='button' value='Go' onclick='javascript:gotoNewURL();' />
+
+    <script>
+        var base = 20;
+        var height = 5;
+        var heaterOFFval = 0 + base;
+        var heaterONheight = height+1;
+        var ventOFFval = 0 + base;
+        var ventONheight = height+2;
+        var fanOFFval = 0 + base;
+        var fanONheight = height;
+
+        var timeFormat = 'YYYY-MM-DD HH:mm:ss';
+        
+        var chart = c3.generate({
+            bindto: '#chart',
+            data: {
+                columns: [
+                    ['data1', 30, 200, 100, 400, 150, 250],
+                    ['data2', 50, 20, 10, 40, 15, 25]
+                ]
+            }
+        });
+        
+      
+        chart.generate();
+      
+    </script>
+{% endblock %}
+

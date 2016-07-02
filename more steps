@@ -1,0 +1,46 @@
+this works for command line compilation and linking - stand alone exe
+
+g++ -I. -I/home/ubuntu/Documents/projects/iotestprj -I/home/ubuntu/c_environment/hardware/arduino/cores/arduino -I/home/ubuntu/c_environment/hardware/arduino/variants/sunxi iotest.c -o ./iotest /home/ubuntu/c_environment/libarduino.a
+
+
+create the wrapper file
+swig -c++ -python iotest.i
+
+creates: iotest_wrap.cxx , iotest.py
+
+
+g++ -fPIC -I/usr/include/python2.7 -I/home/ubuntu/c_environment -I/home/ubuntu/c_environment/hardware -I/home/ubuntu/c_environment/hardware/arduino -I/home/ubuntu/c_environment/hardware/arduino/cores -I/home/ubuntu/c_environment/hardware/arduino/cores/arduino -I/home/ubuntu/c_environment/hardware/arduino/variants -I/home/ubuntu/c_environment/hardware/arduino/variants/sunxi -c iotest.cpp iotest_wrap.cxx
+
+v2
+g++ -fPIC -I. -I/usr/include/python2.7 -I/home/ubuntu/Documents/projects/iotestprj -I/home/ubuntu/c_environment -I/home/ubuntu/c_environment/hardware -I/home/ubuntu/c_environment/hardware/arduino -I/home/ubuntu/c_environment/hardware/arduino/cores -I/home/ubuntu/c_environment/hardware/arduino/cores/arduino -I/home/ubuntu/c_environment/hardware/arduino/variants -I/home/ubuntu/c_environment/hardware/arduino/variants/sunxi -c iotest.cpp iotest_wrap.cxx
+
+creates iotest_wrap.o, iotest.o
+
+
+
+g++ -shared -I. -I/home/ubuntu/Documents/projects/iotestprj -I/home/ubuntu/c_environment/hardware/arduino/cores/arduino -I/home/ubuntu/c_environment/hardware/arduino/variants/sunxi iotest.o iotest_wrap.o /home/ubuntu/c_environment/libarduino.so -o  _iotest.so 
+
+creates _iotest.so
+
+==========
+swig -c++ -python dht11.i
+g++ -fPIC -I/usr/include/python2.7 -I/usr/include/pcduino -c dht11.cpp dht11_wrap.cxx
+g++ -shared libarduino.so dht11.o dht11_wrap.o -o _dht11.so
+python
+==========
+==========
+swig -c++ -python iotest.i
+
+g++ -fPIC -I/usr/include/python2.7 -I/usr/include/pcduino -c iotest.cpp iotest_wrap.cxx
+g++ -shared wiring_digital.o libarduino.so iotest.o iotest_wrap.o -o _iotest.so
+
+python
+
+====
+==========
+swig -python iotest.i
+gcc -fPIC -I/usr/include/python2.7 -I/usr/include/pcduino -c iotest.c iotest_wrap.c
+gcc -shared wiring_digital.o platform.o libarduino.so iotest.o iotest_wrap.o -o _iotest.so
+
+python
+====

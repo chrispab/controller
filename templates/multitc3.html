@@ -1,0 +1,157 @@
+{% extends "layout.html" %}
+
+{% block title %}RPi2 - Data Log - {{timePeriod}} Hours{% endblock %}
+
+{% block head %}
+  {{ super() }}
+<script>
+    var startTime = (new Date()).getTime();
+</script>
+
+<link href="{{ url_for('static', filename='c3.min.css') }}" rel="stylesheet" />
+<script type="text/javascript" src="{{ url_for('static', filename='d3.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='c3.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+
+<script type="text/JavaScript">
+    function timedRefresh(timeoutPeriod) {
+        setTimeout("location.reload(true);",timeoutPeriod);
+    }
+</script>
+
+<script type='text/javascript'>
+    function gotoNewURL() {
+        hoursVal = document.getElementById('hours').value;
+        redirecturl = 'http://192.168.0.8:5000/chart/'+hoursVal;
+        document.location.href=redirecturl;
+    }
+</script>
+{% endblock %}
+
+{% block header %}
+    {{ super() }}
+<div class="loadtime"></div>
+{% endblock %}
+
+{% block content %}
+<div id="chart" style="width:95%; height:680px; margin-left: auto;
+    margin-right: auto ;">
+</div>
+
+Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
+<input type='button' value='Go' onclick='javascript:gotoNewURL();' />
+
+<script>
+    var base = 30;
+    var height = 4;
+    var hval = 0.2;
+    var tspan = 2;
+    var heaterOFFval = 0 + base;
+    var heaterONheight = height+(1*hval);
+    var ventOFFval = 0 + base;
+    var ventONheight = height+(2*hval);
+    var fanOFFval = 0 + base;
+    var fanONheight = height;
+    var timeFormat = 'YYYY-MM-DD HH:mm:ss';
+
+    var chart = c3.generate({
+        bindto: '#chart',
+        data: {
+            x : 'time',
+            xFormat : '%Y-%m-%d %H:%M:%S',
+            columns: [
+                ['time'{% for item in labels %},"{{item}}"{% endfor %}],
+                ['temperature'{% for item in tempvalues %},{{item}}{% endfor %}],
+                ['humidity'{% for item in humivalues %},{{item}}{% endfor %}],
+                ['vent'{% for item in ventvalues %},ventOFFval + (ventONheight * {{item}}){% endfor %}],
+                ['heater'{% for item in heatervalues %},heaterOFFval + (heaterONheight * {{item}}){% endfor %}],
+                ['fan'{% for item in fanvalues %},fanOFFval + (fanONheight * {{item}}){% endfor %}],
+                ['proctemp'{% for item in proctempvalues %},( {{item}} ){% endfor %}]
+            ],
+            colors: {
+                temperature: '#ff0000',
+                humidity: '#663399',
+                vent: '#3eb308',
+                heater: '#bf0d0d',
+                fan: '#f0d817',
+                proctemp: '#000000'
+            },
+            color: function (color, d) {
+                // d will be 'id' when called for legends
+                return d.id && d.id === 'data3' ? d3.rgb(color).darker(d.value / 150) : color;
+            },
+            axes: {
+                humidity: 'y',
+                temperature: 'y2',
+                proctemp: 'y2'
+            }
+        },
+        zoom: {
+            enabled: true
+        },
+        point: {
+            show: true
+        },
+        axis : {
+            x : {
+                type : 'timeseries',
+                tick : {
+                    rotate: 45,
+                    multiline: false,
+                    //              format : '%Y-%m-%d %H:%M:%S',
+                    count : 30,
+                    format : '%H:%M:%S',
+                }
+            },
+            y: {
+                label: {
+                    text: 'Humidity',
+                    position: 'outer-middle'
+                },
+                max: 90,
+                min: 30,
+                padding: {top:0, bottom:0}
+            },
+            y2: {
+                show: true,
+                label: {
+                    text: 'Temperature',
+                    position: 'outer-middle'
+                },
+                //max:  {{tempvalues[-1]}} + tspan,
+                //min: {{tempvalues[-1]}} - tspan+1,
+                max:  24.0,
+                min: 15.0,
+                padding: {top:0, bottom:0},
+                show: true
+            }
+        },
+        grid: {
+            x: {
+                show: true
+            },
+            y: {
+                show: false,
+                lines: [
+                    {value: 16.9, text: 'Low SP', axis: 'y2'},
+                    {value: 22.5, text: 'High SP', axis: 'y2'},
+                ]
+            },
+            y2: {
+                show: true
+            }
+        }
+    });
+</script>
+<script>
+    $(window).load(function () {
+        var endTime = (new Date()).getTime();
+        var millisecondsLoading = endTime - startTime;
+        // Put millisecondsLoading in a hidden form field
+        // or Ajax it back to the server or whatever.
+        $('.loadtime').html(millisecondsLoading);
+        timedRefresh((millisecondsLoading * 2) + 10000);
+    });
+</script>
+{% endblock %}
+

@@ -1,0 +1,13 @@
+swig -python iotest.i
+gcc -fPIC -I/usr/include/python2.7 -c iotest_wrap.c
+gcc -shared iotest.o iotest_wrap.o -o _iotest.so
+
+
+gcc -fPIC -I/usr/include/python2.7 -I/home/ubuntu/c_environment/hardware/arduino/cores/arduino -I/home/ubuntu/c_environment/hardware/arduino/variants/sunxi -c iotest.c iotest_wrap.c
+
+
+gcc -shared libarduino.a iotest.o iotest_wrap.o -o _iotest.so
+
+/home/ubuntu/c_environment/hardware/arduino/cores/arduino/platform.o
+
+gcc -shared /home/ubuntu/c_environment/hardware/arduino/cores/arduino/wiring_digital.o /home/ubuntu/c_environment/hardware/arduino/cores/arduino/wiring.o /home/ubuntu/c_environment/hardware/arduino/cores/arduino/platform.o libarduino.a iotest.o iotest_wrap.o -o _iotest.so

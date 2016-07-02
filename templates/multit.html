@@ -1,0 +1,226 @@
+{% extends "layout.html" %}
+
+{% block title %}RPi2 - Data Log - {{timePeriod}} Hours{% endblock %}
+
+{% block head %}
+  {{ super() }}
+        <script>
+            var startTime = (new Date()).getTime();
+        </script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js">
+        </script>
+
+
+        
+        <script type="text/JavaScript">
+            <!--
+            function timedRefresh(timeoutPeriod) {
+                setTimeout("location.reload(true);",timeoutPeriod);
+            }
+
+            //window.onload = timedRefresh(120000);
+            //   -->
+        </script>
+                <script type='text/javascript'>
+        function gotoNewURL() {
+                hoursVal = document.getElementById('hours').value;
+                //redirecturl = 'http://192.168.0.8:5000/chart/'+hoursVal;
+                redirecturl = 'http://192.168.0.8:5000/chart/'+hoursVal;
+                document.location.href=redirecturl;
+        }
+</script>
+        <script src="static/Chart.bundle.js"></script>
+                <script type="text/javascript" src="{{ url_for('static', filename='Chart.bundle.js') }}"></script>
+
+
+   
+    <style>
+        canvas {
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+        }
+    </style>
+{% endblock %}
+
+{% block header %}
+  {{ super() }}
+    <div class="loadtime"></div>
+
+{% endblock %}
+
+
+{% block content %}
+<!--
+  <div class="loadtime"></div>
+-->
+    <div style="width:90%; margin-left: auto ;
+  margin-right: auto ;">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
+    <input type='button' value='Go' onclick='javascript:gotoNewURL();' />
+
+    <script>
+        var base = 20;
+        var height = 5;
+        var heaterOFFval = 0 + base;
+        var heaterONheight = height+1;
+        var ventOFFval = 0 + base;
+        var ventONheight = height+2;
+        var fanOFFval = 0 + base;
+        var fanONheight = height;
+        
+        var randomScalingFactor = function() {
+            return Math.round(Math.random() * 100 * (Math.random() > 0.5 ? -1 : 1));
+        };
+        var randomColor = function(opacity) {
+            return 'rgba(' + Math.round(Math.random() * 255) + ',' + Math.round(Math.random() * 255) + ',' + Math.round(Math.random() * 255) + ',' + (opacity || '.3') + ')';
+        };
+    
+
+        var timeFormat = 'YYYY-MM-DD HH:mm:ss';
+
+        
+        var lineChartData2 = {
+            labels :    [{% for item in labels %}
+                            "{{item}}",
+                        {% endfor %}],
+            datasets: [{
+                label: 'Temperature',
+                fill: false,
+                lineTension: 0.2,
+                
+                data : [{% for item in tempvalues %}
+                          {{item}},
+                        {% endfor %}],
+                        
+                        borderColor: "rgba(255,0,0,1)",
+                        yAxisID: "y-axis-2",
+                        
+            }, {
+                label: "Humidity",
+                fill: false,
+                lineTension: 0,
+                
+                data : [{% for item in humivalues %}
+                          {{item}},
+                        {% endfor %}],
+                        borderColor: "rgba(0,0,255,1)",
+                        yAxisID: "y-axis-1",
+            }, {
+                label: "Heater",
+                fill: false,
+                lineTension: 0,
+                
+                data : [{% for item in heatervalues %}
+                            heaterOFFval + (heaterONheight * {{item}}),
+                        {% endfor %}],
+                        borderColor: "rgba(255,0,255,1)",
+                        yAxisID: "y-axis-1",
+            }, {
+                label: "Vent",
+                fill: false,
+                lineTension: 0,
+                data : [{% for item in ventvalues %}
+                            ventOFFval + (ventONheight * {{item}}),
+                        {% endfor %}],
+                        yAxisID: "y-axis-1",
+                        borderColor: "rgba(0,255,0,1)",
+            }, {
+                label: "Fan",
+                fill: false,
+                lineTension: 0,
+                
+                data : [{% for item in fanvalues %}
+                            fanOFFval + (fanONheight * {{item}}),
+                        {% endfor %}],
+                        borderColor: "rgba(0,0,0,1)",
+                        yAxisID: "y-axis-1",
+            }]
+        }
+        
+    
+        $.each(lineChartData2.datasets, function(i, dataset) {
+            dataset.borderWidth = 1;
+            dataset.pointBorderWidth = 0;
+            dataset.pointRadius = 0;
+        });
+
+        window.onload = function() {
+            var ctx = document.getElementById("canvas").getContext("2d");
+            window.myLine = Chart.Line(ctx, {
+                data: lineChartData2,
+                options: {
+                    responsive: true,
+                    hoverMode: 'label',
+                    stacked: false,
+                    title:{
+                        display:true,
+                        text:'Time Period - {{timePeriod}} Hours'
+                    },
+                    scales: {
+                        xAxes: [{
+                            type: "time",
+						time: {
+							format: timeFormat,
+							// round: 'day'
+							tooltipFormat: 'll HH:mm:ss'
+						},
+						scaleLabel: {
+							display: true,
+							labelString: 'Time'
+						},
+                            display: true,
+                            gridLines: {
+                                offsetGridLines: false
+                            }
+                        }],
+                        yAxes: [{
+                            type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                            display: true,
+                           scaleLabel: {
+							display: true,
+							labelString: 'Humidity %'
+						},
+                            position: "left",
+                            id: "y-axis-1",
+                            // grid line settings
+                            gridLines: {
+                                drawOnChartArea: false, // only want the grid lines for one axis to show up
+                            },
+                        }, {
+                            type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                            display: true,
+                            ticks: {
+                    max: 26,
+                    min: 16,
+                    stepSize: 0.5
+                },
+                            scaleLabel: {
+							display: true,
+							labelString: 'Temperature C'
+                            
+						},
+                            position: "right",
+                            id: "y-axis-2",
+                        }],
+                    }
+                }
+            });
+        };
+        //$('#genGraph').click(gotoNewURL());
+    </script>
+            <script>
+            $(window).load(function () {
+                var endTime = (new Date()).getTime();
+                var millisecondsLoading = endTime - startTime;
+                // Put millisecondsLoading in a hidden form field
+                // or Ajax it back to the server or whatever.
+                $('.loadtime').html(millisecondsLoading);
+                timedRefresh((millisecondsLoading * 2) + 10000);
+            });
+        </script>
+{% endblock %}
+

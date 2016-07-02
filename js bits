@@ -1,0 +1,28 @@
+<script type='text/javascript'>
+        function gotoserver() {
+                sn = document.getElementById('server').value;
+                redirecturl = 'https://'+sn;
+                document.location.href=redirecturl;
+        }
+</script>
+
+<input type='text' name='server' id='server' />
+<input type='button' value='Go' onclick='javascript:gotoserver();' />
+
+
+
+        <script type='text/javascript'>
+        function gotoNewURL() {
+                hoursVal = document.getElementById('hours').value;
+                //redirecturl = 'http://192.168.0.8:5000/chartx/'+hoursVal;
+                redirecturl = 'http://192.168.0.8:5000/chartx/'+hoursVal;
+                document.location.href=redirecturl;
+        }
+</script>
+
+
+
+
+
+        <script type="text/javascript" src="{{ url_for('static', filename='Chart.bundle.js') }}"></script>
+
