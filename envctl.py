@@ -11,6 +11,8 @@ from bisect import bisect_right
 from csv import reader
 import pdb
 
+import settings
+
 app = Flask(__name__)
 
 relays = {
@@ -34,7 +36,7 @@ def getStartSampleIndex(timeList, targetTimeDelta):
 @app.route("/multitall")
 def multit():
 
-    with open('/home/pi/projects/controller1/thdata.csv', 'r') as f:
+    with open(settings.dataPath, 'r') as f:
         data = list(reader(f))
     
     #listlen = len(data)
@@ -51,7 +53,7 @@ def multit():
 
 @app.route("/chart/<float:timeh>")
 def chartx(timeh):
-    with open('/home/pi/projects/controller1/thdata.csv', 'r') as f:
+    with open(settings.dataPath, 'r') as f:
         data = list(reader(f))
     timeList = [item[0] for item in data]
     del timeList[:0]    #del 1st element of list - start to elem 0

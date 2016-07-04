@@ -105,24 +105,24 @@ def setup():
     global temperature
     global humidity
     global prevTempHumiMillis
-#    global tempHumiReadDelta
     global procTemp
  
     hw.powerCycleSensor()
     
     readErrs = 0    #reset err count
-    humidity, temperature = hw.readSensor()    # get temp, huni
-    while (humidity is None or temperature is None) and readErrs < 10:   #repeat read until valid data or too many errorserror
-        sys.stdout.write('-ERROR TRYING TO READ SENSOR on setup-')
+    humidity, temperature = hw.readSensor()
+    #repeat read until valid data or too many errorserror
+    while (humidity is None or temperature is None) and readErrs < 10:   
+        print('Setup - ERROR TRYING TO READ SENSOR')
         readErrs += 1
         humidity, temperature = hw.readSensor()    # get temp, humi
 
     if readErrs == 10:  # powercyle if 10 read errors
-        powerCycleSensor()
-        print "+++++++++++++++++++++POWER CYCLE sensor setup+++++++++++++++++++++++++++"
-        #print "ERROR TRYING TO READ SENSOR"
+        hw.powerCycleSensor()
+        print "Setup - 10 errors reading sensor"
+        print "Setup - POWER CYCLE sensor"
     else:
-        print "-SETUP READ SUCCESS-"
+        print "Setup - READ SUCCESS-"
     
     prevTempHumiMillis = currentMillis
 
@@ -131,8 +131,6 @@ def setup():
     humidity = round(humidity, 1)
 
     hw.setupIOPins()
-
-    start_time = time.time()
 
 def delay(ms):
     time.sleep(1.0*ms/1000)
@@ -511,6 +509,9 @@ def main():
     
     
     print("---Powering up the device---")
+    
+    start_time = time.time()
+
     startMillis = datetime.datetime.now()   # get time at start of program execution
     setup()
  

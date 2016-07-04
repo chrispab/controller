@@ -28,7 +28,7 @@ FILE_NAME_0=1766;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fc
 FILE_NAME_1=581;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fsettings.py;0;4
 FILE_NAME_2=1001;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fhardware.py;0;4
 FILE_NAME_3=2871;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fenvctl.py;0;4
-FILE_NAME_4=4188;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Ftemplates%2Fmultitc3.html;0;4
+FILE_NAME_4=4073;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Ftemplates%2Fmultitc3.html;0;4
 
 [VTE]
 last_dir=/root
