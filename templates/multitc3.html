@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}RPi2 - Data Log - {{timePeriod}} Hours{% endblock %}
+{% block title %}{{platformStr}} - Data Log - {{timePeriod}} Hours{% endblock %}
 
 {% block head %}
   {{ super() }}
@@ -29,17 +29,25 @@
 {% endblock %}
 
 {% block header %}
-    {{ super() }}
-<div class="loadtime"></div>
+
+   {{ super() }}
+
+<div class="loadtime" style=" 
+border: solid 1px #ccc; display: inline-block;"</div>
+
+
 {% endblock %}
 
 {% block content %}
-<div id="chart" style="width:95%; height:680px; margin-left: auto;
+<div id="chart" style="width:95%; height:720px; margin-left: auto;
     margin-right: auto ;">
 </div>
 
+
+
 Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
 <input type='button' value='Go' onclick='javascript:gotoNewURL();' />
+
 
 <script>
     var base = 30;
@@ -66,14 +74,14 @@ Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
                 ['vent'{% for item in ventvalues %},ventOFFval + (ventONheight * {{item}}){% endfor %}],
                 ['heater'{% for item in heatervalues %},heaterOFFval + (heaterONheight * {{item}}){% endfor %}],
                 ['fan'{% for item in fanvalues %},fanOFFval + (fanONheight * {{item}}){% endfor %}],
-                ['proctemp'{% for item in proctempvalues %},( {{item}} ){% endfor %}]
+                //['proctemp'{% for item in proctempvalues %},( {{item}} ){% endfor %}]
             ],
             colors: {
                 temperature: '#ff0000',
                 humidity: '#663399',
                 vent: '#3eb308',
                 heater: '#bf0d0d',
-                fan: '#f0d817',
+                fan: '#f000dd',
                 proctemp: '#000000'
             },
             color: function (color, d) {
@@ -86,11 +94,14 @@ Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
                 proctemp: 'y2'
             }
         },
+        legend: {
+            position: 'right'
+        },
         zoom: {
             enabled: true
         },
         point: {
-            show: true
+            show: false
         },
         axis : {
             x : {
@@ -118,12 +129,25 @@ Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
                     text: 'Temperature',
                     position: 'outer-middle'
                 },
-                //max:  {{tempvalues[-1]}} + tspan,
+                
+                
+                {% if (tempvalues[-1]|float > tSPHigh|float) %}
+                    max:  {{ tempvalues[-1] }} + 0.2,
+                {% else %}
+                    max:  {{ tSPHigh }} + 0.2,
+                {% endif %}
+                    
                 //min: {{tempvalues[-1]}} - tspan+1,
-                max:  25.0,
-                min: 15.0,
+                //max:  {{tSPHigh}} + 6,
+                {% if tempvalues[-1]|float < tSPLow|float %}
+                    min:  {{ tempvalues[-1] }} - 0.2,
+                {% else %}
+                    min:  {{ tSPLow }} - 0.2,
+                {% endif %}
+ 
+                //min: {{tSPLow}} -0.5,
                 padding: {top:0, bottom:0},
-                show: true
+                //show: true
             }
         },
         grid: {
@@ -131,17 +155,34 @@ Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
                 show: true
             },
             y: {
-                show: false,
+                show: true,
                 lines: [
-                    {value: 16.9, text: 'Low SP', axis: 'y2'},
-                    {value: 22.5, text: 'High SP', axis: 'y2'},
+                    {value: {{tSPLow}}, text: 'Low SP {{tSPLow}}', axis: 'y2'},
+                    {value: {{tSPHigh}}, text: 'High SP {{tSPHigh}}', axis: 'y2'},
                 ]
             },
             y2: {
+                //lines: [{value: 16.8}, {value: 22.4, class: 'grid800', text: 'LABEL 800', axis: 'y2'}],
+
                 show: true
             }
         }
     });
+    
+    //setTimeout(function () {
+    //chart.transform('bar', 'temperature');
+//}, 1000);
+
+    //setTimeout(function () {
+    ////    chart.transform('area-spline');
+        //chart.transform('area', 'temperature');
+    //}, 1000);
+
+//setTimeout(function () {
+    //chart.transform('area', 'temperature');
+////    chart.transform('area', 'temperature');
+//}, 1000);
+
 </script>
 <script>
     $(window).load(function () {
@@ -150,7 +191,7 @@ Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
         // Put millisecondsLoading in a hidden form field
         // or Ajax it back to the server or whatever.
         $('.loadtime').html(millisecondsLoading);
-        timedRefresh((millisecondsLoading * 2) + 10000);
+        timedRefresh((millisecondsLoading) + 10000);
     });
 </script>
 {% endblock %}

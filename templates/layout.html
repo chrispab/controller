@@ -7,8 +7,11 @@
     {% endblock %}
   </head>
   <body>
+    <div id="heading">
+    </div>
     <div id="header">
         {% block header %}
+    {{platformStr}}
         <a href="/home">home</a>
         <a href="/status">Status</a>
         <a href="/chart/0.1">6 mins</a>

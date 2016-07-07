@@ -30,3 +30,8 @@ dataPath = "/home/pi/projects/controller1/thdata.csv"
 extraPath = "/home/pi/projects/controller1/extradata.csv"
 
 emailEnabled = True
+
+platformName = 'RPi2Sh'
+
+tSPHi = tempLOnSP
+tSPLo = tempLOffSP

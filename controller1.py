@@ -23,12 +23,12 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=3
-FILE_NAME_0=1766;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fcontrol.py;0;4
-FILE_NAME_1=581;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fsettings.py;0;4
-FILE_NAME_2=1001;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fhardware.py;0;4
+current_page=4
+FILE_NAME_0=17129;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fcontrol.py;0;4
+FILE_NAME_1=1213;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fsettings.py;0;4
+FILE_NAME_2=1217;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fhardware.py;0;4
 FILE_NAME_3=2871;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fenvctl.py;0;4
-FILE_NAME_4=4073;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Ftemplates%2Fmultitc3.html;0;4
+FILE_NAME_4=4769;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Ftemplates%2Fmultitc3.html;0;4
 
 [VTE]
 last_dir=/root

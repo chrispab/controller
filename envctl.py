@@ -68,8 +68,16 @@ def chartx(timeh):
     
     proctempvalues = [i[6] for i in data[startsample::]]
     timePeriod = timeh
+    platformStr = settings.platformName
+    tSPHigh = settings.tSPHi
+    tSPLow = settings.tSPLo
     
-    return render_template('multitc3.html', tempvalues=tempvalues, humivalues=humivalues, heatervalues=heatervalues, ventvalues=ventvalues, fanvalues=fanvalues, labels=labels, proctempvalues=proctempvalues, timePeriod=timePeriod)
+    return render_template('multitc3.html', tempvalues=tempvalues, 
+            humivalues=humivalues, heatervalues=heatervalues, 
+            ventvalues=ventvalues, fanvalues=fanvalues, 
+            labels=labels, proctempvalues=proctempvalues, 
+            timePeriod=timePeriod, platformStr=platformStr,
+            tSPHigh=tSPHigh, tSPLow=tSPLow)
 
 
 @app.route("/home")
