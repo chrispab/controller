@@ -1,11 +1,12 @@
 {% extends "layout.html" %}
 
-{% block title %}{{platformStr}} - Data Log - {{timePeriod}} Hours{% endblock %}
+{% block title %}{{timePeriod}} Hours, {{platformStr}} data{% endblock %}
 
 {% block head %}
   {{ super() }}
 <script>
     var startTime = (new Date()).getTime();
+    var timeoutPeriod = 45000;
 </script>
 
 <link href="{{ url_for('static', filename='c3.min.css') }}" rel="stylesheet" />
@@ -39,7 +40,7 @@ border: solid 1px #ccc; display: inline-block;"</div>
 {% endblock %}
 
 {% block content %}
-<div id="chart" style="width:95%; height:720px; margin-left: auto;
+<div id="chart" style="width:95%; height:640px; margin-left: auto;
     margin-right: auto ;">
 </div>
 
@@ -50,16 +51,16 @@ Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
 
 
 <script>
-    var base = 30;
+    var humibase = 10;
     var height = 4;
     var hval = 0.2;
     var tspan = 2;
-    var heaterOFFval = 0 + base;
+    var heaterOFFval = 0 + humibase;
     var heaterONheight = height+(1*hval);
-    var ventOFFval = 0 + base;
-    var ventONheight = height+(2*hval);
-    var fanOFFval = 0 + base;
-    var fanONheight = height;
+    var ventOFFval = 0 + humibase;
+    var ventONheight = (height+(2*hval)) / 1.5;
+    var fanOFFval = 0 + humibase;
+    var fanONheight = height/2;
     var timeFormat = 'YYYY-MM-DD HH:mm:ss';
 
     var chart = c3.generate({
@@ -110,8 +111,10 @@ Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
                     rotate: 45,
                     multiline: false,
                     //              format : '%Y-%m-%d %H:%M:%S',
-                    count : 30,
+                    count : 60,
+                    fit: true,
                     format : '%H:%M:%S',
+                    //format : '%H:%M',
                 }
             },
             y: {
@@ -120,7 +123,7 @@ Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
                     position: 'outer-middle'
                 },
                 max: 90,
-                min: 30,
+                min: humibase,
                 padding: {top:0, bottom:0}
             },
             y2: {
@@ -131,18 +134,18 @@ Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
                 },
                 
                 
-                {% if (tempvalues[-1]|float > tSPHigh|float) %}
-                    max:  {{ tempvalues[-1] }} + 0.2,
+                {% if (tMax|float > tSPHigh|float) %}
+                    max:  {{ tMax }} + 0.5,
                 {% else %}
-                    max:  {{ tSPHigh }} + 0.2,
+                    max:  {{ tSPHigh }} + 0.5,
                 {% endif %}
                     
                 //min: {{tempvalues[-1]}} - tspan+1,
                 //max:  {{tSPHigh}} + 6,
-                {% if tempvalues[-1]|float < tSPLow|float %}
-                    min:  {{ tempvalues[-1] }} - 0.2,
+                {% if tMin|float < tSPLow|float %}
+                    min:  {{ tMin }} - 0.5,
                 {% else %}
-                    min:  {{ tSPLow }} - 0.2,
+                    min:  {{ tSPLow }} - 0.5,
                 {% endif %}
  
                 //min: {{tSPLow}} -0.5,
@@ -169,19 +172,6 @@ Enter Hours: <input type="text" name="Hours" value="3.0" id='hours' >
         }
     });
     
-    //setTimeout(function () {
-    //chart.transform('bar', 'temperature');
-//}, 1000);
-
-    //setTimeout(function () {
-    ////    chart.transform('area-spline');
-        //chart.transform('area', 'temperature');
-    //}, 1000);
-
-//setTimeout(function () {
-    //chart.transform('area', 'temperature');
-////    chart.transform('area', 'temperature');
-//}, 1000);
 
 </script>
 <script>

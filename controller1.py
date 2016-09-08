@@ -24,11 +24,13 @@ long_line_column=72
 
 [files]
 current_page=4
-FILE_NAME_0=17129;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fcontrol.py;0;4
-FILE_NAME_1=1213;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fsettings.py;0;4
+FILE_NAME_0=16748;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fcontrol.py;0;4
+FILE_NAME_1=173;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fsettings.py;0;4
 FILE_NAME_2=1217;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fhardware.py;0;4
-FILE_NAME_3=2871;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fenvctl.py;0;4
-FILE_NAME_4=4769;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Ftemplates%2Fmultitc3.html;0;4
+FILE_NAME_3=6712;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Fenvctl.py;0;4
+FILE_NAME_4=1623;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Ftemplates%2Fmultitc3.html;0;4
+FILE_NAME_5=1192;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Ftemplates%2Flayout.html;0;4
+FILE_NAME_6=5227;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontroller1%2Ftemplates%2Fstatus.html;0;4
 
 [VTE]
 last_dir=/root

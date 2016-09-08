@@ -1,10 +1,9 @@
-#To be able to read csv formated files, we will first have to import the
-#csv module.
+
 import csv
 
-csvfilename = '/home/pi/projects/controller1/thdata.csv'
-csv_path = "/home/pi/projects/controller1/thdata.csv"
-oppath = "/home/pi/projects/controller1/thdatacleaned.csv"
+csvfilename = '/home/pi/projects/controlleroo/thdata.csv'
+csv_path = "/home/pi/projects/controlleroo/thdata.csv"
+oppath = "/home/pi/projects/controlleroo/thdatacleaned.csv"
 
 import csv
 
@@ -26,7 +25,7 @@ def csv_reader(file_obj):
     for row in reader:
 
 #        print(",".join(row))
-        if (float(row[1]) > 35.0) or (float(row[1]) < 10.0) or (float(row[2]) > 100.0) or (float(row[2]) < 20.0):
+        if (float(row[1]) > 35.0) or (float(row[1]) < 15.0) or (float(row[2]) > 100.0) or (float(row[2]) < 20.0):
             print('skipping row ',row)
         else:
             #write row back to new file

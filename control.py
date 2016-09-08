@@ -1,502 +1,610 @@
 #!/usr/bin/env python
 # control.py
 # control for enviro controller
-#
 
-#================platform specific imports===========================
-import settings
-import hardware as hw
-
-#===================general imports=====================================
-import sys
-import time
-import datetime
-from datetime import timedelta
+# ===================general imports=====================================
 import csv
-import sendemail as emailMe
+import datetime
+import time
+from datetime import timedelta
 
+import hardware as hw
+import settings
+from support import round_time as round_time
 
-#============targets/settings/tuneable params from settings file========
-tempLOnSP = settings.tempLOnSP   #temp set point max with lon
-tempLOffSP = settings.tempLOffSP #target = 16.9, target loff
-temp_max = settings.temp_max #26
-readDelay = settings.readDelay
-minCSVWriteInterval = settings.minCSVWriteInterval  #3 * 60 * 1000 #interval min bet csv writes
+# ============targets/settings/tuneable params from settings file========
+#temp_alarm = settings.temp_alarm  # 26
+#readDelay = settings.readDelay
+#minCSVWriteInterval = settings.min_CSV_write_interval  # 3 * 60 * 1000 #interval min bet csv writes
 
-#----L control params----
-onHours = settings.onHours #hours when l on
-heatOffHours = settings.heatOffHours    #hours when heater should NOT operate
+# ----L control params----
+#onHours = settings.on_hours  # hours when l on
+#heat_off_hours = settings.heat_off_hours  # hours when heater should NOT operate
 
-OFF = settings.OFF #state for relay OFF
-ON = settings.ON  #state for on
+OFF = settings.OFF  # state for relay OFF
+ON = settings.ON  # state for on
 
-
-heaterOnDelta = settings.heaterOnDelta  #min time heater is on or off for
-heaterOffDelta = settings.heaterOffDelta #min time heater is on or off for
-
-ventOnDelta = settings.ventOnDelta      #duration vent is on in millis
-ventOffDelta = settings.ventOffDelta    #vent off duration in miili sec
-ventPulseOnDelta = settings.ventPulseOnDelta    #20 * 1000 #60 secs cooling on delta
-
-fanOnDelta = settings.fanOnDelta    #vent on time
-fanOffDelta = settings.fanOffDelta  #vent off time
-
-path = settings.dataPath    
+path = settings.dataPath
 extraPath = settings.extraPath
 
-#===========initial settings============================================
-temperature = 20    #global temp var
-humidity = 50   #global humidity var
-procTemp = temperature
+# ===========initial settings============================================
+#temperature = 20  # global temp var
+#humidity = 50  # global humidity var
+#procTemp = temperature
 
-#related global vars
-heaterState = OFF
-ventState = ON
-fanState = ON
-ventSpeedState = OFF
-lState = OFF
+# initial state parameter global var values
+#heaterState = OFF
+#ventState = ON
+#fanState = ON
+#ventSpeedState = OFF
+#lState = OFF
 
-#=================initialised global vars etc===========================
-currentMillis = 0
-previousTemperature = 24
-previousProcTemp = 24
-previousHumidity = 40
-previousHeaterState = ON
-previousVentState = OFF
-previousFanState = OFF
-previousVentSpeedState = OFF
-prevTempHumiMillis = 0  #previous time  sensors routine called and data read
+# =================initialised global vars etc===========================
+#currentMillis = 0
+#previousTemperature = 24
+#previousProcTemp = 24
+#previousHumidity = 40
 
-prevHeaterMillis = 0   #last time heater switched on or off
+#previousHeaterState = ON
+#previousVentState = OFF
+#previousFanState = OFF
+#previousVentSpeedState = OFF
+#prevTempHumiMillis = 0  # previous time  sensors routine called and data read
+#prevHeaterMillis = 0  # last time heater switched on or off
 
 # Vent control parameters
-prevVentMillis = 0
-ventPulseActive = False
-ventOverride = OFF
+#prevVentMillis = 0
+#ventPulseActive = False
+#ventOverride = OFF
 
-#Fan control parameters
-prevFanMillis = 0   #last time vent state updated
-previousCSVWriteMillis = 0 #last time CSV file row added
+# Fan control parameters
+#prevFanMillis = 0  # last time vent state updated
+#previousCSVWriteMillis = 0  # last time CSV file row added
 
-#general time use params
-startMillis = 0    #time at start of program execution
-currentTime = 0
-start_time = time.time()
-up_time = time.time()
+# general time use params
+#startMillis = 0  # time at start of program execution
+#currentTime = 0
+#start_time = time.time()
+#up_time = time.time()
 
-#============================common code start==========================
-def delay(ms):
-    time.sleep(1.0*ms/1000)
- 
-def setup():
-    hw.setupIOPins()
-    hw.powerCycleSensor()
-   
-def readTempHumi():
-    #read till ret 0-ok. timeout if no valid data after timeout
-    global currentMillis        #current time
-    global prevTempHumiMillis   #last time sensor read
-    global procTemp # processedsed / filter temp reading
-    global temperature
-    global humidity
-    
-    print "..try to read sensor"
-    readErrs = 0    #reset err count
-    prevTemp = temperature
-    prevHumi = humidity
-    
-    delay(readDelay)
-    humidity, temperature = hw.readSensor()    # get temp, huni
-    #repeat read until valid data or too many errorserror
-    while (humidity is None or temperature is None) and readErrs < 10:
-        print('..ERROR TRYING TO READ SENSOR on sensor read-')
-        readErrs += 1
-        delay(readDelay) #wait secs before re-read
-        humidity, temperature = hw.readSensor()    # get temp, humi
 
-    if readErrs == 10:  # powercyle if 10 read errors
-        hw.powerCycleSensor()
-        print "..POWER CYCLE during sensor read++++"
-        print '..DODGY TEMP READING USING - OLD VALS---------------- '
-        if settings.emailEnabled == True:
-            message = 'Power cycling sensor due to too many errors'
-            emailMe.sendemail('PowerCycle', message)
-        temperature = prevTemp  #restore prev sample readings
-        humidity = prevHumi
-    else:#good read if here
-        if ( abs(temperature - prevTemp) < 10) and ( (humidity >= 10)
-            and (humidity <= 100)): #if temp diff smallish, assume good sample
-            print( "..read sensor SUCCESS" )
-            prevTempHumiMillis = currentMillis
-            temperature = round(temperature, 1)
-            humidity = round(humidity, 1)
-            
-            #filter temp function
-            procTemp = procTemp + ( 0.333 * (temperature - procTemp))
-            procTemp = round(procTemp, 3)
-            print '..temp: %2.1f, procTemp: %2.1f, humi: %2.1f' %(temperature, procTemp, humidity)
+# ============================common code start==========================
+
+class Relay(object):
+    def __init__(self):
+        print("creating relay - dummy so far")
+
+
+class Vent(object):
+    def __init__(self):
+        print("creating vent")
+        self.state = OFF
+        self.speed_state = OFF
+        self.prev_vent_millis = 0  # last time vent state updated
+        self.vent_on_delta = settings.ventOnDelta  # vent on time
+        self.vent_off_delta = settings.ventOffDelta  # vent off time
+        self.vent_pulse_active = OFF  # settings.ventPulseActive
+        self.vent_pulse_delta = 0  # ventPulseDelta
+        self.vent_pulse_on_delta = settings.ventPulseOnDelta
+        self.vent_override = OFF  # settings.ventOverride
+
+    def control(self, current_temp, target_temp, d_state, current_millis):
+        print('.Vent ctl')
+
+
+        if d_state == ON:
+            self.speed_state = ON  # high speed
         else:
-            #bad sample even though good crc
-            print '..DODGY TEMP READING USING - OLD VALS---------------- '
-            if settings.emailEnabled == True:
-                message = 'Readings, Temp = '+ str(temperature) + ',  Humi = '+ str(humidity)
-                emailMe.sendemail('Spike in Reading', message)
-            temperature = prevTemp  #restore prev sample readings
-            humidity = prevHumi
-    
-    return humidity, temperature
+            self.speed_state = OFF  # lo speed
+
+        if current_temp > target_temp:
+            self.vent_override = ON
+            self.state = ON
+            self.prev_vent_millis = current_millis  # retrigeer time period
+            print("..VENT ON - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
+        elif (self.vent_override == ON) and ((current_millis - self.prev_vent_millis) >= self.vent_pulse_on_delta):  # temp below target, change state to OFF after pulse delay
+            self.state = OFF
+            self.vent_override = OFF
+            self.prev_vent_millis = current_millis
+            print("..VENT OFF - temp ok, OVERRIDE - OFF")
+        elif self.vent_override == ON:
+            print('..Vent on - override in progress')
+
+        # periodic vent control - only execute if vent ovveride not active
+        if self.vent_override == OFF:  # process periodic vent activity
+            if self.state == OFF:  ##if the vent is off, we must wait for the interval to expire before turning it on
+                ## iftime is up, so change the state to ON
+                if current_millis - self.prev_vent_millis >= self.vent_off_delta:
+                    self.state = ON
+                    print("..VENT ON cycle period start")
+                    self.prev_vent_millis = current_millis
+                else:
+                    print('..Vent off - during cycle OFF period')
+            else:
+                # vent is on, we must wait for the duration to expire before turning it off
+                if (current_millis - self.prev_vent_millis) >= self.vent_on_delta:  # time up, change state to OFF
+                    self.state = OFF
+                    print("..VENT OFF cycle period start")
+                    self.prev_vent_millis = current_millis
+                else:
+                    print('..Vent on - during cycle ON period')
+        
+        #self.state = ON
+        
+        print(' ')
+        return
 
 
-def heatControl(currTemp, tempSP):
-    print '.Heat ctl'
-    #add hysteresis with time delay between poss chnages to heater
-    global heaterState
-    global heaterOffDelta #min time heater is on or off for
-    global heaterOnDelta #min time heater is on or off for
-    global currentMillis
-    global prevHeaterMillis   #last time heater switched on or off
+class Fan(object):
+    def __init__(self):
+        print("Creating fan")
+        self.state = OFF
+        self.prev_fan_millis = 0  # last time vent state updated
+        self.fan_on_delta = settings.fan_on_t  # vent on time
+        self.fan_off_delta = settings.fan_off_t  # vent off time
 
-    
-    if currTemp >= tempSP:#if over temp immediately turn off
-        heaterState = OFF
-        print "..temp over sp - HEATER OFF"
-        prevHeaterMillis = currentMillis
-    elif (heaterState == ON):  #t below tsp if time is up, so change the state to OFF
-        if (currentMillis - prevHeaterMillis >= heaterOnDelta):
-            heaterState = OFF
-            print "..in cycle - HEATER OFF"
-            prevHeaterMillis = currentMillis
+    def control(self, current_millis):
+        print('.fan ctl')
+        # if fan off, we must wait for the interval to expire before turning it on
+        print('current millis ', current_millis)
+        print('..current fan state ', self.state)
+        if self.state == OFF:
+            # iftime is up, so change the state to ON
+            if current_millis - self.prev_fan_millis >= self.fan_off_delta:
+                self.state = ON
+                print("..FAN ON")
+                self.prev_fan_millis = current_millis
+        # else if fanState is ON
         else:
-            print('..Heater on - during low temp heat pulse')
-    elif (currentMillis - prevHeaterMillis >= heaterOffDelta):#heater is off, turn on after delta
-        heaterState = ON
-        print "..in cycle - HEATER ON"
-        prevHeaterMillis = currentMillis
-    else:
-        print "..in cycle - during heat OFF period"
-    
-    print(' ')
-    return
+            # time is up, so change the state to LOW
+            if (current_millis - self.prev_fan_millis) >= self.fan_on_delta:
+                self.state = OFF
+                print("..FAN OFF")
+                self.prev_fan_millis = current_millis
+        #self.state = ON
+        return
 
-        
-        
 
-def ventControl(currTemp, targetTemp, ventSpeed):
-    print '.Vent ctl'
-    #vent routine and temp ovveride
-    global ventState
-    global currentMillis        #current time
-    global prevVentMillis   #last time vent state updated
-    global ventOnDelta    #vent on time
-    global ventOffDelta #vent off time
-    global ventPulseActive
-    global ventPulseDelta
-    global ventPulseOnDelta
-    global ventOverride
-    global ventSpeedState
+class Heater(object):
+    def __init__(self):
+        print("creating heater")
+        self.state = OFF
+        self.heater_off_delta = settings.heater_off_t  # min time heater is on or off for
+        self.heater_on_delta = settings.heater_on_t  # min time heater is on or off for
+        self.prev_heater_millis = 0  # last time heater switched on or off
 
-    ventSpeedState = ventSpeed
-    if currTemp > targetTemp:
-        ventOverride = ON
-        ventState = ON
-        prevVentMillis = currentMillis  #retrigeer time period
-        print "..VENT ON - HI TEMP OVERRIDE - (Re)Triggering cooling pulse"
-    elif ( (ventOverride == ON) and ((currentMillis - prevVentMillis) >= ventPulseOnDelta) ):#temp below target, change state to OFF after pulse delay
-            ventState = OFF
-            ventOverride = OFF
-            prevVentMillis = currentMillis
-            print "..VENT OFF - temp ok, OVERRIDE - OFF"
-    elif ventOverride == ON:
-        print('..Vent on - override in progress')
-        
-    #periodic vent control - only execute if vent ovveride not active
-    if ventOverride == OFF: #process periodic vent activity
-        if (ventState == OFF): ##if the vent is off, we must wait for the interval to expire before turning it on 
-            ## iftime is up, so change the state to ON
-            if (currentMillis - prevVentMillis >= ventOffDelta):
-                ventState = ON
-                print "..VENT ON cycle period start"
-                prevVentMillis = currentMillis
+    def control(self, current_temp, target_temp, current_millis, d_state):
+        print('.Heat ctl')
+        #if d_state == ON:
+        current_hour = datetime.datetime.now().hour
+        if current_hour in settings.heat_off_hours:  # l on and not 10:xx pm
+            print('..d on, in heat off hours - skipping lon heatctl')
+        else:#d state on or off here
+            print('..do lon or off heatctl')
+            if current_temp >= target_temp:  # if over temp immediately turn off
+                self.state = OFF
+                print("...temp over sp - HEATER OFF")
+                self.prev_heater_millis = current_millis
+            elif self.state == ON:  # t below tsp if time is up, so change the state to OFF
+                if current_millis - self.prev_heater_millis >= self.heater_on_delta:
+                    self.state = OFF
+                    print("...in heat auto cycle - switch HEATER OFF")
+                    self.prev_heater_millis = current_millis
+                else:
+                    print('...in heat auto cycle - Heater still on - during low temp heat pulse')
+            elif current_millis - self.prev_heater_millis >= self.heater_off_delta:  # heater is off, turn on after delta
+                self.state = ON
+                print("...in heat auto cycle - switch HEATER ON")
+                self.prev_heater_millis = current_millis
             else:
-                print('..Vent off - during cycle OFF period')
-        else:
-            #vent is on, we must wait for the duration to expire before turning it off
-            if (currentMillis - prevVentMillis) >= ventOnDelta:#time up, change state to OFF
-                ventState = OFF
-                print "..VENT OFF cycle period start"
-                prevVentMillis = currentMillis
-            else:
-                print('..Vent on - during cycle ON period')
-    print(' ')
-    return
+                print("...in heat auto cycle - during heat OFF period")
+        #else:   
+            #print("..in d-off, no heat ctl")
 
-def doFanControl():
-    print '.fan ctl'
-    global fanState
-    global currentMillis        #current time
-    global prevFanMillis   #last time vent state updated
-    global fanOnDelta    #vent on time
-    global fanOffDelta #vent off time
-    
-    #if fan off, we must wait for the interval to expire before turning it on
-    if (fanState == OFF):  
-        # iftime is up, so change the state to ON
-        if (currentMillis - prevFanMillis >= fanOffDelta):
-            fanState = ON
-            print "..FAN ON"
-            prevFanMillis = currentMillis
-    #else if fanState is ON
-    else:
-        #time is up, so change the state to LOW
-        if (currentMillis - prevFanMillis) >= fanOnDelta:
-            fanState = OFF
-            print "..FAN OFF"
-            prevFanMillis = currentMillis
+        print(' ')
+        return
 
-def writeToCSV():
-    #print 'write to csv'
-    global currentTime
-    global temperature
-    global humidity
-    global heaterState
-    global ventState
-    global fanState
-    global ventSpeedState
-    global previousCSVWriteMillis
-    global currentMillis        #current time
-    global dataLogInterval    #vent on time
-    global minCSVWriteInterval  #csv log write min interval
-     
-    #path = "/home/pi/projects/controller1/thdata.csv"
-    data =['time','temp','humi','heaterstate','ventstate','fanstate','procTemp']
-    data[0] = roundTime(currentTime, 1) #round timestamp to nearest second
-    data[1] = temperature
-    data[2] = humidity
-    if heaterState== OFF:
-        data[3] = 0;    #off line on graph
-    else:
-        data[3] = 1    #on line on graph
-    if ventState == OFF:
-        data[4] = 0    #off line on graph
-    if ventState == ON:
-        if ventSpeedState == OFF:#vent on andspeed ==low
-            data[4] = 1    #on line on graph
-        if ventSpeedState == ON:#vent on and hi speed
-            data[4] = 2    #on line on graph
-    if fanState== OFF:
-        data[5] = 0;    #off line on graph
-    else:
-        data[5] = 1    #on line on graph
+
+class Logger(object):
+    # roundT = roundTime
+    def __init__(self):
+        print("creating logger object")
+        self.temperature = 0
+        self.humidity = 0
+        self.heater_state = OFF
+        self.vent_state = OFF
+        self.fan_state = OFF
+        self.vent_speed_state = OFF
+        self.current_millis = 0
+        self.current_time = 0
+
+
+        self.previous_temperature = 0
+        self.previous_humidity = 0
+        self.previous_heater_state = OFF
+        self.previous_vent_state = OFF
+        self.previous_fan_state = OFF
+        self.previous_vent_speed_state = OFF
+        self.previous_proc_temp = 0
+        # self.previousHeater = 0
+        self.previous_CSV_write_millis = 0
+        self.min_CSV_write_interval = settings.min_CSV_write_interval
+        # self.writeExtraDataToCSV()
         
-    data[6] = round(procTemp, 1)  #add processed temp value
-    print data
-    with open(path, "ab") as csv_file:
-        writer = csv.writer(csv_file, delimiter=',')
-        #for line in data:
-        writer.writerow(data)
-        previousCSVWriteMillis = currentMillis  #note time row written
+    def write_edge_change(self, state, previous_state):
+        if previous_state == OFF:  # must be going OFF to ON
+            # write a low record immediately before hi record
+            print("----- write edge func -- new prev low row appended to CSV -----")
+            state[0] = OFF
+            self._write_to_CSV()
+            state[0] = ON  # restore to actual current val
+            self._write_to_CSV()
 
-def writeExtraDataToCSV():
-    extraData = ['time','temp', 'procTemp','round-procTemp']
-    extraData[0] = roundTime(currentTime, 1) #round timestamp to nearest second
-    extraData[1] = temperature
-    extraData[2] = procTemp
-    extraData[3] = round(procTemp, 1)
-    with open(extraPath, "ab") as csv_file:
-        writer = csv.writer(csv_file, delimiter=',')
-        #for line in data:
-        writer.writerow(extraData)
-    
-def updateCSVIfChanges():
-    global previousTemperature
-    global previousHumidity
-    global previousHeaterState
-    global previousVentState
-    global previousFanState
-    global previousVentSpeedState
-    global previousProcTemp
-    global ventState
-    global fanState
-    global heaterState
-    global ventSpeedState
-    global previousHeater
-    global previousCSVWriteMillis
-    
-    writeExtraDataToCSV()
-    
-    # update csv if any chanmge
-    #check for changes in vent values
-    if (ventState <> previousVentState): # any change in vent
-        if previousVentState == OFF:  #must be going OFF to ON
-            #write a low record immediately before hi record
-            print "----- new prevvent low row appended to CSV -----"
-            ventState = OFF
-            writeToCSV()
-            ventState = ON  #restore to actual current val
-        if previousVentState == ON:   # must be going ON TO OFF
-            #write a on record immediately before hi record
-            print "----- new hi row appended to CSV -----"
-            ventState = ON
-            writeToCSV()
-            ventState = OFF  #restore to actual current val
-            
-    if (ventSpeedState <> previousVentSpeedState): # any change in vent speed
-        if previousVentSpeedState == OFF:  #was lo speed
-            #write a low record immediately before hi record
-            print "----- new low row appended to CSV -----"
-            ventSpeedState = OFF
-            writeToCSV()
-            ventSpeedState = ON  #restore to actual current val
-            writeToCSV()
-        else:   #was hi speed going low
-            #write a on record immediately before hi record
-            print "----- new hi row appended to CSV -----"
-            ventSpeedState = ON
-            writeToCSV()
-            ventSpeedState = OFF  #restore to actual current val
-            writeToCSV()
-    
-    if (fanState <> previousFanState): # any change in vent
-        if previousFanState == OFF:  #must be going OFF to ON
-            #write a low record immediately before hi record
-            print "----- new low row appended to CSV -----"
-            fanState = OFF
-            writeToCSV()
-            fanState = ON  #restore to actual current val
-        else:   # must be going ON TO OFF
-            #write a on record immediately before hi record
-            print "----- new hi row appended to CSV -----"
-            fanState = ON
-            writeToCSV()
-            fanState = OFF  #restore to actual current val
-            
-    if (heaterState <> previousHeaterState): # any change in vent
-        if previousHeaterState == OFF:  #must be going OFF to ON
-            #write a low record immediately before hi record
-            print "----- new low row appended to CSV -----"
-            heaterState = OFF
-            writeToCSV()
-            heaterState = ON  #restore to actual current val
-        else:   # must be going ON TO OFF
-            #write a on record immediately before hi record
-            print "----- new hi row appended to CSV -----"
-            heaterState = ON
-            writeToCSV()
-            heaterState = OFF  #restore to actual current val
-            
-    if ( (currentMillis > (previousCSVWriteMillis + minCSVWriteInterval))
-            or (heaterState <> previousHeaterState) 
-            or (ventState <> previousVentState) 
-            or (ventSpeedState <> previousVentSpeedState) 
-            or (round(procTemp,1) <> round(previousProcTemp,1)) 
-            or (fanState <> previousFanState)  or (temperature <> previousTemperature) ): # any change
-            #: # 
+        if previous_state == ON:  # must be going ON TO OFF
+            # write a on record immediately before hi record
+            print("----- new prev hi row appended to CSV -----")
+            state[0] = ON
+            self._write_to_CSV()
+            state[0] = OFF  # restore to actual current val
+            self._write_to_CSV()
 
-        if (currentMillis > (previousCSVWriteMillis + minCSVWriteInterval)):
-            print "..time for new CSV write"
-        else:
-            print "..new data row appended to CSV cos of some change"
-        writeToCSV()
-        previousTemperature = temperature
-        previousHumidity = humidity
-        previousHeaterState = heaterState
-        previousVentState = ventState
-        previousFanState = fanState
-        previousVentSpeedState = ventSpeedState
-        previousProcTemp = procTemp
-        previousCSVWriteMillis = currentMillis
- 
-def roundTime(dt=None, roundTo=60):
-   """Round a datetime object to any time laps in seconds
-   dt : datetime.datetime object, default now.
-   roundTo : Closest number of seconds to round to, default 1 minute.
-   Author: Thierry Husson 2012 - Use it as you want but don't blame me.
-   """
-   if dt == None : dt = datetime.datetime.now()
-   seconds = (dt - dt.min).seconds
-   # // is a floor division, not a comment on following line:
-   rounding = (seconds+roundTo/2) // roundTo * roundTo
-   return dt + datetime.timedelta(0,rounding-seconds,-dt.microsecond)
-   
-def updateCurrentMillis():
-    global currentTime
-    global currentMillis
-    global startMillis 
-       
-    currentTime = datetime.datetime.now()   #get current time
-    delta = currentTime - startMillis   #calc elapsed delta since program began
-    currentMillis = int(delta.total_seconds() * 1000)
-        
-def  getLState():
-    """ Function doc """
-    global lState
-    global tLOn
-    global tLOff
 
-    #if time between 7am and 7pm L on else L off
-    currentHour = datetime.datetime.now().hour
-    if currentHour in onHours:
-        lState = ON
-    else:
-        lState = OFF
+    def update_CSV_If_changes(self, temperature, humidity, vent_state,
+                              fan_state, heater_state, vent_speed_state, current_millis,
+                              current_time, proc_temp):
+        self.temperature = temperature
+        self.humidity = humidity
+        self.vent_state = vent_state
+        self.fan_state = fan_state
+        self.heater_state = heater_state
+        self.vent_speed_state = vent_speed_state
+        self.current_millis = current_millis
+        self.current_time = current_time
+        self.proc_temp = proc_temp
         
-def main():
-    global startMillis
-    global temperature
-    global humidity
-    global procTemp
-    global lState
-    global ventState
-    global fanState
-    global heaterState
-    global ventSpeedState
-   
-    print("---Powering up the device---")
-    
-    start_time = time.time()
-    startMillis = datetime.datetime.now()   # get time at start of program execution
-    setup()
-    humidity, temperature = readTempHumi()
-    procTemp = temperature
- 
-    while(1):
-        print 'main'
-        #print(roundTime(currentTime, 1))
-        updateCurrentMillis() 
-        getLState()
-        humidity, temperature = readTempHumi()
-        doFanControl()        
-        
-        if lState == ON:
-            print('.LON')
-            #heat
-            currentHour = datetime.datetime.now().hour
-            if currentHour in heatOffHours:  #l on and not 10:xx pm
-                print('xx skipping lon heatctl')
-            else:
-                print('xx do lon heatctl')
-                heatControl(temperature, tempLOnSP)
-            #vent    
-            if temperature > tempLOnSP + 0.2:  #if over temp by ? deg
-                ventHiSpeed = ON    #setFanSpeed(fanSpeedHigh)
-            else:
-                ventHiSpeed = OFF   #lo speed
-            ventControl(temperature, tempLOnSP, ventHiSpeed)
+        self.state_changed = False
+        # check each for state change and set new prewrite states
+        if self.vent_state != self.previous_vent_state:  # any change in vent
+            if self.previous_vent_state == OFF:  # must be going OFF to ON
+                # write a low record immediately before hi record
+                print("----- new prevvent low row appended to CSV -----")
+                self.vent_state = OFF
+                self.state_changed = True
+            else: # if self.previous_vent_state == ON:  # must be going ON TO OFF
+                # write a on record immediately before hi record
+                print("----- new prevvent hi row appended to CSV -----")
+                self.vent_state = ON
+                self.state_changed = True
                 
-        if lState == OFF:
-            print('.LOFF')
-            heatControl(temperature, tempLOffSP)
-            ventHiSpeed = OFF   #ensure low speed if light off
-            ventControl(temperature, tempLOffSP, ventHiSpeed)
+        if self.vent_speed_state != self.previous_vent_speed_state:  # any change in vent speed
+            if self.previous_vent_speed_state == OFF:  # was lo speed
+                # write a low record immediately before hi record
+                print("----- new prevvspeed low row appended to CSV -----")
+                self.vent_speed_state = OFF
+                self.state_changed = True
+            else:  # was hi speed going low
+                # write a on record immediately before hi record
+                print("----- new prevvspeed hi row appended to CSV -----")
+                self.vent_speed_state = ON
+                self.state_changed = True
 
-        hw.switchRelays(heaterState, ventState, fanState, ventSpeedState)  #switch relays according to State vars
-        updateCSVIfChanges()#write to csv if any state changes
+        if self.fan_state != self.previous_fan_state:  # any change in vent
+            if self.previous_fan_state == OFF:  # must be going OFF to ON
+                # write a low record immediately before hi record
+                print("----- new prevfanstate low row appended to CSV -----")
+                self.fan_state = OFF
+                self.state_changed = True
+            else:  # must be going ON TO OFF
+                # write a on record immediately before hi record
+                print("----- new  prevfanstate hi row appended to CSV -----")
+                self.fan_state = ON
+                self.state_changed = True
+
+        if self.heater_state != self.previous_heater_state:  # any change in vent
+            if self.previous_heater_state == OFF:  # must be going OFF to ON
+                # write a low record immediately before hi record
+                print("----- new heaterstate low row appended to CSV -----")
+                self.heater_state = OFF
+                self.state_changed = True
+            else:  # must be going ON TO OFF
+                # write a on record immediately before hi record
+                print("----- new  heaterstate hi row appended to CSV -----")
+                self.heater_state = ON
+                self.state_changed = True
+                
+        #if ((self.temperature != self.previous_temperature)):  # any change
+            #self.state_changed = True
+
+        if self.state_changed == True:
+            self._write_to_CSV()    #write modded pre change state(s)
+            self.vent_state = vent_state
+            self.vent_speed_state = vent_speed_state
+            self.heater_state = heater_state
+            self.fan_state = fan_state
+            self._write_to_CSV()    #write modded post change state(s)
+            self.previous_CSV_write_millis = self.current_millis #reset timer
+        else: #no state change check temp and timer
+            if ((self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval))
+                    or (self.temperature != self.previous_temperature)):  # any change
+                if self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval):
+                    print("..interval passed ..time for new CSV write")
+                else:
+                    print("..new data row appended to CSV cos of temp change")
+                self._write_to_CSV()
+                self.previous_CSV_write_millis = self.current_millis #reset timer
+
+            
+        self.previous_temperature = self.temperature
+        self.previous_humidity = self.humidity
+        self.previous_heater_state = self.heater_state
+        self.previous_vent_state = self.vent_state
+        self.previous_fan_state = self.fan_state
+        self.previous_vent_speed_state = self.vent_speed_state
+        self.previous_proc_temp = self.proc_temp
+        #self.previous_CSV_write_millis = self.current_millis
+
+        return
         
+        
+        
+    def update_CSV_If_changes_OLD(self, temperature, humidity, vent_state,
+                              fan_state, heater_state, vent_speed_state, current_millis,
+                              current_time, proc_temp):
+        self.temperature = temperature
+        self.humidity = humidity
+        self.vent_state = vent_state
+        self.fan_state = fan_state
+        self.heater_state = heater_state
+        self.vent_speed_state = vent_speed_state
+        self.current_millis = current_millis
+        self.current_time = current_time
+        self.proc_temp = proc_temp
+        
+        # update csv if any change
+        # check for changes in vent values
+        
+        if self.vent_state != self.previous_vent_state:  # any change in vent
+            #self.write_edge_change( vent_state, self.previous_vent_state)
+
+            if self.previous_vent_state == OFF:  # must be going OFF to ON
+                # write a low record immediately before hi record
+                print("----- new prevvent low row appended to CSV -----")
+                self.vent_state = OFF
+                self._write_to_CSV()
+                self.vent_state = ON  # restore to actual current val
+                self._write_to_CSV()
+
+            if self.previous_vent_state == ON:  # must be going ON TO OFF
+                # write a on record immediately before hi record
+                print("----- new prevvent hi row appended to CSV -----")
+                self.vent_state = ON
+                self._write_to_CSV()
+                self.vent_state = OFF  # restore to actual current val
+                self._write_to_CSV()
+
+        if self.vent_speed_state != self.previous_vent_speed_state:  # any change in vent speed
+            if self.previous_vent_speed_state == OFF:  # was lo speed
+                # write a low record immediately before hi record
+                print("----- new prevvspeed low row appended to CSV -----")
+                self.vent_speed_state = OFF
+                self._write_to_CSV()
+                self.vent_speed_state = ON  # restore to actual current val
+                self._write_to_CSV()
+            else:  # was hi speed going low
+                # write a on record immediately before hi record
+                print("----- new prevvspeed hi row appended to CSV -----")
+                self.vent_speed_state = ON
+                self._write_to_CSV()
+                self.vent_speed_state = OFF  # restore to actual current val
+                self._write_to_CSV()
+
+        if self.fan_state != self.previous_fan_state:  # any change in vent
+            #pbref=[self.fan_state]
+            #self.write_edge_change(', self.previous_fan_state)
+
+            if self.previous_fan_state == OFF:  # must be going OFF to ON
+                # write a low record immediately before hi record
+                print("----- new prevfanstate low row appended to CSV -----")
+                self.fan_state = OFF
+                self._write_to_CSV()
+                self.fan_state = ON  # restore to actual current val
+                self._write_to_CSV()
+
+            else:  # must be going ON TO OFF
+                # write a on record immediately before hi record
+                print("----- new  prevfanstate hi row appended to CSV -----")
+                self.fan_state = ON
+                self._write_to_CSV()
+                self.fan_state = OFF  # restore to actual current val
+                self._write_to_CSV()
+
+
+        if self.heater_state != self.previous_heater_state:  # any change in vent
+            if self.previous_heater_state == OFF:  # must be going OFF to ON
+                # write a low record immediately before hi record
+                print("----- new heaterstate low row appended to CSV -----")
+                self.heater_state = OFF
+                self._write_to_CSV()
+                self.heater_state = ON  # restore to actual current val
+                self._write_to_CSV()
+            else:  # must be going ON TO OFF
+                # write a on record immediately before hi record
+                print("----- new  heaterstate hi row appended to CSV -----")
+                self.heater_state = ON
+                self._write_to_CSV()
+                self.heater_state = OFF  # restore to actual current val
+                self._write_to_CSV()
+
+        if ((self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval))
+                or (self.temperature != self.previous_temperature)):  # any change
+            if self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval):
+                print("..interval passed ..time for new CSV write")
+            else:
+                print("..new data row appended to CSV cos of temp change")
+            self._write_to_CSV()
+            self.previous_CSV_write_millis = self.current_millis
+            
+        self.previous_temperature = self.temperature
+        self.previous_humidity = self.humidity
+        self.previous_heater_state = self.heater_state
+        self.previous_vent_state = self.vent_state
+        self.previous_fan_state = self.fan_state
+        self.previous_vent_speed_state = self.vent_speed_state
+        self.previous_proc_temp = self.proc_temp
+        
+
+        return
+
+
+    def _write_to_CSV(self):
+        print('..write data line to CSV')
+        data = ['time', 'temp', 'humi', 'heaterstate', 'ventstate', 'fanstate', 'procTemp']
+        data[0] = round_time(self.current_time, 1)  # round timestamp to nearest second
+        data[1] = self.temperature
+        data[2] = self.humidity
+        if self.heater_state == OFF:
+            data[3] = 0  # off line on graph
+        else:
+            data[3] = 1  # on line on graph
+        if self.vent_state == OFF:
+            data[4] = 0  # off line on graph
+        if self.vent_state == ON:
+            if self.vent_speed_state == OFF:  # vent on andspeed ==low
+                data[4] = 1  # on line on graph
+            if self.vent_speed_state == ON:  # vent on and hi speed
+                data[4] = 2  # on line on graph
+        if self.fan_state == OFF:
+            data[5] = 0  # off line on graph
+        else:
+            data[5] = 1  # on line on graph
+
+        data[6] = round(self.proc_temp, 1)  # add processed temp value
+        print(data)
+        with open(path, "ab") as csv_file:
+        #with open(path, 'w', newline='') as csv_file:
+            writer = csv.writer(csv_file, delimiter=',')
+            # for line in data:
+            # outfile.write(bytes(plaintext, 'UTF-8'))
+            writer.writerow(data)
+            self.previous_CSV_write_millis = self.current_millis  # note time row written
+
+        return
+
+    def _write_extra_data_to_CSV(self):
+        extra_data = ['time', 'temp', 'procTemp', 'round-procTemp']
+        extra_data[0] = round_time(self.current_time, 1)  # round timestamp to nearest second
+        extra_data[1] = temperature
+        extra_data[2] = procTemp
+        extra_data[3] = round(self.proc_temp, 1)
+        with open(extraPath, "ab") as csv_file:
+            writer = csv.writer(csv_file, delimiter=',')
+            # for line in data:
+            writer.writerow(extra_data)
+        return
+
+
+class system_timer(object):
+    def __init__(self):
+        print("creating system timer")
+        self.current_hour = datetime.datetime.now().hour
+        self.current_time = 0
+        self.start_millis = 0
+        self.current_millis = 0
+        self.delta = 0
+        self.d_state = OFF
+        self.start_millis = datetime.datetime.now()  # get time at start of program execution
+        self.update_current_millis()
+
+    def update_current_millis(self):
+        self.current_time = datetime.datetime.now()  # get current time
+        self.delta = self.current_time - self.start_millis  # calc elapsed delta since program began
+        self.current_millis = int(self.delta.total_seconds() * 1000)
+        return
+
+    def get_d_state(self):
+        """ Function doc """
+
+        # if time between 7am and 7pm L on else L off
+        self.current_hour = datetime.datetime.now().hour
+        if self.current_hour in settings.on_hours:
+            self.d_state = ON
+        else:
+            self.d_state = OFF
+
+        return self.d_state
+
+class Controller(object):
+    def __init__(self):
+        print("creating controller")
+        print("---Creating Objects---")
+        self.board1 = hw.platform()
+        self.sensor1 = hw.sensor()
+        self.vent1 = Vent()
+        self.heater1 = Heater()
+        self.fan1 = Fan()
+        self.logger1 = Logger()
+        self.timer1 = system_timer()
+
+
+print("---Creating the controller---")
+ctl1 = Controller()
+
+
+def main():
+    #print("---Creating the controller---")
+    #ctl1 = Controller()
+    #print("---Creating Objects---")
+    #board1 = hw.platform()
+    #sensor1 = hw.sensor()
+    #vent1 = Vent()
+    #heater1 = Heater()
+    #fan1 = Fan()
+    #logger1 = Logger()
+    #timer1 = system_timer()
+
+    start_time = time.time()
+
+    humidity, temperature = ctl1.sensor1.read()
+    
+    procTemp = temperature
+
+    while 1:
+        print("main")
+        print(round_time(ctl1.timer1.current_time, 1))
+
+        ctl1.timer1.update_current_millis()
+        ctl1.timer1.get_d_state()
+
+        humidity, temperature = ctl1.sensor1.read()
+        
+        
+        ctl1.fan1.control(ctl1.timer1.current_millis)
+
+        if ctl1.timer1.d_state == ON:
+            print('.LOn')
+            target_temp = settings.temp_d_on_SP
+        else:  # off
+            print('.LOff')
+            target_temp = settings.temp_d_off_SP
+
+        ctl1.vent1.control(ctl1.sensor1.temperature, target_temp,
+                      ctl1.timer1.d_state, ctl1.timer1.current_millis)
+        ctl1.heater1.control(ctl1.sensor1.temperature, target_temp,
+                              ctl1.timer1.current_millis, ctl1.timer1.d_state)
+        ctl1.fan1.control(ctl1.timer1.current_millis)
+        ctl1.board1.switch_relays(ctl1.heater1.state, ctl1.vent1.state, ctl1.fan1.state,
+                            ctl1.vent1.speed_state)  # switch relays according to State vars
+
+        ctl1.logger1.update_CSV_If_changes(ctl1.sensor1.temperature, ctl1.sensor1.humidity,
+                                      ctl1.vent1.state, ctl1.fan1.state, ctl1.heater1.state,
+                                      ctl1.vent1.speed_state, ctl1.timer1.current_millis,
+                                      ctl1.timer1.current_time, ctl1.sensor1.proc_temp)  # write to csv if any state changes
+
         end_time = time.time()
         uptime = end_time - start_time
         human_uptime = str(timedelta(seconds=int(uptime)))
+        print(human_uptime)
 
 if __name__ == "__main__":
-   # stuff only to run when not called via 'import' here
-   main()
-   
+    # stuff only to run when not called via 'import' here
+    main()
