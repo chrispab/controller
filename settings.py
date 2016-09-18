@@ -24,9 +24,10 @@ testDivisor = 1 #divisor to speed up sequencing to test timings
 
 heater_on_t = 3 * 1000 / testDivisor  #min time heater is on or off for
 heater_off_t = 20 * 1000 / testDivisor  #min time heater is on or off for
+heater_sp_offset = 0.5
 
 ventOnDelta = 60 * 1000 / testDivisor   #duration vent is on in millis
-ventOffDelta = 30 * 1000 / testDivisor  #vent off duration in miili sec
+ventOffDelta = 60 * 1000 / testDivisor  #vent off duration in miili sec
 ventPulseOnDelta = 20 * 1000 #60 secs cooling on delta
 
 fan_on_t = 29 * 60 * 1000 / testDivisor   #vent on time
@@ -39,8 +40,6 @@ dataPath = "/home/pi/projects/controlleroo/thdata.csv"
 extraPath = "/home/pi/projects/controlleroo/extradata.csv"
 
 emailEnabled = False
-
-
 
 tSPHi = temp_d_on_SP
 tSPLo = temp_d_off_SP

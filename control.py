@@ -172,16 +172,18 @@ class Heater(object):
         self.heater_off_delta = settings.heater_off_t  # min time heater is on or off for
         self.heater_on_delta = settings.heater_on_t  # min time heater is on or off for
         self.prev_heater_millis = 0  # last time heater switched on or off
+        self.heater_sp_offset = settings.heater_sp_offset
 
     def control(self, current_temp, target_temp, current_millis, d_state):
         print('.Heat ctl')
         #if d_state == ON:
         current_hour = datetime.datetime.now().hour
-        if current_hour in settings.heat_off_hours:  # l on and not 10:xx pm
+        if current_hour in settings.heat_off_hours:  # l on and not hh:xx pm
+            self.state = OFF
             print('..d on, in heat off hours - skipping lon heatctl')
         else:#d state on or off here
             print('..do lon or off heatctl')
-            if current_temp >= target_temp:  # if over temp immediately turn off
+            if current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
                 self.state = OFF
                 print("...temp over sp - HEATER OFF")
                 self.prev_heater_millis = current_millis
