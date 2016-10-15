@@ -47,3 +47,9 @@ emailEnabled = False
 
 tSPHi = temp_d_on_SP
 tSPLo = temp_d_off_SP
+
+#db params
+db_hostname = "localhost"
+db_username = "controller"
+db_password = "password"
+db_dbname = "sensordata_db"
