@@ -51,9 +51,15 @@ def requires_auth(f):
 
 def getStartSampleIndex(timeList, targetTimeDelta):
     lastSampleDTO = datetime.strptime(timeList[len(timeList)-1], '%Y-%m-%d %H:%M:%S')# conv to DTO from string format YYY-MM-DD HH:mm:ss
+    print("++++++++ lastSampleDTO = %s  +++++++++++++++++++++") % lastSampleDTO
     reqStartDTO = lastSampleDTO - targetTimeDelta  #calc target DTO
+    print("++++++++ reqStartDTO = %s  +++++++++++++++++++++") % reqStartDTO
+
     targetDateTimeStr = datetime.strftime(reqStartDTO, '%Y-%m-%d %H:%M:%S') #conv targetDTO to string format
+    print("++++++++ targetDateTimeStr = %s  +++++++++++++++++++++") % targetDateTimeStr
+
     startSampleIndex = bisect_right(timeList, targetDateTimeStr)
+    
     print "WEB Server - time delta: %s , start sample index: %s oooooooo" % (targetTimeDelta, startSampleIndex)
     return startSampleIndex
 

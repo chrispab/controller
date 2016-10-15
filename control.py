@@ -7,6 +7,7 @@ import csv
 import datetime
 import time
 from datetime import timedelta
+import MySQLdb
 
 import hardware as hw
 import settings
@@ -206,6 +207,43 @@ class Heater(object):
         print(' ')
         return
 
+class Database(object):
+    
+    def __init__(self):
+        print("Creating db")
+        
+    def writedb(self,sample_dt,temperature,humidity,heaterstate,ventstate,fanstate):
+        # Open database connection
+        print("writing record to db")
+
+        self.db = MySQLdb.connect("localhost", "controller", "password", "sensordata_db")
+
+        # prepare a cursor object using cursor() method
+        self.cursor=self.db.cursor()
+        
+        # Prepare SQL query to INSERT a record into the database.
+        sql = "INSERT INTO thdata(sample_dt, \
+               temperature, humidity, heaterstate, ventstate, fanstate) \
+               VALUES ('%s', '%s', '%s', '%s', '%s', '%s' )" % \
+               (sample_dt,temperature,humidity,heaterstate,ventstate,fanstate)
+        try:
+           # Execute the SQL command
+           self.cursor.execute(sql)
+           # Commit your changes in the database
+           self.db.commit()
+        except:
+           # Rollback in case there is any error
+           self.db.rollback()
+        
+        # disconnect from server
+        self.db.close()
+        return
+        
+
+    def control(self, current_millis):
+        print('.writedb control')
+        pass
+        return
 
 class Logger(object):
     # roundT = roundTime
@@ -231,7 +269,8 @@ class Logger(object):
         # self.previousHeater = 0
         self.previous_CSV_write_millis = 0
         self.min_CSV_write_interval = settings.min_CSV_write_interval
-        # self.writeExtraDataToCSV()
+        self.datastore = Database()
+        
         
     def write_edge_change(self, state, previous_state):
         if previous_state == OFF:  # must be going OFF to ON
@@ -462,6 +501,8 @@ class Logger(object):
         print('..write data line to CSV')
         data = ['time', 'temp', 'humi', 'heaterstate', 'ventstate', 'fanstate', 'procTemp']
         data[0] = round_time(self.current_time, 1)  # round timestamp to nearest second
+#        data[0] = datetime.datetime.now() # round timestamp to nearest second
+
         data[1] = self.temperature
         data[2] = self.humidity
         if self.heater_state == OFF:
@@ -489,6 +530,8 @@ class Logger(object):
             # outfile.write(bytes(plaintext, 'UTF-8'))
             writer.writerow(data)
             self.previous_CSV_write_millis = self.current_millis  # note time row written
+        #self.datastore.writedb(self.current_time, self.temperature, self.humidity, self.heater_state, self.vent_state, self.fan_state)
+        self.datastore.writedb(data[0], data[1], data[2], data[3], data[4], data[5])
 
         return
 
@@ -524,21 +567,43 @@ class system_timer(object):
         return
 
     def get_d_state(self):
-        """ Function doc """
-
-        # if time between 7am and 7pm L on else L off
         self.current_hour = datetime.datetime.now().hour
         if self.current_hour in settings.on_hours:
             self.d_state = ON
         else:
             self.d_state = OFF
+            
+        current_time = datetime.datetime.now()    # get time in h:m
+        now = datetime.datetime.now()    # get time in h:m
+        
+        tlon = now.replace(hour=settings.tlon_hour, minute=settings.tlon_minute, second=0, microsecond=0)
+        tloff = now.replace(hour=settings.tloff_hour, minute=settings.tloff_minute, second=0, microsecond=0) 
+
+        #note this sectiononly works if ton < 23:59 and toff >0:0 and toff < ton
+        #section start
+        print( "..",current_time.time())
+        print( "..",tlon.time())
+        print( "..",tloff.time())
+        
+        self.d_state = ON	#on as default posn
+        print("..ON defaul at start of range check")
+        
+        if (current_time.time() > tloff.time()):# and (current_time < tloff):
+            print("..OFF time passed...time in OFF range")
+            self.d_state = OFF
+        if (current_time.time() > tlon.time()): # and (current_time.time() > tloff.time()):
+            print("..ON time passed...time in ON range")
+            self.d_state = ON
+        #section end
+        
 
         return self.d_state
+        
 
 class Controller(object):
     def __init__(self):
-        print("creating controller")
-        print("---Creating Objects---")
+        print("init controller")
+        print("---Creating system Objects---")
         self.board1 = hw.platform()
         self.sensor1 = hw.sensor()
         self.vent1 = Vent()
@@ -572,7 +637,8 @@ def main():
 
     while 1:
         print("main")
-        print(round_time(ctl1.timer1.current_time, 1))
+#        print(round_time(ctl1.timer1.current_time, 1))
+        print(ctl1.timer1.current_time)
 
         ctl1.timer1.update_current_millis()
         ctl1.timer1.get_d_state()

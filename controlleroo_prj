@@ -24,13 +24,14 @@ long_line_column=72
 
 [files]
 current_page=2
-FILE_NAME_0=7672;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Fcontrol.py;0;4
-FILE_NAME_1=1728;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Fhardware.py;0;4
-FILE_NAME_2=946;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Fsettings.py;0;4
-FILE_NAME_3=2687;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Fenvctl.py;0;4
-FILE_NAME_4=1212;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Ftemplates%2Fmultitc3.html;0;4
+FILE_NAME_0=21358;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Fcontrol.py;0;4
+FILE_NAME_1=1514;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Fhardware.py;0;4
+FILE_NAME_2=727;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Fsettings.py;0;4
+FILE_NAME_3=1820;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Fenvctl.py;0;4
+FILE_NAME_4=3696;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Ftemplates%2Fmultitc3.html;0;4
 FILE_NAME_5=0;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Fsupport.py;0;4
 FILE_NAME_6=0;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Ftemplates%2Flayout.html;0;4
+FILE_NAME_7=468;None;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fprojects%2Fcontrolleroo%2Fthdata.csv;0;4
 
 [VTE]
 last_dir=/root
