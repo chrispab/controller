@@ -16,8 +16,8 @@ min_CSV_write_interval = 1 * 60 * 1000 #interval min bet csv writes
 #----L control params----
 on_hours = [ 0,1,2,3,4,5,6,7,8,9,22,23 ] #hours when l on
 heat_off_hours = [ 22 ]   #hours when heater should NOT operate
-tlon_hour = 21
-tlon_minute = 45    # time on
+tlon_hour = 22
+tlon_minute = 15    # time on
 tloff_hour = 9
 tloff_minute = 45	# time off
 
@@ -49,7 +49,7 @@ tSPHi = temp_d_on_SP
 tSPLo = temp_d_off_SP
 
 #db params
-db_hostname = "localhost"
+db_hostname = "192.168.0.201"
 db_username = "controller"
 db_password = "password"
 db_dbname = "sensordata_db"

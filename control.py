@@ -216,27 +216,46 @@ class Database(object):
         # Open database connection
         print("writing record to db")
 
-        self.db = MySQLdb.connect("localhost", "controller", "password", "sensordata_db")
-
-        # prepare a cursor object using cursor() method
-        self.cursor=self.db.cursor()
-        
-        # Prepare SQL query to INSERT a record into the database.
-        sql = "INSERT INTO thdata(sample_dt, \
-               temperature, humidity, heaterstate, ventstate, fanstate) \
-               VALUES ('%s', '%s', '%s', '%s', '%s', '%s' )" % \
-               (sample_dt,temperature,humidity,heaterstate,ventstate,fanstate)
         try:
-           # Execute the SQL command
-           self.cursor.execute(sql)
-           # Commit your changes in the database
-           self.db.commit()
+            print("trying to connect")
+            self.db = MySQLdb.connect(settings.db_hostname, settings.db_username, settings.db_password, settings.db_dbname)
+            print("connected")
+            # prepare a cursor object using cursor() method
+            self.cursor=self.db.cursor()
+            
+            # Prepare SQL query to INSERT a record into the database.
+            sql = "INSERT INTO thdata(sample_dt, \
+            temperature, humidity, heaterstate, ventstate, fanstate) \
+            VALUES ('%s', '%s', '%s', '%s', '%s', '%s' )" % \
+            (sample_dt,temperature,humidity,heaterstate,ventstate,fanstate)
+            # Execute the SQL command
+            self.cursor.execute(sql)
+            print("executing sql")
+
+            # Commit your changes in the database
+            self.db.commit()
+            print("commiting")
+            
+            # Rollback in case there is any error
+            #self.db.rollback()
+            
+            # disconnect from server
+            #self.db.close()
+            print("ready for closing")
+
         except:
-           # Rollback in case there is any error
-           self.db.rollback()
+                        # Rollback in case there is any error
+            self.db.rollback()
+            
+            # disconnect from server
+            #self.db.close()
+            print("+++++++++++++DB WRITE PROBLEM +++++++++")
+        finally:    
+            if self.db:    
+                self.db.close()     
+                print("++ final close ++")
+
         
-        # disconnect from server
-        self.db.close()
         return
         
 
