@@ -33,6 +33,7 @@ heater_sp_offset = -1.0
 ventOnDelta = 5 * 1000 / testDivisor   #duration vent is on in millis
 ventOffDelta = 59 * 1000 / testDivisor  #vent off duration in miili sec
 ventPulseOnDelta = 20 * 1000 #60 secs cooling on delta
+vent_sp_offset = -0.2
 
 fan_on_t = 29 * 60 * 1000 / testDivisor   #vent on time
 #fan_on_t = 30 * 1000 / testDivisor   #vent on time
@@ -49,7 +50,7 @@ tSPHi = temp_d_on_SP
 tSPLo = temp_d_off_SP
 
 #db params
-db_hostname = "192.168.0.201"
+db_hostname = "192.168.0.153"
 db_username = "controller"
 db_password = "password"
 db_dbname = "sensordata_db"

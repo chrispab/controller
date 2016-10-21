@@ -13,60 +13,11 @@ import hardware as hw
 import settings
 from support import round_time as round_time
 
-# ============targets/settings/tuneable params from settings file========
-#temp_alarm = settings.temp_alarm  # 26
-#readDelay = settings.readDelay
-#minCSVWriteInterval = settings.min_CSV_write_interval  # 3 * 60 * 1000 #interval min bet csv writes
-
-# ----L control params----
-#onHours = settings.on_hours  # hours when l on
-#heat_off_hours = settings.heat_off_hours  # hours when heater should NOT operate
-
 OFF = settings.OFF  # state for relay OFF
 ON = settings.ON  # state for on
 
 path = settings.dataPath
 extraPath = settings.extraPath
-
-# ===========initial settings============================================
-#temperature = 20  # global temp var
-#humidity = 50  # global humidity var
-#procTemp = temperature
-
-# initial state parameter global var values
-#heaterState = OFF
-#ventState = ON
-#fanState = ON
-#ventSpeedState = OFF
-#lState = OFF
-
-# =================initialised global vars etc===========================
-#currentMillis = 0
-#previousTemperature = 24
-#previousProcTemp = 24
-#previousHumidity = 40
-
-#previousHeaterState = ON
-#previousVentState = OFF
-#previousFanState = OFF
-#previousVentSpeedState = OFF
-#prevTempHumiMillis = 0  # previous time  sensors routine called and data read
-#prevHeaterMillis = 0  # last time heater switched on or off
-
-# Vent control parameters
-#prevVentMillis = 0
-#ventPulseActive = False
-#ventOverride = OFF
-
-# Fan control parameters
-#prevFanMillis = 0  # last time vent state updated
-#previousCSVWriteMillis = 0  # last time CSV file row added
-
-# general time use params
-#startMillis = 0  # time at start of program execution
-#currentTime = 0
-#start_time = time.time()
-#up_time = time.time()
 
 
 # ============================common code start==========================
@@ -92,13 +43,13 @@ class Vent(object):
     def control(self, current_temp, target_temp, d_state, current_millis):
         print('.Vent ctl')
 
-
         if d_state == ON:
             self.speed_state = ON  # high speed
         else:
             self.speed_state = OFF  # lo speed
 
-        if current_temp > target_temp:
+        # cool
+        if current_temp > target_temp + settings.vent_sp_offset:
             self.vent_override = ON
             self.state = ON
             self.prev_vent_millis = current_millis  # retrigeer time period
