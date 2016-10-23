@@ -10,7 +10,7 @@ port = 587
 
 sender = 'cbattisson@gmail.com'
 recipient = 'cbattisson@gmail.com'
-password='chutn3y'
+password=''
 subject = 'Water Leakage Detected'
 body = 'Water detected at basement water heater 1.'
 
