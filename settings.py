@@ -33,7 +33,7 @@ heater_sp_offset = -1.0
 ventOnDelta = 5 * 1000 / testDivisor   #duration vent is on in millis
 ventOffDelta = 59 * 1000 / testDivisor  #vent off duration in miili sec
 ventPulseOnDelta = 20 * 1000 #60 secs cooling on delta
-vent_sp_offset = -0.2
+vent_sp_offset = -0.15
 
 fan_on_t = 29 * 60 * 1000 / testDivisor   #vent on time
 #fan_on_t = 30 * 1000 / testDivisor   #vent on time
