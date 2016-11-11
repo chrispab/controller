@@ -39,9 +39,9 @@ fan_on_t = 29 * 60 * 1000 / testDivisor   #vent on time
 
 fan_off_t = 10 * 1000 / testDivisor#vent off time
 
-dataPath = "/home/pi/controlleroo/thdata.csv"
+dataPath = "data/thdata.csv"
     
-extraPath = "/home/pi/controlleroo/extradata.csv"
+extraPath = "data/extradata.csv"
 
 emailEnabled = False
 
