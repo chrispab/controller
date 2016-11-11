@@ -55,7 +55,7 @@ class sensor(object):
     def __init__(self):
         print("create sensor")
         self.humidity = 55.5
-        self.temperature = 25.0
+        self.temperature = 18.0
         #self.prevTempHumiMillis = 0   #last time sensor read
         self.proc_temp = 0       # processedsed, filter temp reading
         self.currentTime = 0

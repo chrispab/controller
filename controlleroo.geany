@@ -8,8 +8,8 @@ replace_tabs=false
 indent_width=4
 indent_type=0
 indent_hard_tab_width=8
-detect_indent=true
-detect_indent_width=true
+detect_indent=false
+detect_indent_width=false
 indent_mode=2
 
 [project]
@@ -23,10 +23,14 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=1
-FILE_NAME_0=1487;Python;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fcontrolleroo%2Fcontrol.py;0;4
-FILE_NAME_1=1192;Python;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fcontrolleroo%2Fsettings.py;0;4
-FILE_NAME_2=2445;HTML;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fcontrolleroo%2Ftemplates%2Fmultitc3.html;0;4
+current_page=0
+FILE_NAME_0=8938;Python;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fcontrolleroo%2Fcontrol.py;0;4
+FILE_NAME_1=1837;Python;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fcontrolleroo%2Fsettings.py;0;4
+FILE_NAME_2=1853;HTML;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fcontrolleroo%2Ftemplates%2Fmultitc3.html;0;4
+FILE_NAME_3=0;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fcontrolleroo%2Fenvctl.py;0;4
+FILE_NAME_4=0;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fcontrolleroo%2Fsupport.py;0;3
+FILE_NAME_5=0;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fcontrolleroo%2Fsendemail.py;0;4
+FILE_NAME_6=1726;Python;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2Fcontrolleroo%2Fhardware.py;0;4
 
 [VTE]
 last_dir=/root
