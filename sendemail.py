@@ -4,9 +4,9 @@ from email.mime.text import MIMEText
 
 
 def sendemail(subject, message):
-    USERNAME = "cbattisson@gmail.com"
-    PASSWORD = "ijdkchanybaphucn"
-    MAILTO  = "cbattisson@gmail.com"
+    USERNAME = "cn@gmail.com"
+    PASSWORD = "in"
+    MAILTO  = "c@gmail.com"
     
     msg = MIMEText(message)
     msg['Subject'] = subject
