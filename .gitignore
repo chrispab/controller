@@ -7,3 +7,6 @@ thdata.csv
 .DS_Store
 extradata.csv
 venv
+*.geany
+*.yml
+/chartx

@@ -8,6 +8,7 @@ import datetime
 import time
 from datetime import timedelta
 import MySQLdb
+#import yaml
 
 import hardware as hw
 import settings

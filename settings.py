@@ -14,7 +14,7 @@ min_CSV_write_interval = 1 * 60 * 1000 #interval min bet csv writes
 
 #----L control params----
 on_hours = [ 0,1,2,3,4,5,6,7,8,9,22,23 ] #hours when l on
-heat_off_hours = [  ]   #hours when heater should NOT operate
+heat_off_hours = [ 22 ]   #hours when heater should NOT operate
 tlon_hour = 22
 tlon_minute = 15    # time on
 tloff_hour = 9
@@ -39,9 +39,9 @@ fan_on_t = 29 * 60 * 1000 / testDivisor   #vent on time
 
 fan_off_t = 10 * 1000 / testDivisor#vent off time
 
-dataPath = "data/thdata.csv"
+dataPath = "/home/pi/controlleroo/data/thdata.csv"
     
-extraPath = "data/extradata.csv"
+extraPath = "/home/pi/controlleroo/data/extradata.csv"
 
 emailEnabled = False
 
