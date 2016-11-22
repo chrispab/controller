@@ -33,6 +33,8 @@ class Vent(object):
         print("creating vent")
         self.state = OFF
         self.speed_state = OFF
+        self.speed_state_count = 0
+        self.speed_state_trigger = 5    #trigger hi state on n counts hi
         self.prev_vent_millis = 0  # last time vent state updated
         self.vent_on_delta = settings.ventOnDelta  # vent on time
         self.vent_off_delta = settings.ventOffDelta  # vent off time
@@ -40,15 +42,27 @@ class Vent(object):
         self.vent_pulse_delta = 0  # ventPulseDelta
         self.vent_pulse_on_delta = settings.ventPulseOnDelta
         self.vent_override = OFF  # settings.ventOverride
+      
 
     def control(self, current_temp, target_temp, d_state, current_millis):
         print('.Vent ctl')
 
-        if d_state == ON:
-            self.speed_state = ON  # high speed
-        else:
-            self.speed_state = OFF  # lo speed
-
+        #if self.speed_state = ON  # high speed
+            #self.speed_state_count++
+        #if self.speed_state_count == self.speed_state_trigger:
+            #self.speed_state = ON  # high speed
+            #self.speed_state_count = 0
+        #if self.speed_state = OFF  # lo speed
+        
+        #else:
+            #self.speed_state = OFF  # lo speed        
+        
+        #if d_state == ON:
+            #self.speed_state = ON  # high speed
+        #else:
+            #self.speed_state = OFF  # lo speed
+        self.speed_state = OFF  # lo speed
+        
         # cool
         if current_temp > target_temp + settings.vent_sp_offset:
             self.vent_override = ON
@@ -81,10 +95,6 @@ class Vent(object):
                     self.prev_vent_millis = current_millis
                 else:
                     print('..Vent on - during cycle ON period')
-        
-        #self.state = ON
-        
-        print(' ')
         return
 
 
