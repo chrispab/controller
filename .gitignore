@@ -10,3 +10,4 @@ venv
 *.geany
 *.yml
 /chartx
+/C_Python_sensor_driver
