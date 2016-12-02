@@ -144,6 +144,8 @@ class Heater(object):
         if current_hour in settings.heat_off_hours:  # l on and not hh:xx pm
             self.state = OFF
             print('..d on, in heat off hours - skipping lon heatctl')
+            #oveeride
+            #self.state = ON
         else:#d state on or off here
             print('..do lon or off heatctl')
             if current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off

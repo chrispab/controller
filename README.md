@@ -1,7 +1,6 @@
-## controller
-### Description
+## Controller
 A Python/Flask/ environmental control system to run on PCDuino 3 or Raspberry Pi  
-Monitor temp and humidy and controls heating to manage setpoint temp.  
+Monitors temp and humidity and intelligently controls heating to manage setpoint temp.  
 
 Also contains embedded Database for record/datalogging storage.
 Provides embedded webserver for graphical feedback.
