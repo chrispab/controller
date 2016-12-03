@@ -665,22 +665,22 @@ class system_timer(object):
         tlon = now.replace(hour=settings.tlon_hour, minute=settings.tlon_minute, second=0, microsecond=0)
         tloff = now.replace(hour=settings.tloff_hour, minute=settings.tloff_minute, second=0, microsecond=0) 
 
-        #note this sectiononly works if ton < 23:59 and toff >0:0 and toff < ton
-        #section start
-        print( "..",current_time.time())
-        print( "..",tlon.time())
-        print( "..",tloff.time())
+        ##note this section only works if ton < 23:59 and toff >0:0 and toff < ton
+        ##section start
+        #print( "..",current_time.time())
+        #print( "..",tlon.time())
+        #print( "..",tloff.time())
         
-        self.d_state = ON	#on as default posn
-        print("..ON defaul at start of range check")
+        #self.d_state = ON	#on as default posn
+        #print("..ON defaul at start of range check")
         
-        if (current_time.time() > tloff.time()):# and (current_time < tloff):
-            print("..OFF time passed...time in OFF range")
-            self.d_state = OFF
-        if (current_time.time() > tlon.time()): # and (current_time.time() > tloff.time()):
-            print("..ON time passed...time in ON range")
-            self.d_state = ON
-        #section end
+        #if (current_time.time() > tloff.time()):# and (current_time < tloff):
+            #print("..OFF time passed...time in OFF range")
+            #self.d_state = OFF
+        #if (current_time.time() > tlon.time()): # and (current_time.time() > tloff.time()):
+            #print("..ON time passed...time in ON range")
+            #self.d_state = ON
+        ##section end
         
 
         return self.d_state
