@@ -57,10 +57,11 @@ class Vent(object):
         #else:
             #self.speed_state = OFF  # lo speed        
         
-        #if d_state == ON:
-            #self.speed_state = ON  # high speed
-        #else:
-            #self.speed_state = OFF  # lo speed
+        if d_state == ON:
+            self.speed_state = ON  # high speed
+        else:
+            self.speed_state = OFF  # lo speed
+            
         self.speed_state = OFF  # lo speed
         
         # cool

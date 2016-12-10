@@ -6,7 +6,7 @@ platform_name = "RPi2"
 hardware = "RaspberryPi2"
 #hardware = "PCDuino"
 
-temp_d_on_SP = 22.5   #temp set point max with lon
+temp_d_on_SP = 24.0   #target 22.5 mp set point max with lon
 temp_d_off_SP = 15.3 #16.9 #target = 16.9, target loff
 
 readDelay = 3
@@ -40,7 +40,7 @@ fan_on_t = 29 * 60 * 1000 / testDivisor   #vent on time
 fan_off_t = 10 * 1000 / testDivisor#vent off time
 
 dataPath = "/home/pi/controlleroo/data/thdata.csv"
-    
+
 extraPath = "/home/pi/controlleroo/data/extradata.csv"
 
 emailEnabled = False
