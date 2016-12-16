@@ -6,7 +6,7 @@ platform_name = "RPi2"
 hardware = "RaspberryPi2"
 #hardware = "PCDuino"
 
-temp_d_on_SP = 24.0   #target 22.5 mp set point max with lon
+temp_d_on_SP = 22.5   #target 22.5 mp set point max with lon
 temp_d_off_SP = 15.3 #16.9 #target = 16.9, target loff
 
 readDelay = 3
@@ -32,7 +32,8 @@ heater_sp_offset = 0
 ventOnDelta = 3 * 1000 / testDivisor   #duration vent is on in millis
 ventOffDelta = 197 * 1000 / testDivisor  #vent off duration in miili sec
 ventPulseOnDelta = 10 * 1000 #60 secs cooling on delta
-vent_sp_offset = 0.0
+vent_lon_sp_offset = 0.0 #offset
+vent_loff_sp_offset = 1.0 #
 
 fan_on_t = 29 * 60 * 1000 / testDivisor   #vent on time
 #fan_on_t = 30 * 1000 / testDivisor   #vent on time
