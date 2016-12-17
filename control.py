@@ -66,13 +66,13 @@ class Vent(object):
         self.speed_state = OFF  # lo speed
 
         # loff vent/cooling
-        if ( ( d_state == OFF) and (current_temp > target_temp + settings.vent_loff_sp_offset) ):
+        if ((d_state == OFF) and (current_temp > target_temp + settings.vent_loff_sp_offset)):
             self.vent_override = ON
             self.state = ON
             self.prev_vent_millis = current_millis  # retrigeer time period
             print("..VENT ON Loff - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
 
-        if ( ( d_state == ON) and (current_temp > target_temp + settings.vent_lon_sp_offset) ):
+        if ((d_state == ON) and (current_temp > target_temp + settings.vent_lon_sp_offset)):
             self.vent_override = ON
             self.state = ON
             self.prev_vent_millis = current_millis  # retrigeer time period
