@@ -8,7 +8,11 @@ import datetime
 import time
 from datetime import timedelta
 import MySQLdb
-#import yaml
+import yaml
+
+#my classes
+from settingsClass import Settings
+
 
 import hardware as hw
 import settings
@@ -719,6 +723,7 @@ class Controller(object):
         self.fan1 = Fan()
         self.logger1 = Logger()
         self.timer1 = system_timer()
+        self.settings = Settings()
 
 
 print("--- crispy startup - Creating the controller---")
@@ -739,6 +744,7 @@ def main():
 
         print("main")
 #        print(round_time(ctl1.timer1.current_time, 1))
+
         print(ctl1.timer1.current_time)
 
         ctl1.timer1.update_current_millis()
