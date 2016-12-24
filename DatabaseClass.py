@@ -140,7 +140,7 @@ class Database(object):
         return
 
 
-    def updateCentralConfigTable(self):
+    def updateCentralConfigTable(self, config): #pass config object
 
         print("about to try update config table from local db to central db")
         print("trying to connect to central server")
@@ -161,15 +161,26 @@ class Database(object):
         except:
             print("dberror getting cursor")
             
-            
+        #######################################    
         # Prepare SQL query to update a single item in the database settings table.
-        sql = "UPDATE  config SET %s = %f" % ('tempSPLOn', value)
+        sql = "UPDATE  config SET %s = %f" % ('tempSPLOn', config['tempSPLOn'])
         # Execute the SQL command
         try:
             self.central_cursor.execute(sql)
         except:
             print("dberror executing sql query")
         print("executing sql")
+        
+        # Prepare SQL query to update a single item in the database settings table.
+        sql = "UPDATE  config SET %s = %f" % ('tempSPLOff', config['tempSPLOff'])
+        # Execute the SQL command
+        try:
+            self.central_cursor.execute(sql)
+        except:
+            print("dberror executing sql query")
+        print("executing sql")
+        ##############################################
+
 
         # Commit your changes in the database
         try:
@@ -190,10 +201,12 @@ class Database(object):
                 self.central_db.close()
                 print("++ final close ++")
 
-        return value
+        return
 
 
     def update_central_db(self):
+        
+
 
         print("about to try batch update from local db to central db")
         print("trying to connect to central server")

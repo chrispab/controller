@@ -10,7 +10,7 @@ from datetime import timedelta
 import yaml
 
 #my classes
-from SettingsClass import Settings
+from ConfigClass import Config
 #from DatabaseClass import Database
 from DatabaseObject import db # singleton
 
@@ -563,7 +563,7 @@ class Controller(object):
         self.fan1 = Fan()
         self.logger1 = Logger()
         self.timer1 = system_timer()
-        self.settings = Settings()
+        self.config = Config()
 
 
 print("--- crispy startup - Creating the controller---")
@@ -581,6 +581,12 @@ def main():
         # if seetings changed - reload
         # if is_changed(settings):
         #settings = importlib.reload(settings)
+        
+        
+        
+        ctl1.config.writeConfigToDB()
+        
+        
 
         print("main")
 #        print(round_time(ctl1.timer1.current_time, 1))
