@@ -8,8 +8,8 @@ platform_name: "RPi2"
 hardware: "RaspberryPi2"
 #hardware = "PCDuino"
 
-temp_d_on_SP: 22.9   #target 22.5 mp set point max with lon
-temp_d_off_SP: 16.6 #16.9 #target = 16.9, target loff
+tempSPLOn: 22.5   #target 22.5 mp set point max with lon
+tempSPLOff: 15.3 #16.9 #target = 16.9, target loff
 
 readDelay: 3
 min_CSV_write_interval: 1 * 60 * 1000 #interval min bet csv writes
@@ -48,8 +48,8 @@ extraPath: "/home/pi/controlleroo/data/extradata.csv"
 
 emailEnabled: False
 
-tSPHi: temp_d_on_SP
-tSPLo: temp_d_off_SP
+tSPHi: tempSPLOn
+tSPLo: tempSPLOff
 
 #db params
 db_hostname: "127.0.0.1"
@@ -60,8 +60,8 @@ db_dbname: "sensordata_db"
 hi_temp_warning: 26.0
 lo_temp_warning: 14.0
 
-t_lon: "22:15:00"    # time light on hh:mm:ss
-t_loff: "09:45:00"   # time off
+lightOnT: "21:00:00"    # time light on hh:mm:ss
+lightOffT: "09:00:00"   # time off
 
 central_db_hostname: "192.168.0.201"
 central_db_username: "myiot"
