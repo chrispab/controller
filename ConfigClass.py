@@ -17,7 +17,7 @@ class Config(object):
 
     def readConfigFromFile(self):
         #to start use python settings imported module from tof
-        f = open('/home/pi/controlleroo/config.yaml')
+        f = open('/home/ubuntu/controlleroo/config.yaml')
         # use safe_load instead load
         config = yaml.safe_load(f)
         print("==Reading config settings from yaml file==")

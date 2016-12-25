@@ -3,10 +3,10 @@
 #============targets/settings/tuneable params===========================
 
 # comment out for hardware used as appropriate
-platform_name: "RPi2"
-#platformName = "PCDuino"
-hardware: "RaspberryPi2"
-#hardware = "PCDuino"
+#platform_name: "RPi2"
+platformName: "PCDuino"
+#hardware: "RaspberryPi2"
+hardware: "PCDuino"
 
 tempSPLOn: 22.5   #target 22.5 mp set point max with lon
 tempSPLOff: 15.3 #16.9 #target = 16.9, target loff
@@ -15,7 +15,7 @@ readDelay: 3
 min_CSV_write_interval: 1 * 60 * 1000 #interval min bet csv writes
 
 #----L control params----
-on_hours: [ 6,7,8,9,10,11,12,13,14,15,16,17 ] #hours when l on
+on_hours: [ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,20,21,22,23] #hours when l on
 heat_off_hours: [ 6,7,8,9,10,11,12,13,14,15,16,17 ]   #hours when heater should NOT operate
 tlon_hour: 06
 tlon_minute: 0    # time on
@@ -42,9 +42,9 @@ fan_on_t: 29 * 60 * 1000 / testDivisor   #vent on time
 
 fan_off_t: 10 * 1000 / testDivisor #vent off time
 
-dataPath: "/home/pi/controlleroo/data/thdata.csv"
+dataPath: "/home/ubuntu/controlleroo/thdata.csv"
 
-extraPath: "/home/pi/controlleroo/data/extradata.csv"
+extraPath: "/home/ubuntu/controlleroo/extradata.csv"
 
 emailEnabled: False
 
@@ -53,8 +53,8 @@ tSPLo: tempSPLOff
 
 #db params
 db_hostname: "127.0.0.1"
-db_username: "controller"
-db_password: "password"
+db_username: "root"
+db_password: "ubuntu"
 db_dbname: "sensordata_db"
 
 hi_temp_warning: 26.0
@@ -66,4 +66,4 @@ lightOffT: "09:00:00"   # time off
 central_db_hostname: "192.168.0.201"
 central_db_username: "myiot"
 central_db_password: "myiot"
-central_db_dbname: "zone1_sensordata_db"
+central_db_dbname: "zone2_sensordata_db"
