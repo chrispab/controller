@@ -8,11 +8,16 @@ import datetime
 import time
 from datetime import timedelta
 import yaml
+import datetime as dt
+import sys    # for stdout print
+
 
 #my classes
-from SettingsClass import Settings
+from ConfigClass import Config
 #from DatabaseClass import Database
 from DatabaseObject import db # singleton
+from ConfigObject import cfg # singleton
+
 
 
 
@@ -52,7 +57,7 @@ class Vent(object):
         self.vent_override = OFF  # settings.ventOverride
 
     def control(self, current_temp, target_temp, d_state, current_millis):
-        print('.Vent ctl')
+        print('==Vent ctl==')
 
         # if self.speed_state = ON  # high speed
         # self.speed_state_count++
@@ -69,7 +74,7 @@ class Vent(object):
         else:
             self.speed_state = OFF  # lo speed
 
-        self.speed_state = OFF  # lo speed
+        #self.speed_state = OFF  # lo speed
 
         # loff vent/cooling
         if ((d_state == OFF) and (current_temp > target_temp + settings.vent_loff_sp_offset)):
@@ -125,11 +130,11 @@ class Fan(object):
         self.fan_off_delta = settings.fan_off_t  # vent off time
 
     def control(self, current_millis):
-        print('.fan ctl')
+        print('==fan ctl==')
         # if fan off, we must wait for the interval to expire before turning it
         # on
-        print('current millis ', current_millis)
-        print('..current fan state ', self.state)
+        print('==current millis: %s' % (current_millis))
+        print('==current fan state: %s' % (self.state))
         if self.state == OFF:
             # iftime is up, so change the state to ON
             if current_millis - self.prev_fan_millis >= self.fan_off_delta:
@@ -158,7 +163,7 @@ class Heater(object):
         self.heater_sp_offset = settings.heater_sp_offset
 
     def control(self, current_temp, target_temp, current_millis, d_state):
-        print('.Heat ctl')
+        print('==Heat ctl==')
         # if d_state == ON:
         current_hour = datetime.datetime.now().hour
         if current_hour in settings.heat_off_hours:  # l on and not hh:xx pm
@@ -253,52 +258,54 @@ class Logger(object):
         self.proc_temp = proc_temp
 
         self.state_changed = False
+        print('==Update CSV==')
+
         # check each for state change and set new prewrite states
         if self.vent_state != self.previous_vent_state:  # any change in vent
             if self.previous_vent_state == OFF:  # must be going OFF to ON
                 # write a low record immediately before hi record
-                print("----- new prevvent low row appended to CSV -----")
+                print("--new prevvent low row appended to CSV -----")
                 self.vent_state = OFF
                 self.state_changed = True
             else:  # if self.previous_vent_state == ON:  # must be going ON TO OFF
                 # write a on record immediately before hi record
-                print("----- new prevvent hi row appended to CSV -----")
+                print("-- new prevvent hi row appended to CSV -----")
                 self.vent_state = ON
                 self.state_changed = True
 
         if self.vent_speed_state != self.previous_vent_speed_state:  # any change in vent speed
             if self.previous_vent_speed_state == OFF:  # was lo speed
                 # write a low record immediately before hi record
-                print("----- new prevvspeed low row appended to CSV -----")
+                print("-- new prevvspeed low row appended to CSV -----")
                 self.vent_speed_state = OFF
                 self.state_changed = True
             else:  # was hi speed going low
                 # write a on record immediately before hi record
-                print("----- new prevvspeed hi row appended to CSV -----")
+                print("-- new prevvspeed hi row appended to CSV -----")
                 self.vent_speed_state = ON
                 self.state_changed = True
 
         if self.fan_state != self.previous_fan_state:  # any change in vent
             if self.previous_fan_state == OFF:  # must be going OFF to ON
                 # write a low record immediately before hi record
-                print("----- new prevfanstate low row appended to CSV -----")
+                print("-- new prevfanstate low row appended to CSV -----")
                 self.fan_state = OFF
                 self.state_changed = True
             else:  # must be going ON TO OFF
                 # write a on record immediately before hi record
-                print("----- new  prevfanstate hi row appended to CSV -----")
+                print("-- new  prevfanstate hi row appended to CSV -----")
                 self.fan_state = ON
                 self.state_changed = True
 
         if self.heater_state != self.previous_heater_state:  # any change in vent
             if self.previous_heater_state == OFF:  # must be going OFF to ON
                 # write a low record immediately before hi record
-                print("----- new heaterstate low row appended to CSV -----")
+                print("-- new heaterstate low row appended to CSV -----")
                 self.heater_state = OFF
                 self.state_changed = True
             else:  # must be going ON TO OFF
                 # write a on record immediately before hi record
-                print("----- new  heaterstate hi row appended to CSV -----")
+                print("-- new  heaterstate hi row appended to CSV -----")
                 self.heater_state = ON
                 self.state_changed = True
 
@@ -441,7 +448,7 @@ class Logger(object):
         return
 
     def _write_to_CSV(self):
-        print('..write data line to CSV')
+        print('===write data line to CSV')
         data = ['time', 'temp', 'humi', 'heaterstate',
                 'ventstate', 'fanstate', 'procTemp']
         # round timestamp to nearest second
@@ -467,7 +474,7 @@ class Logger(object):
             data[5] = 1  # on line on graph
 
         data[6] = round(self.proc_temp, 1)  # add processed temp value
-        print(data)
+        #sys.stdout.write(data.tostring() )
         with open(path, "ab") as csv_file:
             # with open(path, 'w', newline='') as csv_file:
             writer = csv.writer(csv_file, delimiter=',')
@@ -517,6 +524,8 @@ class system_timer(object):
         return
 
     def get_d_state(self):
+        print('==light - get d state==')
+
         self.current_hour = datetime.datetime.now().hour
         if self.current_hour in settings.on_hours:
             self.d_state = ON
@@ -551,6 +560,52 @@ class system_timer(object):
         return self.d_state
 
 
+class Light(object):
+    def __init__(self):
+        print("creating light object")
+        self.state = OFF
+        self.tOn = dt.time()
+        self.tOff = dt.time()
+
+    def testGetLightState(self):
+        print("??Running get lightstate stet??")
+        tOn = dt.time(21,0,0)
+        tOff = dt.time(9,0,0)
+
+        for hour in range(0,24):
+            for minute in range(0,60):
+                print ( hour, minute, tOn, tOff, dt.time(hour,minute))
+                print(self.getLightState(tOn, tOff, dt.time(hour,minute)))
+                #print("--------")
+                
+        return
+        
+    #return true if testTime between timeOn and TimeOff, else false if in off period
+    def getLightState(self ):   
+        #print('==light - get light state==')
+
+        tOff = cfg.getTOff()
+        tOn = cfg.getTOn()
+        currT = datetime.datetime.now().time()
+        X = False
+        if (tOn > tOff):
+            X = True
+            
+        lightState = OFF
+        if (( currT > tOn) and (currT < tOff)):
+            lightState = ON
+        #if ( currT > tOff):
+         #   lightState = False
+        if (((currT > tOn) or (currT < tOff)) and ( X )):
+            lightState = ON
+
+        print ("==light check. ON: %s, OFF: %s, NOW: %s, state: %d" % (tOn.strftime("%H:%M:%S"), tOff.strftime("%H:%M:%S"), currT.strftime("%H:%M:%S"), lightState))
+
+        self.d_state = lightState
+        return self.d_state
+
+
+
 class Controller(object):
 
     def __init__(self):
@@ -561,9 +616,10 @@ class Controller(object):
         self.vent1 = Vent()
         self.heater1 = Heater()
         self.fan1 = Fan()
+        self.light = Light()
         self.logger1 = Logger()
         self.timer1 = system_timer()
-        self.settings = Settings()
+        #self.config = Config()
 
 
 print("--- crispy startup - Creating the controller---")
@@ -572,52 +628,36 @@ ctl1 = Controller()
 
 def main():
     start_time = time.time()
-
     humidity, temperature = ctl1.sensor1.read()
-
-    procTemp = temperature
-
     while 1:
-        # if seetings changed - reload
-        # if is_changed(settings):
-        #settings = importlib.reload(settings)
-
-        print("main")
-#        print(round_time(ctl1.timer1.current_time, 1))
-
-        print(ctl1.timer1.current_time)
-
+        print("=main=")
+        print("=current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.update_current_millis()
-        ctl1.timer1.get_d_state()
-
+        current_millis = ctl1.timer1.current_millis
         humidity, temperature = ctl1.sensor1.read()
-
-        ctl1.fan1.control(ctl1.timer1.current_millis)
-
-        if ctl1.timer1.d_state == ON:
-            print('.LOn')
-            target_temp = settings.temp_d_on_SP
+        lightState = ctl1.light.getLightState()
+        heaterState = ctl1.heater1.state
+        ventState = ctl1.vent1.state
+        fanState = ctl1.fan1.state
+        ventSpeedState = ctl1.vent1.speed_state
+        if lightState == ON:
+            print('=LOn=')
+            target_temp = cfg.getItemValue('tempSPLOn')
         else:  # off
-            print('.LOff')
-            target_temp = settings.temp_d_off_SP
+            print('=LOff=')
+            target_temp = cfg.getItemValue('tempSPLOff')
 
-        ctl1.vent1.control(ctl1.sensor1.temperature, target_temp,
-                           ctl1.timer1.d_state, ctl1.timer1.current_millis)
-        ctl1.heater1.control(ctl1.sensor1.temperature, target_temp,
-                             ctl1.timer1.current_millis, ctl1.timer1.d_state)
-        ctl1.fan1.control(ctl1.timer1.current_millis)
-        ctl1.board1.switch_relays(ctl1.heater1.state, ctl1.vent1.state, ctl1.fan1.state,
-                                  ctl1.vent1.speed_state)  # switch relays according to State vars
-
-        ctl1.logger1.update_CSV_If_changes(ctl1.sensor1.temperature, ctl1.sensor1.humidity,
-                                           ctl1.vent1.state, ctl1.fan1.state, ctl1.heater1.state,
-                                           ctl1.vent1.speed_state, ctl1.timer1.current_millis,
-                                           ctl1.timer1.current_time, ctl1.sensor1.proc_temp)  # write to csv if any state changes
-
+        ctl1.fan1.control(current_millis)
+        ctl1.vent1.control(temperature, target_temp, lightState, current_millis)
+        ctl1.heater1.control(temperature, target_temp, current_millis, lightState)
+        ctl1.fan1.control(current_millis)
+        ctl1.board1.switch_relays(heaterState, ventState, fanState, ventSpeedState)  # switch relays according to State vars
+        ctl1.logger1.update_CSV_If_changes(temperature, humidity, ventState, fanState, heaterState, ventSpeedState,
+            current_millis, ctl1.timer1.current_time, ctl1.sensor1.proc_temp)  # write to csv if any state changes
         end_time = time.time()
         uptime = end_time - start_time
         human_uptime = str(timedelta(seconds=int(uptime)))
-        print(human_uptime)
+        print('=uptime: %s' % (human_uptime))
 
 if __name__ == "__main__":
     # stuff only to run when not called via 'import' here
