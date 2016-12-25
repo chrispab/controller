@@ -13,11 +13,14 @@ readDelay = 3
 min_CSV_write_interval = 1 * 60 * 1000 #interval min bet csv writes
 
 #----L control params----
-on_hours = [ 6,7,8,9,10,11,12,13,14,15,16,17 ] #hours when l on
-heat_off_hours = [ 6,7,8,9,10,11,12,13,14,15,16,17 ]   #hours when heater should NOT operate
-tlon_hour = 06
+on_hours = [ 21,22,23,0,1,2,3,4,5,6,7,8 ] #hours when l on
+#heat_off_hours = [ 9,10,11,12,13,14,15,16,17,18,19,20 ]   #hours when heater should NOT operate
+
+heat_off_hours = []   #hours when heater should NOT operate
+
+tlon_hour = 21
 tlon_minute = 0    # time on
-tloff_hour = 18
+tloff_hour = 9
 tloff_minute = 0   # time off
 
 OFF = 1 #state for relay OFF
@@ -25,7 +28,7 @@ ON = 0  #state for on
 
 testDivisor = 1 #divisor to speed up sequencing to test timings
 
-heater_on_t = 18 * 1000 / testDivisor  #min time heater is on or off for
+heater_on_t = 20 * 1000 / testDivisor  #min time heater is on or off for
 heater_off_t = 113 * 1000 / testDivisor  #min time heater is on or off for
 heater_sp_offset = 0
 
@@ -58,8 +61,10 @@ db_dbname = "sensordata_db"
 hi_temp_warning = 26.0
 lo_temp_warning = 14.0
 
-t_lon = "22:15:00"    # time light on hh:mm:ss
-t_loff = "09:45:00"   # time off
+t_lon = "21:00:00"    # time light on hh:mm:ss
+t_loff = "09:00:00"   # time off
+
+
 
 central_db_hostname = "192.168.0.201"
 central_db_username = "myiot"

@@ -1,4 +1,5 @@
 import MySQLdb
+import sys
 import settings #old settings py file
 
 
@@ -11,14 +12,14 @@ class Database(object):
 
     def getConfigItem(self, name):
         # Open database connection
-        print("trying to connect for setconfigitem in db")
+        print("===trying to connect for setconfigitem in db===")
         try:
             self.db = MySQLdb.connect(
                 settings.db_hostname, settings.db_username, settings.db_password, settings.db_dbname)
         except MySQLdb.Error, e:
             print("error connecting to dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
-        print("connected")
+        sys.stdout.write("===connected-")
         # prepare a cursor object using cursor() method
         try:
             self.cursor = self.db.cursor()
@@ -42,14 +43,14 @@ class Database(object):
 
     def setConfigItem(self, name, value):
         # Open database connection
-        print("trying to connect for setconfigitem in db")
+        print("===trying to connect for setconfigitem in db===")
         try:
             self.db = MySQLdb.connect(
                 settings.db_hostname, settings.db_username, settings.db_password, settings.db_dbname)
         except MySQLdb.Error, e:
             print("error connecting to dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
-        print("connected")
+        sys.stdout.write("===connected..")
         # prepare a cursor object using cursor() method
         try:
             self.cursor = self.db.cursor()
@@ -63,15 +64,15 @@ class Database(object):
             self.cursor.execute(sql)
         except:
             print("dberror executing sql query")
-        print("executing sql")
+        sys.stdout.write("executing sql..")
 
         # Commit your changes in the database
         try:
             self.db.commit()
-            print("committed")
+            sys.stdout.write("committed-")
 
             # disconnect from server
-            print("ready for closing")
+            sys.stdout.write("ready for closing-")
         except MySQLdb.Error, e:
             try:
                 self.db.rollback()
@@ -89,15 +90,14 @@ class Database(object):
 
     def writedb(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
         # Open database connection
-        print("about to try writing record to db")
-        print("trying to connect")
+        print("===about to try writing record to db..trying to connect===")
         try:
             self.db = MySQLdb.connect(
                 settings.db_hostname, settings.db_username, settings.db_password, settings.db_dbname)
         except MySQLdb.Error, e:
             print("error connecting to dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
-        print("connected")
+        sys.stdout.write("===connected-")
         # prepare a cursor object using cursor() method
         try:
             self.cursor = self.db.cursor()
@@ -114,15 +114,15 @@ class Database(object):
             self.cursor.execute(sql)
         except:
             print("dberror executing sql query")
-        print("executing sql")
+        sys.stdout.write("===executing sql-")
 
         # Commit your changes in the database
         try:
             self.db.commit()
-            print("committed")
+            sys.stdout.write("===committed-")
 
             # disconnect from server
-            print("ready for closing")
+            sys.stdout.write("ready for closing-")
         except MySQLdb.Error, e:
             try:
                 self.db.rollback()
@@ -142,8 +142,7 @@ class Database(object):
 
     def updateCentralConfigTable(self, config): #pass config object
 
-        print("about to try update config table from local db to central db")
-        print("trying to connect to central server")
+        print("===try to update config table from local db to central. trying to connect to central server===")
         # Open database connection
         try:
             self.central_db = MySQLdb.connect(settings.central_db_hostname, settings.central_db_username,
@@ -153,7 +152,7 @@ class Database(object):
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
             print("returning 1")
             return
-        print("connected")
+        sys.stdout.write("===connected-")
 
         # prepare a cursor object using cursor() method
         try:
@@ -169,7 +168,7 @@ class Database(object):
             self.central_cursor.execute(sql)
         except:
             print("dberror executing sql query")
-        print("executing sql")
+        sys.stdout.write("executing sql-")
         
         # Prepare SQL query to update a single item in the database settings table.
         sql = "UPDATE  config SET %s = %f" % ('tempSPLOff', config['tempSPLOff'])
@@ -178,17 +177,17 @@ class Database(object):
             self.central_cursor.execute(sql)
         except:
             print("dberror executing sql query")
-        print("executing sql")
+        sys.stdout.write("executing sql-")
         ##############################################
 
 
         # Commit your changes in the database
         try:
             self.central_db.commit()
-            print("committed")
+            sys.stdout.write("committed-")
 
             # disconnect from server
-            print("ready for closing")
+            sys.stdout.write("ready for closing-")
         except MySQLdb.Error, e:
             try:
                 self.central_db.rollback()
@@ -206,10 +205,7 @@ class Database(object):
 
     def update_central_db(self):
         
-
-
-        print("about to try batch update from local db to central db")
-        print("trying to connect to central server")
+        print("===try batch update from local db to central db--trying to connect to central server===")
         # Open database connection
         try:
             self.central_db = MySQLdb.connect(settings.central_db_hostname, settings.central_db_username,
@@ -219,7 +215,7 @@ class Database(object):
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
             print("returning 1")
             return
-        print("connected")
+        sys.stdout.write("===connected-")
 
         # prepare a cursor object using cursor() method
         try:
@@ -234,14 +230,15 @@ class Database(object):
             last_sample_time = self.central_cursor.execute(sql)
         except MySQLdb.Error, e:
             print("dberror getting last sample time from central db")
-            last_sample_time
-
-        print("last sample time from central db: ", last_sample_time)
+            #last_sample_time
+##############################################################################################
+##############################################################################################
+        sys.stdout.write("last sample time from central db: %s - " % (last_sample_time) )
         row = self.central_cursor.fetchone()    # get result if any
-        print("row :", row)
+        sys.stdout.write("row :%s - " % (row))
 
         if row > 0:
-            print("last sample time = ", row[0])
+            sys.stdout.write("last sample time: %s - " % (row[0]) )
             last_sample_time = row[0]
         if row == None:
             last_sample_time = "2016-11-01 00:00:00"
@@ -249,7 +246,7 @@ class Database(object):
         # now get samples from local db with timestamp > last sample time on
         # central db
         sql = "SELECT sample_dt, temperature, humidity, heaterstate, ventstate,fanstate FROM thdata WHERE sample_dt >= '%s'" % last_sample_time
-        print (sql)
+        #sys.stdout.write (sql)
         # get rs from local db
         try:
             self.local_db = MySQLdb.connect(
@@ -257,7 +254,7 @@ class Database(object):
         except MySQLdb.Error, e:
             print("error connecting to local dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
-        print("connected")
+        sys.stdout.write("===connected-")
 
         # prepare a cursor object using cursor() method
         try:
@@ -270,12 +267,12 @@ class Database(object):
             rs_to_update_central_db = list(self.local_cursor.fetchall())
             print(rs_to_update_central_db)
             # rs_to_update_central_db)
-            print("data got from local server - in list ready to upload")
+            sys.stdout.write("data got from local server - in list ready to upload-")
         except MySQLdb.Error, e:
             print("dberror getting last sample time from central db")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
 
-        print("executing sql to update to remote db to sync with local db")
+        sys.stdout.write("executing sql to update to remote db to sync with local db=")
         # if rs_to_update_central_db.count > 0:    #if there are records to add
         # to central db
         if self.local_cursor.rowcount > 0:  # if there are records to add to central db
@@ -290,15 +287,15 @@ class Database(object):
             except MySQLdb.Error, e:
                 print("error updating central db dberror")
                 print "dberror Error %d: %s" % (e.args[0], e.args[1])
-            print("connected")
+            sys.stdout.write("===connected-")
 
             # Commit your changes in the database
         try:
             self.local_db.commit()
-            print("committed")
+            sys.stdout.write("committed-")
 
             # disconnect from server
-            print("ready for closing")
+            sys.stdout.write("ready for closing-")
         except MySQLdb.Error, e:
             try:
                 self.local_db.rollback()

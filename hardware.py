@@ -53,7 +53,7 @@ elif settings.platform_name == "PCDuino":    # pcduino platform
 class sensor(object):
 
     def __init__(self):
-        print("create sensor")
+        print("create sensor object")
         self.humidity = 55.5
         self.temperature = 18.0
         #self.prevTempHumiMillis = 0   #last time sensor read
@@ -68,7 +68,7 @@ class sensor(object):
         if settings.platform_name == "RPi2":
             sensor = Adafruit_DHT.DHT22
             self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, sensorPin)
-            sleep(settings.readDelay)
+            #sleep(settings.readDelay)
             
         elif settings.platform_name == "PCDuino":
             if dht22.getth() == 0:
@@ -78,7 +78,7 @@ class sensor(object):
             else:
                 self.temperature = None
                 self.humidity = None
-            sleep(settings.readDelay)
+            #sleep(settings.readDelay)
 
         return self.humidity, self.temperature
 
@@ -86,7 +86,7 @@ class sensor(object):
         #read till ret 0-ok. timeout if no valid data after timeout
         #global currentMillis        #current time
 
-        print ("..try to read sensor", round_time(datetime.datetime.now(), 1))
+        print ("...try to read sensor at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
         self.readErrs = 0    #reset err count
         self.prevTemp = self.temperature
         self.prevHumi = self.humidity
@@ -118,7 +118,8 @@ class sensor(object):
         else:#good read CRC if here
             if ( abs(self.temperature - self.prevTemp) < 10) and ( (self.humidity >= 10)
                 and (self.humidity <= 100)): #if temp diff smallish, assume good sample
-                print( "..read sensor SUCCESS" )
+                #print( "..read sensor SUCCESS" )
+                print ("..read sensor success at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
                 #self.prevTempHumiMillis = self.currentMillis
                 self.temperature = round(self.temperature, 1)
                 self.humidity = round(self.humidity, 1)
@@ -126,7 +127,7 @@ class sensor(object):
                 #filter temp function
                 self.proc_temp = self.proc_temp + ( 0.333 * (self.temperature - self.proc_temp))
                 self.proc_temp = round(self.proc_temp, 3)
-                print ('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))
+                print ('..temp: %2.1f, humi: %2.1f' %(self.temperature, self.humidity))
             else:
                 #bad sample even though good crc
                 print ('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))

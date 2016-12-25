@@ -1,3 +1,5 @@
+import datetime as dt
+
 import yaml
 from DatabaseObject import db # singleton
 
@@ -10,22 +12,21 @@ class Config(object):
         self.config = self.readConfigFromFile()
         self.writeConfigToDB()
 
-        print("________written temp lon sp to db config____\n");
+        print("__written temp lon sp to db config__");
         return
 
     def readConfigFromFile(self):
-
         #to start use python settings imported module from tof
         f = open('/home/pi/controlleroo/config.yaml')
         # use safe_load instead load
         config = yaml.safe_load(f)
+        print("==Reading config settings from yaml file==")
         print yaml.dump(config)
         f.close()
         return config
         
     def writeConfigToDB(self):
-        print("Writing settings to db ..................")
-
+        print("==Writing settings to db ..")
         self.setConfigItemInDB( 'tempSPLOn', self.config['tempSPLOn'])
         self.setConfigItemInDB( 'tempSPLOff', self.config['tempSPLOff'])
         db.updateCentralConfigTable(self.config) 
@@ -33,10 +34,13 @@ class Config(object):
         
     def setConfigItemInDB(self, name, value):
         db.setConfigItem(name, value)
-        
         return
         
     def getConfigItemFromDB(self, name, value):
+        return value
+        
+    def getItemValue(self, item):
+        value = self.config[item]
         return value
         
     def readConfigFromDB(self):
@@ -47,14 +51,18 @@ class Config(object):
 
     def writeConfigToFile(self, settings):
         f = open('/home/pi/controlleroo/config_new.yaml', "w")
+        print("==Writing config settings to yaml file==")
         yaml.dump(settings, f)
         f.close()
         return
 
-    def setSetting(self, name, val):
-        return
+    def getTOn(self):
+        hrs = int(float(self.config['lightOnT'][0:2]))
+        mins = int(float(self.config['lightOnT'][3:5]))
+        return dt.time(hrs,mins)
 
-    def getSetting(self, name):
-        val = 1
-        return val
+    def getTOff(self):
+        hrs = int(float(self.config['lightOffT'][0:2]))
+        mins = int(float(self.config['lightOffT'][3:5]))
+        return dt.time(hrs,mins)
 
