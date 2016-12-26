@@ -6,7 +6,7 @@
 #Hardware specific config items
 # comment out for hardware used as appropriate
 #platform_name: "RPi2"
-platformName: "PCDuino"
+platform_name: "PCDuino"
 #hardware: "RaspberryPi2"
 hardware: "PCDuino"
 readDelay: 3
