@@ -1,19 +1,18 @@
 # YAML
 
-#============targets/settings/tuneable params===========================
+#===config params to store in config obj so tunable via web interface====
 
-## comment out for hardware used as appropriate
-#platform_name: "RPi2"
-##platformName = "PCDuino"
-#hardware: "RaspberryPi2"
-#hardware = "PCDuino"
-
+#Zone 2 - RPi
 tempSPLOn: 22.5   #target 22.5 mp set point max with lon
 tempSPLOff: 15.3 #16.9 #target = 16.9, target loff
 
 lightOnT: "21:00:00"    # time light on hh:mm:ss
 lightOffT: "09:00:00"   # time off
-
+## comment out for hardware used as appropriate
+#platform_name: "RPi2"
+##platformName = "PCDuino"
+#hardware: "RaspberryPi2"
+#hardware = "PCDuino"
 #readDelay: 3
 #min_CSV_write_interval: 1 * 60 * 1000 #interval min bet csv writes
 
