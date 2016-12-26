@@ -4,7 +4,7 @@
 #platform_name = "RPi2"
 platform_name = "PCDuino"
 #hardware = "RaspberryPi2"
-#hardware = "PCDuino"
+hardware = "PCDuino"
 
 temp_d_on_SP = 24.0   #temp set point max with lon
 temp_d_off_SP = 21.0 # was 21.016.9 #target = 16.9, target loff
