@@ -19,6 +19,7 @@ class Config(object):
     def readConfigFromFile(self):
         #to start use python settings imported module from tof
         fileStr = os.path.abspath("config.yaml")
+        #f = open('/home/pi/controlleroo/config.yaml')
         f = open(fileStr)
         # use safe_load instead load
         config = yaml.safe_load(f)
@@ -26,7 +27,7 @@ class Config(object):
         print yaml.dump(config)
         f.close()
         
-        #print("$$$$$$$$$$$$$$$$$$$$$$$$$$$: ",os.path.abspath("config.yaml"))
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$: ",os.path.abspath("config.yaml"))
         
         return config
         
