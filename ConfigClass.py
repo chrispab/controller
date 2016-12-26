@@ -2,6 +2,7 @@ import datetime as dt
 
 import yaml
 from DatabaseObject import db # singleton
+import os
 
 class Config(object):
 
@@ -17,12 +18,16 @@ class Config(object):
 
     def readConfigFromFile(self):
         #to start use python settings imported module from tof
-        f = open('/home/ubuntu/controlleroo/config.yaml')
+        fileStr = os.path.abspath("config.yaml")
+        f = open(fileStr)
         # use safe_load instead load
         config = yaml.safe_load(f)
         print("==Reading config settings from yaml file==")
         print yaml.dump(config)
         f.close()
+        
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$: ",os.path.abspath("config.yaml"))
+        
         return config
         
     def writeConfigToDB(self):
