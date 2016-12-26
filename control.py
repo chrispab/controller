@@ -651,10 +651,12 @@ def main():
         if lightState == ON:
             print('=LOn=')
             target_temp = cfg.getItemValue('tempSPLOn')
+
         else:  # off
             print('=LOff=')
             target_temp = cfg.getItemValue('tempSPLOff')
-
+        print(target_temp)
+        
         ctl1.fan1.control(current_millis)
         ctl1.vent1.control(temperature, target_temp, lightState, current_millis)
         ctl1.heater1.control(temperature, target_temp, current_millis, lightState)
