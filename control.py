@@ -163,7 +163,7 @@ class Heater(object):
         print('==Heat ctl==')
         # if d_state == ON:
         current_hour = datetime.datetime.now().hour
-        if current_hour in settings.heat_off_hours:  # l on and not hh:xx pm
+        if current_hour in cfg.getItemValue('heat_off_hours'):  # l on and not hh:xx pm
             self.state = OFF
             print('..d on, in heat off hours - skipping lon heatctl')
             # oveeride

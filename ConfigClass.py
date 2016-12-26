@@ -21,7 +21,6 @@ class Config(object):
         return
 
     def readConfigFromFile(self):
-        #to start use python settings imported module from tof
         cfgFilename = "config_" + socket.gethostname() + ".yaml"
         print(cfgFilename)
         fileStr = os.path.abspath( cfgFilename )

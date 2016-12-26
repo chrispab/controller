@@ -3,8 +3,8 @@
 #===config params to store in config obj so tunable via web interface====
 
 #Zone 2 - PCDuino
-tempSPLOn: 24.1   #target 22.5 mp set point max with lon
-tempSPLOff: 21.1 #16.9 #target = 16.9, target loff
+tempSPLOn: 24.0   #target 22.5 mp set point max with lon
+tempSPLOff: 21.0 #16.9 #target = 16.9, target loff
 
 lightOnT: "14:00:00"    # time light on hh:mm:ss
 lightOffT: "20:00:00"   # time off
