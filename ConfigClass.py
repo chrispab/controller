@@ -13,7 +13,7 @@ class Config(object):
         print("creating config object")
         #write init config from file to db
         self.config = self.readConfigFromFile()
-        self.writeConfigToFile(self.config)
+        #self.writeConfigToFile(self.config)
 
         self.writeConfigToDB()
 
