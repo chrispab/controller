@@ -14,7 +14,7 @@ min_CSV_write_interval = 1 * 60 * 1000 #interval min bet csv writes
 #ventSpeedState = OFF
 
 #----L control params----
-on_hours = [ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,20,21,22,23]
+#on_hours = [ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,20,21,22,23]
 #heat_off_hours = [ 20 ]   #hours when heater should NOT operate
 #tlon_hour = 20
 #tlon_minute = 00    # time on
@@ -26,9 +26,9 @@ ON = 0  #state for on
 
 testDivisor = 1 #divisor to speed up sequencing to test timings
 
-heater_on_t = 1 * 1000 / testDivisor  #min time heater is on or off for
-heater_off_t = 30 * 1000 / testDivisor  #min time heater is on or off for
-heater_sp_offset = -1.0
+#heater_on_t = 1 * 1000 / testDivisor  #min time heater is on or off for
+#heater_off_t = 30 * 1000 / testDivisor  #min time heater is on or off for
+##heater_sp_offset = -1.0
 
 
 ventOnDelta = 3 * 1000 / testDivisor   #duration vent is on in millis

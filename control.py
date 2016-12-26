@@ -154,10 +154,10 @@ class Heater(object):
     def __init__(self):
         print("creating heater")
         self.state = OFF
-        self.heater_off_delta = settings.heater_off_t  # min time heater is on or off for
-        self.heater_on_delta = settings.heater_on_t  # min time heater is on or off for
+        self.heater_off_delta = cfg.getItemValue('heater_off_t')  # min time heater is on or off for
+        self.heater_on_delta = cfg.getItemValue('heater_on_t')  # min time heater is on or off for
         self.prev_heater_millis = 0  # last time heater switched on or off
-        self.heater_sp_offset = settings.heater_sp_offset
+        self.heater_sp_offset = cfg.getItemValue('heater_sp_offset')
 
     def control(self, current_temp, target_temp, current_millis, d_state):
         print('==Heat ctl==')
