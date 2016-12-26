@@ -58,8 +58,8 @@ db_dbname = "sensordata_db"
 hi_temp_warning = 26.0
 lo_temp_warning = 14.0
 
-t_lon = "22:15:00"    # time light on hh:mm:ss
-t_loff = "09:45:00"   # time off
+#t_lon = "22:15:00"    # time light on hh:mm:ss
+#t_loff = "09:45:00"   # time off
 
 central_db_hostname = "192.168.0.201"
 central_db_username = "myiot"
