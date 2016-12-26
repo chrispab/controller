@@ -2,15 +2,15 @@
 
 # comment out for hardware used as appropriate
 #platform_name = "RPi2"
-platform_name = "PCDuino"
+#platform_name = "PCDuino"
 #hardware = "RaspberryPi2"
-hardware = "PCDuino"
+#hardware = "PCDuino"
 
 #temp_d_on_SP = 24.0   #temp set point max with lon
 #temp_d_off_SP = 21.0 # was 21.016.9 #target = 16.9, target loff
-temp_alarm = 30
-readDelay = 3
-min_CSV_write_interval = 1 * 60 * 1000 #interval min bet csv writes
+#temp_alarm = 30
+#readDelay = 3
+#min_CSV_write_interval = 1 * 60 * 1000 #interval min bet csv writes
 #ventSpeedState = OFF
 
 #----L control params----
@@ -31,38 +31,38 @@ testDivisor = 1 #divisor to speed up sequencing to test timings
 ##heater_sp_offset = -1.0
 
 
-ventOnDelta = 3 * 1000 / testDivisor   #duration vent is on in millis
-ventOffDelta = 179 * 1000 / testDivisor  #vent off duration in miili sec
-ventPulseOnDelta = 10 * 1000 # secs cooling on delta
-vent_sp_offset = 0.0
-vent_lon_sp_offset= 0.0 #offset
-vent_loff_sp_offset= 1.0 #
+#ventOnDelta = 3 * 1000 / testDivisor   #duration vent is on in millis
+#ventOffDelta = 179 * 1000 / testDivisor  #vent off duration in miili sec
+#ventPulseOnDelta = 10 * 1000 # secs cooling on delta
+#vent_sp_offset = 0.0
+#vent_lon_sp_offset= 0.0 #offset
+#vent_loff_sp_offset= 1.0 #
 
-fan_on_t = 17 * 1000 / testDivisor   #vent on time
-fan_off_t = 37 * 1000 / testDivisor#vent off time
+#fan_on_t = 17 * 1000 / testDivisor   #vent on time
+#fan_off_t = 37 * 1000 / testDivisor#vent off time
 
 #dataPath = "/home/ubuntu/controlleroo/thdata.csv"
 
 #extraPath = "/home/ubuntu/controlleroo/extradata.csv"
 
-emailEnabled = False
+#mailEnabled = False
 
 #tSPHi = temp_d_on_SP
 #tSPLo = temp_d_off_SP
 
-#db params
-db_hostname = "127.0.0.1"
-db_username = "root"
-db_password = "ubuntu"
-db_dbname = "sensordata_db"
+##db params
+#db_hostname = "127.0.0.1"
+#db_username = "root"
+#db_password = "ubuntu"
+#db_dbname = "sensordata_db"
 
-hi_temp_warning = 26.0
-lo_temp_warning = 15.0
+#hi_temp_warning = 26.0
+#lo_temp_warning = 15.0
 
-t_lon = "22:15:00"    # time light on hh:mm:ss
-t_loff = "09:45:00"   # time off
+#t_lon = "22:15:00"    # time light on hh:mm:ss
+#t_loff = "09:45:00"   # time off
 
-central_db_hostname = "192.168.0.201"
-central_db_username = "myiot"
-central_db_password = "myiot"
-central_db_dbname = "zone2_sensordata_db"
+#central_db_hostname = "192.168.0.201"
+#central_db_username = "myiot"
+#central_db_password = "myiot"
+#central_db_dbname = "zone2_sensordata_db"

@@ -10,21 +10,25 @@ import datetime
 import sendemail as emailMe
 
 
-#import settings
-import socket # to get hostname 
-#note: hostName expected zone1 or zone2
-hostName = socket.gethostname()
-settingsFileName = 'settings_' + hostName
-print(settingsFileName)
-#import as settings
-settings = __import__(settingsFileName)
+##import settings
+#import socket # to get hostname 
+##note: hostName expected zone1 or zone2
+#hostName = socket.gethostname()
+#settingsFileName = 'settings_' + hostName
+#print(settingsFileName)
+##import as settings
+#settings = __import__(settingsFileName)
 
 
 from support import round_time as round_time
 from support import delay as delay
+
+from ConfigObject import cfg # singleton global
+
+
 #******************** hardware specifics********************************
 #================hardware dependant imports=============================
-if settings.platform_name == "RPi2": #rpi platform
+if cfg.getItemValue('platform_name') == "RPi2": #rpi platform
     import RPi.GPIO as GPIO
     import Adafruit_DHT
     sensor = Adafruit_DHT.DHT22
@@ -37,7 +41,7 @@ if settings.platform_name == "RPi2": #rpi platform
     ventRelay = 6   #phys pin 31
     fanRelay = 7    #phys pin 26
     relay4 = 8      #pyhs pin 24
-elif settings.platform_name == "PCDuino":    # pcduino platform
+elif cfg.getItemValue('platform_name') == "PCDuino":    # pcduino platform
     import gpio
     import dht22 as dht22
     #=================hardware dependant pins values etc====================
@@ -75,12 +79,12 @@ class sensor(object):
         self._power_cycle()
             
     def _read_sensor(self):
-        if settings.platform_name == "RPi2":
+        if cfg.getItemValue('platform_name') == "RPi2":
             sensor = Adafruit_DHT.DHT22
             self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, sensorPin)
             #sleep(settings.readDelay)
             
-        elif settings.platform_name == "PCDuino":
+        elif cfg.getItemValue('platform_name') == "PCDuino":
             if dht22.getth() == 0:
                 #humidity, temperature = Adafruit_DHT.read_retry(sensor, sensorPin)
                 self.temperature = round(dht22.cvar.temperature, 1)
@@ -101,7 +105,7 @@ class sensor(object):
         self.prevTemp = self.temperature
         self.prevHumi = self.humidity
         
-        sleep(settings.readDelay)
+        sleep(cfg.getItemValue('readDelay'))
         
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
         
@@ -109,7 +113,7 @@ class sensor(object):
         while (self.humidity is None or self.temperature is None) and self.readErrs < 10:
             print("..ERROR TRYING TO READ SENSOR on sensor read")
             self.readErrs += 1
-            sleep(settings.readDelay) #wait secs before re-read
+            sleep(cfg.getItemValue('readDelay')) #wait secs before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi
     
         if self.readErrs == 10:  # powercyle if 10 read errors
@@ -117,7 +121,7 @@ class sensor(object):
             self._power_cycle()
             print ("..POWER CYCLE complete during sensor read")
             print ("..DODGY TEMP READING USING")
-            if settings.emailEnabled == True:
+            if cfg.getItemValue('emailEnabled') == True:
                 self.message = 'Power cycling sensor due to too many errors'
                 try:
                     emailMe.sendemail('PowerCycle', self.message)
@@ -142,7 +146,7 @@ class sensor(object):
                 #bad sample even though good crc
                 print ('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))
                 print ('..DODGY TEMP READING USING - OLD VALS---------------- ')
-                if settings.emailEnabled == True:
+                if cfg.getItemValue('emailEnabled') == True:
                     self.message = 'Readings, Temp = '+ str(self.temperature) + ',  Humi = '+ str(self.humidity)
                     try:
                         emailMe.sendemail('Spike in Reading', self.message)
@@ -155,13 +159,13 @@ class sensor(object):
          
     def _power_cycle(self):
             print("entering power cycle")
-            if settings.platform_name == "RPi2":
+            if cfg.getItemValue('platform_name') == "RPi2":
                 GPIO.setup(powerPin, GPIO.OUT)  #set pin as OP
                 GPIO.output(powerPin, 0)        #set low to power off sensor
                 sleep(1.0 * 3000 / 1000)
                 GPIO.output(powerPin, 1)        #hi to power on sensor
                 sleep(1.0 * 3000 / 1000)
-            elif settings.platform_name == "PCDuino":
+            elif cfg.getItemValue('platform_name') == "PCDuino":
                 gpio.pinMode(powerPin, gpio.OUTPUT)
                 gpio.digitalWrite(powerPin, gpio.LOW)   #power off
                 sleep(1.0 * 3000 / 1000)
@@ -172,10 +176,10 @@ class platform(object):
     def __init__(self):
         print('creating platform board')
         #Make sure the GPIO pins are ready:
-        if settings.platform_name == "RPi2":
+        if cfg.getItemValue('platform_name') == "RPi2":
             GPIO.setmode(GPIO.BCM)
             GPIO.setwarnings(False)
-        elif settings.platform_name == "PCDuino":
+        elif cfg.getItemValue('platform_name') == "PCDuino":
             dht22.setup()               #init dht22 pins etc
         
         self._setupIO_pins()
@@ -183,7 +187,7 @@ class platform(object):
         
     def _setupIO_pins(self):
         print('initialising io pins')
-        if settings.platform_name == "RPi2":
+        if cfg.getItemValue('platform_name') == "RPi2":
             GPIO.setup(heaterRelay, GPIO.OUT)   #set pin as OP
             GPIO.output(heaterRelay, 1)         #heat off
             GPIO.setup(ventRelay, GPIO.OUT)     #set pin as OP
@@ -192,7 +196,7 @@ class platform(object):
             GPIO.output(fanRelay, 0)            #fan on
             GPIO.setup(relay4, GPIO.OUT)        #set pin as OP
             GPIO.output(relay4, 1)              #speed low
-        elif settings.platform_name == "PCDuino":
+        elif cfg.getItemValue('platform_name') == "PCDuino":
             for portpin in relaypins:
                 gpio.pinMode(portpin, gpio.OUTPUT)    #
             for portpin in relaypins:
@@ -200,12 +204,12 @@ class platform(object):
         
     def switch_relays(self, heaterState, ventState, fanState, ventSpeedState):
         #print('....fan switch state', fanState)
-        if settings.platform_name == "RPi2":
+        if cfg.getItemValue('platform_name') == "RPi2":
             GPIO.output(heaterRelay, heaterState)
             GPIO.output(ventRelay, ventState)
             GPIO.output(fanRelay, fanState)
             GPIO.output(relay4, ventSpeedState)
-        elif settings.platform_name == "PCDuino":
+        elif cfg.getItemValue('platform_name') == "PCDuino":
             #print 'switch relays'
             gpio.digitalWrite(heaterRelay, heaterState)
             gpio.digitalWrite(ventRelay, ventState)

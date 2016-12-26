@@ -56,11 +56,15 @@ class Vent(object):
         self.speed_state_count = 0
         self.speed_state_trigger = 5  # trigger hi state on n counts hi
         self.prev_vent_millis = 0  # last time vent state updated
-        self.vent_on_delta = settings.ventOnDelta  # vent on time
-        self.vent_off_delta = settings.ventOffDelta  # vent off time
+        self.vent_on_delta = cfg.getItemValue('ventOnDelta')  # vent on time
+        self.vent_off_delta = cfg.getItemValue('ventOffDelta')  # vent off time
         self.vent_pulse_active = OFF  # settings.ventPulseActive
         self.vent_pulse_delta = 0  # ventPulseDelta
-        self.vent_pulse_on_delta = settings.ventPulseOnDelta
+        self.vent_pulse_on_delta = cfg.getItemValue('ventPulseOnDelta')
+        self.vent_loff_sp_offset = cfg.getItemValue('vent_loff_sp_offset')
+        self.vent_lon_sp_offset = cfg.getItemValue('vent_lon_sp_offset')
+
+
         self.vent_override = OFF  # settings.ventOverride
 
     def control(self, current_temp, target_temp, d_state, current_millis):
@@ -74,13 +78,13 @@ class Vent(object):
         #self.speed_state = OFF  # lo speed
 
         # loff vent/cooling
-        if ((d_state == OFF) and (current_temp > target_temp + settings.vent_loff_sp_offset)):
+        if ((d_state == OFF) and (current_temp > target_temp + self.vent_loff_sp_offset)):
             self.vent_override = ON
             self.state = ON
             self.prev_vent_millis = current_millis  # retrigeer time period
             print("..VENT ON Loff - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
 
-        if ((d_state == ON) and (current_temp > target_temp + settings.vent_lon_sp_offset)):
+        if ((d_state == ON) and (current_temp > target_temp + self.vent_lon_sp_offset)):
             self.vent_override = ON
             self.state = ON
             self.prev_vent_millis = current_millis  # retrigeer time period
@@ -123,8 +127,8 @@ class Fan(object):
         print("Creating fan")
         self.state = OFF
         self.prev_fan_millis = 0  # last time vent state updated
-        self.fan_on_delta = settings.fan_on_t  # vent on time
-        self.fan_off_delta = settings.fan_off_t  # vent off time
+        self.fan_on_delta = cfg.getItemValue('fan_on_t')  # vent on time
+        self.fan_off_delta = cfg.getItemValue('fan_off_t')  # vent off time
 
     def control(self, current_millis):
         print('==fan ctl==')
@@ -221,7 +225,7 @@ class Logger(object):
         self.previous_proc_temp = 0
         # self.previousHeater = 0
         self.previous_CSV_write_millis = 0
-        self.min_CSV_write_interval = settings.min_CSV_write_interval
+        self.min_CSV_write_interval = cfg.getItemValue('min_CSV_write_interval')
         #self.datastore = Database()
 
     #def write_edge_change(self, state, previous_state):
