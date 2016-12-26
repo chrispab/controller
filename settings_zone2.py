@@ -15,7 +15,7 @@ min_CSV_write_interval = 1 * 60 * 1000 #interval min bet csv writes
 
 #----L control params----
 on_hours = [ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,20,21,22,23]
-heat_off_hours = [ 20 ]   #hours when heater should NOT operate
+#heat_off_hours = [ 20 ]   #hours when heater should NOT operate
 #tlon_hour = 20
 #tlon_minute = 00    # time on
 #tloff_hour = 14
