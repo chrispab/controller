@@ -20,12 +20,12 @@ from DatabaseObject import db # singleton global
 from ConfigObject import cfg # singleton global
 
 
-#note: hostName expected zone1 or zone2
-hostName = socket.gethostname()
-settingsFileName = 'settings_' + hostName
-print(settingsFileName)
-#import as settings
-settings = __import__(settingsFileName)
+##note: hostName expected zone1 or zone2
+#hostName = socket.gethostname()
+#settingsFileName = 'settings_' + hostName
+#print(settingsFileName)
+##import as settings
+#settings = __import__(settingsFileName)
 
 
 import hardware as hw
