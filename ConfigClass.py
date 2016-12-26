@@ -26,7 +26,7 @@ class Config(object):
         print yaml.dump(config)
         f.close()
         
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$: ",os.path.abspath("config.yaml"))
+        #print("$$$$$$$$$$$$$$$$$$$$$$$$$$$: ",os.path.abspath("config.yaml"))
         
         return config
         
