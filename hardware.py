@@ -9,7 +9,17 @@ from time import sleep
 import datetime
 import sendemail as emailMe
 
-import settings
+
+#import settings
+import socket # to get hostname 
+#note: hostName expected zone1 or zone2
+hostName = socket.gethostname()
+settingsFileName = 'settings_' + hostName
+print(settingsFileName)
+#import as settings
+settings = __import__(settingsFileName)
+
+
 from support import round_time as round_time
 from support import delay as delay
 #******************** hardware specifics********************************
