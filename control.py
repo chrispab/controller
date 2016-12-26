@@ -14,7 +14,7 @@ import socket # to get hostname
 
 
 #my classes
-from ConfigClass import Config
+#from ConfigClass import Config #config object with settings in
 #from DatabaseClass import Database
 from DatabaseObject import db # singleton global
 from ConfigObject import cfg # singleton global
@@ -65,16 +65,6 @@ class Vent(object):
 
     def control(self, current_temp, target_temp, d_state, current_millis):
         print('==Vent ctl==')
-
-        # if self.speed_state = ON  # high speed
-        # self.speed_state_count++
-        # if self.speed_state_count == self.speed_state_trigger:
-        # self.speed_state = ON  # high speed
-        #self.speed_state_count = 0
-        # if self.speed_state = OFF  # lo speed
-
-        # else:
-        # self.speed_state = OFF  # lo speed
 
         if d_state == ON:
             self.speed_state = ON  # high speed
@@ -234,22 +224,22 @@ class Logger(object):
         self.min_CSV_write_interval = settings.min_CSV_write_interval
         #self.datastore = Database()
 
-    def write_edge_change(self, state, previous_state):
-        if previous_state == OFF:  # must be going OFF to ON
-            # write a low record immediately before hi record
-            print("----- write edge func -- new prev low row appended to CSV -----")
-            state[0] = OFF
-            self._write_to_CSV()
-            state[0] = ON  # restore to actual current val
-            self._write_to_CSV()
+    #def write_edge_change(self, state, previous_state):
+        #if previous_state == OFF:  # must be going OFF to ON
+            ## write a low record immediately before hi record
+            #print("----- write edge func -- new prev low row appended to CSV -----")
+            #state[0] = OFF
+            #self._write_to_CSV()
+            #state[0] = ON  # restore to actual current val
+            #self._write_to_CSV()
 
-        if previous_state == ON:  # must be going ON TO OFF
-            # write a on record immediately before hi record
-            print("----- new prev hi row appended to CSV -----")
-            state[0] = ON
-            self._write_to_CSV()
-            state[0] = OFF  # restore to actual current val
-            self._write_to_CSV()
+        #if previous_state == ON:  # must be going ON TO OFF
+            ## write a on record immediately before hi record
+            #print("----- new prev hi row appended to CSV -----")
+            #state[0] = ON
+            #self._write_to_CSV()
+            #state[0] = OFF  # restore to actual current val
+            #self._write_to_CSV()
 
     def update_CSV_If_changes(self, temperature, humidity, vent_state,
                               fan_state, heater_state, vent_speed_state, current_millis,
@@ -348,111 +338,7 @@ class Logger(object):
 
         return
 
-    def update_CSV_If_changes_OLD(self, temperature, humidity, vent_state,
-                                  fan_state, heater_state, vent_speed_state, current_millis,
-                                  current_time, proc_temp):
-        self.temperature = temperature
-        self.humidity = humidity
-        self.vent_state = vent_state
-        self.fan_state = fan_state
-        self.heater_state = heater_state
-        self.vent_speed_state = vent_speed_state
-        self.current_millis = current_millis
-        self.current_time = current_time
-        self.proc_temp = proc_temp
 
-        # update csv if any change
-        # check for changes in vent values
-
-        if self.vent_state != self.previous_vent_state:  # any change in vent
-            #self.write_edge_change( vent_state, self.previous_vent_state)
-
-            if self.previous_vent_state == OFF:  # must be going OFF to ON
-                # write a low record immediately before hi record
-                print("----- new prevvent low row appended to CSV -----")
-                self.vent_state = OFF
-                self._write_to_CSV()
-                self.vent_state = ON  # restore to actual current val
-                self._write_to_CSV()
-
-            if self.previous_vent_state == ON:  # must be going ON TO OFF
-                # write a on record immediately before hi record
-                print("----- new prevvent hi row appended to CSV -----")
-                self.vent_state = ON
-                self._write_to_CSV()
-                self.vent_state = OFF  # restore to actual current val
-                self._write_to_CSV()
-
-        if self.vent_speed_state != self.previous_vent_speed_state:  # any change in vent speed
-            if self.previous_vent_speed_state == OFF:  # was lo speed
-                # write a low record immediately before hi record
-                print("----- new prevvspeed low row appended to CSV -----")
-                self.vent_speed_state = OFF
-                self._write_to_CSV()
-                self.vent_speed_state = ON  # restore to actual current val
-                self._write_to_CSV()
-            else:  # was hi speed going low
-                # write a on record immediately before hi record
-                print("----- new prevvspeed hi row appended to CSV -----")
-                self.vent_speed_state = ON
-                self._write_to_CSV()
-                self.vent_speed_state = OFF  # restore to actual current val
-                self._write_to_CSV()
-
-        if self.fan_state != self.previous_fan_state:  # any change in vent
-            # pbref=[self.fan_state]
-            # self.write_edge_change(', self.previous_fan_state)
-
-            if self.previous_fan_state == OFF:  # must be going OFF to ON
-                # write a low record immediately before hi record
-                print("----- new prevfanstate low row appended to CSV -----")
-                self.fan_state = OFF
-                self._write_to_CSV()
-                self.fan_state = ON  # restore to actual current val
-                self._write_to_CSV()
-
-            else:  # must be going ON TO OFF
-                # write a on record immediately before hi record
-                print("----- new  prevfanstate hi row appended to CSV -----")
-                self.fan_state = ON
-                self._write_to_CSV()
-                self.fan_state = OFF  # restore to actual current val
-                self._write_to_CSV()
-
-        if self.heater_state != self.previous_heater_state:  # any change in vent
-            if self.previous_heater_state == OFF:  # must be going OFF to ON
-                # write a low record immediately before hi record
-                print("----- new heaterstate low row appended to CSV -----")
-                self.heater_state = OFF
-                self._write_to_CSV()
-                self.heater_state = ON  # restore to actual current val
-                self._write_to_CSV()
-            else:  # must be going ON TO OFF
-                # write a on record immediately before hi record
-                print("----- new  heaterstate hi row appended to CSV -----")
-                self.heater_state = ON
-                self._write_to_CSV()
-                self.heater_state = OFF  # restore to actual current val
-                self._write_to_CSV()
-
-        if ((self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval))
-                or (self.temperature != self.previous_temperature)):  # any change
-            if self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval):
-                print("..interval passed ..time for new CSV write")
-            else:
-                print("..new data row appended to CSV cos of temp change")
-            self._write_to_CSV()
-            self.previous_CSV_write_millis = self.current_millis
-
-        self.previous_temperature = self.temperature
-        self.previous_humidity = self.humidity
-        self.previous_heater_state = self.heater_state
-        self.previous_vent_state = self.vent_state
-        self.previous_fan_state = self.fan_state
-        self.previous_vent_speed_state = self.vent_speed_state
-        self.previous_proc_temp = self.proc_temp
-
-        return
 
     def _write_to_CSV(self):
         print('===write data line to CSV')
@@ -495,18 +381,18 @@ class Logger(object):
 
         return
 
-    def _write_extra_data_to_CSV(self):
-        extra_data = ['time', 'temp', 'procTemp', 'round-procTemp']
-        # round timestamp to nearest second
-        extra_data[0] = round_time(self.current_time, 1)
-        extra_data[1] = temperature
-        extra_data[2] = procTemp
-        extra_data[3] = round(self.proc_temp, 1)
-        with open(extraPath, "ab") as csv_file:
-            writer = csv.writer(csv_file, delimiter=',')
-            # for line in data:
-            writer.writerow(extra_data)
-        return
+    #def _write_extra_data_to_CSV(self):
+        #extra_data = ['time', 'temp', 'procTemp', 'round-procTemp']
+        ## round timestamp to nearest second
+        #extra_data[0] = round_time(self.current_time, 1)
+        #extra_data[1] = temperature
+        #extra_data[2] = procTemp
+        #extra_data[3] = round(self.proc_temp, 1)
+        #with open(extraPath, "ab") as csv_file:
+            #writer = csv.writer(csv_file, delimiter=',')
+            ## for line in data:
+            #writer.writerow(extra_data)
+        #return
 
 
 class system_timer(object):
@@ -530,41 +416,24 @@ class system_timer(object):
         self.current_millis = int(self.delta.total_seconds() * 1000)
         return
 
-    def get_d_state(self):
-        print('==light - get d state==')
+    #def get_d_state(self):
+        #print('==light - get d state==')
 
-        self.current_hour = datetime.datetime.now().hour
-        if self.current_hour in settings.on_hours:
-            self.d_state = ON
-        else:
-            self.d_state = OFF
+        #self.current_hour = datetime.datetime.now().hour
+        #if self.current_hour in settings.on_hours:
+            #self.d_state = ON
+        #else:
+            #self.d_state = OFF
 
-        current_time = datetime.datetime.now()    # get time in h:m
-        now = datetime.datetime.now()    # get time in h:m
+        #current_time = datetime.datetime.now()    # get time in h:m
+        #now = datetime.datetime.now()    # get time in h:m
 
-        tlon = now.replace(hour=settings.tlon_hour,
-                           minute=settings.tlon_minute, second=0, microsecond=0)
-        tloff = now.replace(hour=settings.tloff_hour,
-                            minute=settings.tloff_minute, second=0, microsecond=0)
+        #tlon = now.replace(hour=settings.tlon_hour,
+                           #minute=settings.tlon_minute, second=0, microsecond=0)
+        #tloff = now.replace(hour=settings.tloff_hour,
+                            #minute=settings.tloff_minute, second=0, microsecond=0)
 
-        # note this section only works if ton < 23:59 and toff >0:0 and toff < ton
-        # section start
-        #print( "..",current_time.time())
-        #print( "..",tlon.time())
-        #print( "..",tloff.time())
-
-        # self.d_state = ON	#on as default posn
-        #print("..ON defaul at start of range check")
-
-        # if (current_time.time() > tloff.time()):# and (current_time < tloff):
-        #print("..OFF time passed...time in OFF range")
-        #self.d_state = OFF
-        # if (current_time.time() > tlon.time()): # and (current_time.time() > tloff.time()):
-        #print("..ON time passed...time in ON range")
-        #self.d_state = ON
-        # section end
-
-        return self.d_state
+        #return self.d_state
 
 
 class Light(object):
@@ -574,7 +443,7 @@ class Light(object):
         self.tOn = dt.time()
         self.tOff = dt.time()
 
-    def testGetLightState(self):
+    def testGetLightState(self): # testing only routine
         print("??Running get lightstate stet??")
         tOn = dt.time(21,0,0)
         tOff = dt.time(9,0,0)

@@ -6,8 +6,8 @@ platform_name = "RPi2"
 hardware = "RaspberryPi2"
 #hardware = "PCDuino"
 
-temp_d_on_SP = 22.5   #target 22.5 mp set point max with lon
-temp_d_off_SP = 15.3 #16.9 #target = 16.9, target loff
+#temp_d_on_SP = 22.5   #target 22.5 mp set point max with lon
+#temp_d_off_SP = 15.3 #16.9 #target = 16.9, target loff
 
 readDelay = 3
 min_CSV_write_interval = 1 * 60 * 1000 #interval min bet csv writes
@@ -46,8 +46,8 @@ extraPath = "data/extradata.csv"
 
 emailEnabled = False
 
-tSPHi = temp_d_on_SP
-tSPLo = temp_d_off_SP
+#tSPHi = temp_d_on_SP
+#tSPLo = temp_d_off_SP
 
 #db params
 db_hostname = "127.0.0.1"

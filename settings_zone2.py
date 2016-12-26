@@ -6,8 +6,8 @@ platform_name = "PCDuino"
 #hardware = "RaspberryPi2"
 hardware = "PCDuino"
 
-temp_d_on_SP = 24.0   #temp set point max with lon
-temp_d_off_SP = 21.0 # was 21.016.9 #target = 16.9, target loff
+#temp_d_on_SP = 24.0   #temp set point max with lon
+#temp_d_off_SP = 21.0 # was 21.016.9 #target = 16.9, target loff
 temp_alarm = 30
 readDelay = 3
 min_CSV_write_interval = 1 * 60 * 1000 #interval min bet csv writes
@@ -47,8 +47,8 @@ extraPath = "/home/ubuntu/controlleroo/extradata.csv"
 
 emailEnabled = False
 
-tSPHi = temp_d_on_SP
-tSPLo = temp_d_off_SP
+#tSPHi = temp_d_on_SP
+#tSPLo = temp_d_off_SP
 
 #db params
 db_hostname = "127.0.0.1"
