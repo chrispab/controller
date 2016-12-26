@@ -1,7 +1,15 @@
 import MySQLdb
 import sys
-import settings #old settings py file
 
+#import settings #old settings py file
+import socket # to get hostname 
+
+#note: hostName expected zone1 or zone2
+hostName = socket.gethostname()
+settingsFileName = 'settings_' + hostName
+print(settingsFileName)
+#import as settings
+settings = __import__(settingsFileName)
 
 class Database(object):
 
