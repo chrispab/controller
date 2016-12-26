@@ -11,6 +11,8 @@ class Config(object):
         print("creating config object")
         #write init config from file to db
         self.config = self.readConfigFromFile()
+        self.writeConfigToFile(self.config)
+
         self.writeConfigToDB()
 
         print("__written temp lon sp to db config__");
@@ -26,6 +28,7 @@ class Config(object):
         print("==Reading config settings from yaml file==")
         print yaml.dump(config)
         f.close()
+        #self.config = config
         
         print("$$$$$$$$$$$$$$$$$$$$$$$$$$$: ",os.path.abspath("config.yaml"))
         
@@ -55,10 +58,11 @@ class Config(object):
 
 
 
-    def writeConfigToFile(self, settings):
-        f = open('/home/pi/controlleroo/config_new.yaml', "w")
-        print("==Writing config settings to yaml file==")
-        yaml.dump(settings, f)
+    def writeConfigToFile(self, config):
+        fileStr = os.path.abspath("config_new.yaml")
+        f = open(fileStr, "w")
+        print("==Writing config settings to new yaml file config_new.yaml==")
+        yaml.dump(config, f)
         f.close()
         return
 

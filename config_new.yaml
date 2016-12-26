@@ -14,27 +14,23 @@ extraPath: /home/pi/controlleroo/data/extradata.csv
 fan_off_t: 10 * 1000 / testDivisor
 fan_on_t: 29 * 60 * 1000 / testDivisor
 hardware: RaspberryPi2
-heat_off_hours: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+heat_off_hours: [21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8]
 heater_off_t: 113 * 1000 / testDivisor
 heater_on_t: 18 * 1000 / testDivisor
 heater_sp_offset: 0
 hi_temp_warning: 26.0
+lightOffT: 09:00:00
+lightOnT: '21:00:00'
 lo_temp_warning: 14.0
 min_CSV_write_interval: 1 * 60 * 1000
-on_hours: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+on_hours: [21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8]
 platform_name: RPi2
 readDelay: 3
 tSPHi: temp_d_on_SP
 tSPLo: temp_d_off_SP
-t_loff: 09:45:00
-t_lon: '22:15:00'
-temp_d_off_SP: 15.3
-temp_d_on_SP: 22.5
+tempSPLOff: 15.3
+tempSPLOn: 22.5
 testDivisor: 1
-tloff_hour: 18
-tloff_minute: 0
-tlon_hour: 6
-tlon_minute: 0
 ventOffDelta: 197 * 1000 / testDivisor
 ventOnDelta: 3 * 1000 / testDivisor
 ventPulseOnDelta: 10 * 1000
