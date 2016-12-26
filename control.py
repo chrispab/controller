@@ -10,19 +10,26 @@ from datetime import timedelta
 import yaml
 import datetime as dt
 import sys    # for stdout print
+import socket # to get hostname 
 
 
 #my classes
 from ConfigClass import Config
 #from DatabaseClass import Database
-from DatabaseObject import db # singleton
-from ConfigObject import cfg # singleton
+from DatabaseObject import db # singleton global
+from ConfigObject import cfg # singleton global
 
 
+#note: hostName expected zone1 or zone2
+hostName = socket.gethostname()
+settingsFileName = 'settings_' + hostName
+print(settingsFileName)
+#import as settings
+settings = __import__(settingsFileName)
 
 
 import hardware as hw
-import settings
+
 from support import round_time as round_time
 
 OFF = settings.OFF  # state for relay OFF
@@ -631,6 +638,7 @@ def main():
     humidity, temperature = ctl1.sensor1.read()
     while 1:
         print("=main=")
+        print(socket.gethostname())
         print("=current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.update_current_millis()
         current_millis = ctl1.timer1.current_millis

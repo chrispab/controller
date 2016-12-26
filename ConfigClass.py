@@ -3,6 +3,8 @@ import datetime as dt
 import yaml
 from DatabaseObject import db # singleton
 import os
+import socket # to get hostname 
+
 
 class Config(object):
 
@@ -20,7 +22,9 @@ class Config(object):
 
     def readConfigFromFile(self):
         #to start use python settings imported module from tof
-        fileStr = os.path.abspath("config.yaml")
+        cfgFilename = "config_" + socket.gethostname() + ".yaml"
+        print(cfgFilename)
+        fileStr = os.path.abspath( cfgFilename )
         #f = open('/home/pi/controlleroo/config.yaml')
         f = open(fileStr)
         # use safe_load instead load
@@ -30,7 +34,7 @@ class Config(object):
         f.close()
         #self.config = config
         
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$: ",os.path.abspath("config.yaml"))
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$: ",os.path.abspath( cfgFilename ))
         
         return config
         

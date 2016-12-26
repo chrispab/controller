@@ -4,13 +4,13 @@ central_db_dbname: zone1_sensordata_db
 central_db_hostname: 192.168.0.201
 central_db_password: myiot
 central_db_username: myiot
-dataPath: /home/pi/controlleroo/data/thdata.csv
+dataPath: data/thdata.csv
 db_dbname: sensordata_db
 db_hostname: 127.0.0.1
 db_password: password
 db_username: controller
 emailEnabled: false
-extraPath: /home/pi/controlleroo/data/extradata.csv
+extraPath: data/extradata.csv
 fan_off_t: 10 * 1000 / testDivisor
 fan_on_t: 29 * 60 * 1000 / testDivisor
 hardware: RaspberryPi2
