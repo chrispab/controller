@@ -41,9 +41,9 @@ vent_loff_sp_offset= 1.0 #
 fan_on_t = 17 * 1000 / testDivisor   #vent on time
 fan_off_t = 37 * 1000 / testDivisor#vent off time
 
-dataPath = "/home/ubuntu/controlleroo/thdata.csv"
+#dataPath = "/home/ubuntu/controlleroo/thdata.csv"
 
-extraPath = "/home/ubuntu/controlleroo/extradata.csv"
+#extraPath = "/home/ubuntu/controlleroo/extradata.csv"
 
 emailEnabled = False
 

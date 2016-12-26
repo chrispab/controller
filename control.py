@@ -35,8 +35,8 @@ from support import round_time as round_time
 OFF = cfg.getItemValue('RelayOff')  # state for relay OFF
 ON = cfg.getItemValue('RelayOn')  # state for on
 
-path = settings.dataPath
-extraPath = settings.extraPath
+path = cfg.getItemValue('dataPath')
+extraPath = cfg.getItemValue('extraPath')
 
 
 # ============================common code start==========================

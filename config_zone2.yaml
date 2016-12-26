@@ -45,9 +45,8 @@ heater_sp_offset: 0
 
 #fan_off_t: 10 * 1000 / testDivisor #vent off time
 
-#dataPath: "/home/ubuntu/controlleroo/thdata.csv"
-
-#extraPath: "/home/ubuntu/controlleroo/extradata.csv"
+dataPath: "data/thdata.csv"
+extraPath: "data/extradata.csv"
 
 #emailEnabled: False
 
