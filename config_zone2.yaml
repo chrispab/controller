@@ -25,8 +25,8 @@ heat_off_hours: [ 20 ]   #hours when heater should NOT operate
 ##tloff_hour: 18
 ##tloff_minute: 0   # time off
 
-#OFF: 1 #state for relay OFF
-#ON: 0  #state for on
+RelayOff: 1 #state for relay OFF
+RelayOn: 0  #state for on
 
 #testDivisor: 1 #divisor to speed up sequencing to test timings
 

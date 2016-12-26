@@ -20,8 +20,8 @@ min_CSV_write_interval = 1 * 60 * 1000 #interval min bet csv writes
 #tloff_hour = 18
 #tloff_minute = 0   # time off
 
-OFF = 1 #state for relay OFF
-ON = 0  #state for on
+#OFF = 1 #state for relay OFF
+#ON = 0  #state for on
 
 testDivisor = 1 #divisor to speed up sequencing to test timings
 

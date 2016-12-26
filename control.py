@@ -32,8 +32,8 @@ import hardware as hw
 
 from support import round_time as round_time
 
-OFF = settings.OFF  # state for relay OFF
-ON = settings.ON  # state for on
+OFF = cfg.getItemValue('RelayOff')  # state for relay OFF
+ON = cfg.getItemValue('RelayOn')  # state for on
 
 path = settings.dataPath
 extraPath = settings.extraPath
