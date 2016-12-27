@@ -36,7 +36,7 @@ OFF = cfg.getItemValue('RelayOff')  # state for relay OFF
 ON = cfg.getItemValue('RelayOn')  # state for on
 
 path = cfg.getItemValue('dataPath')
-extraPath = cfg.getItemValue('extraPath')
+#extraPath = cfg.getItemValue('extraPath')
 
 
 # ============================common code start==========================

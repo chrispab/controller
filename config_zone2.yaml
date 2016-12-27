@@ -17,8 +17,6 @@ tempSPLOff: 21.0 #16.9 #target = 16.9, target loff
 lightOnT: "20:00:00"    # time light on hh:mm:ss
 lightOffT: "14:00:00"   # time off
 
-## comment out for hardware used as appropriate
-
 min_CSV_write_interval: 60000 #interval min bet csv writes
 
 ##----L control params----
@@ -40,11 +38,9 @@ vent_lon_sp_offset: 0.0 #offset
 vent_loff_sp_offset: 0.0 #
 
 fan_on_t: 5000    #vent on time ms
-#fan_on_t = 30 * 1000 / testDivisor   #vent on time
 fan_off_t: 45000 #vent off time ms
 
 dataPath: "data/thdata.csv"
-extraPath: "data/extradata.csv"
 
 emailEnabled: False
 

@@ -275,7 +275,7 @@ class Database(object):
         try:
             rs_to_update_central_db = self.local_cursor.execute(sql)
             rs_to_update_central_db = list(self.local_cursor.fetchall())
-            print(rs_to_update_central_db)
+            print("--Records to update central db: %s" % (rs_to_update_central_db))
             # rs_to_update_central_db)
             sys.stdout.write("data got from local server - in list ready to upload-")
         except MySQLdb.Error, e:

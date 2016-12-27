@@ -36,7 +36,7 @@ class Config(object):
         f.close()
         #self.config = config
         
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$: ",os.path.abspath( cfgFilename ))
+        #print("$$$$$$$$$$$$$$$$$$$$$$$$$$$: ",os.path.abspath( cfgFilename ))
         
         return config
         
