@@ -200,8 +200,6 @@ class Heater(object):
 
 
 
-
-
 class Logger(object):
     # roundT = roundTime
 
@@ -419,7 +417,17 @@ class system_timer(object):
         self.delta = self.current_time - self.start_millis
         self.current_millis = int(self.delta.total_seconds() * 1000)
         return
-
+    
+    def getUpTime(self):
+        # get uptime from the linux terminal command
+        from subprocess import check_output
+        uptime = check_output(["uptime"])
+        # return only uptime info
+        #uptime = output[output.find("up"):output.find("user")-5]
+        #uptime = output
+        return uptime
+    
+    
     #def get_d_state(self):
         #print('==light - get d state==')
 
@@ -540,6 +548,7 @@ def main():
         end_time = time.time()
         uptime = end_time - start_time
         human_uptime = str(timedelta(seconds=int(uptime)))
+        human_uptime = ctl1.timer1.getUpTime()
         print('=uptime: %s' % (human_uptime))
 
 if __name__ == "__main__":
