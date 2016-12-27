@@ -226,22 +226,7 @@ class Logger(object):
         self.min_CSV_write_interval = cfg.getItemValue('min_CSV_write_interval')
         #self.datastore = Database()
 
-    #def write_edge_change(self, state, previous_state):
-        #if previous_state == OFF:  # must be going OFF to ON
-            ## write a low record immediately before hi record
-            #print("----- write edge func -- new prev low row appended to CSV -----")
-            #state[0] = OFF
-            #self._write_to_CSV()
-            #state[0] = ON  # restore to actual current val
-            #self._write_to_CSV()
 
-        #if previous_state == ON:  # must be going ON TO OFF
-            ## write a on record immediately before hi record
-            #print("----- new prev hi row appended to CSV -----")
-            #state[0] = ON
-            #self._write_to_CSV()
-            #state[0] = OFF  # restore to actual current val
-            #self._write_to_CSV()
 
     def update_CSV_If_changes(self, temperature, humidity, vent_state,
                               fan_state, heater_state, vent_speed_state, current_millis,
@@ -383,19 +368,6 @@ class Logger(object):
 
         return
 
-    #def _write_extra_data_to_CSV(self):
-        #extra_data = ['time', 'temp', 'procTemp', 'round-procTemp']
-        ## round timestamp to nearest second
-        #extra_data[0] = round_time(self.current_time, 1)
-        #extra_data[1] = temperature
-        #extra_data[2] = procTemp
-        #extra_data[3] = round(self.proc_temp, 1)
-        #with open(extraPath, "ab") as csv_file:
-            #writer = csv.writer(csv_file, delimiter=',')
-            ## for line in data:
-            #writer.writerow(extra_data)
-        #return
-
 
 class system_timer(object):
 
@@ -427,25 +399,6 @@ class system_timer(object):
         #uptime = output
         return uptime
     
-    
-    #def get_d_state(self):
-        #print('==light - get d state==')
-
-        #self.current_hour = datetime.datetime.now().hour
-        #if self.current_hour in settings.on_hours:
-            #self.d_state = ON
-        #else:
-            #self.d_state = OFF
-
-        #current_time = datetime.datetime.now()    # get time in h:m
-        #now = datetime.datetime.now()    # get time in h:m
-
-        #tlon = now.replace(hour=settings.tlon_hour,
-                           #minute=settings.tlon_minute, second=0, microsecond=0)
-        #tloff = now.replace(hour=settings.tloff_hour,
-                            #minute=settings.tloff_minute, second=0, microsecond=0)
-
-        #return self.d_state
 
 
 class Light(object):
@@ -546,10 +499,16 @@ def main():
         ctl1.logger1.update_CSV_If_changes(temperature, humidity, ventState, fanState, heaterState, ventSpeedState,
             current_millis, ctl1.timer1.current_time, ctl1.sensor1.proc_temp)  # write to csv if any state changes
         end_time = time.time()
-        uptime = end_time - start_time
-        human_uptime = str(timedelta(seconds=int(uptime)))
-        human_uptime = ctl1.timer1.getUpTime()
-        print('=uptime: %s' % (human_uptime))
+        processUptime = end_time - start_time
+        processUptime = str(timedelta(seconds=int(processUptime)))
+        systemMessage = ctl1.timer1.getUpTime().strip()
+        cfg.setConfigItemInDB('processUptime', processUptime)
+        cfg.setConfigItemInDB('systemMessage', systemMessage )
+        print('=Process uptime: %s' % (processUptime))
+        print('=System message: %s' % (systemMessage))
+        #print('=System uptime: %s' % (systemUptime))
+
+
 
 if __name__ == "__main__":
     # stuff only to run when not called via 'import' here

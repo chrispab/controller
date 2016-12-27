@@ -47,9 +47,9 @@ class Config(object):
         self.updateCentralConfigTable(self.config) 
         return
         
-    def setConfigItemInDB(self, name, value):
-        self.setConfigItem(name, value)
-        return
+    #def setConfigItemInDB(self, name, value):
+        #self.setConfigItem(name, value)
+        #return
         
     def getConfigItemFromDB(self, name, value):
         return value
@@ -115,7 +115,7 @@ class Config(object):
         return
 
 
-    def setConfigItem(self, name, value):
+    def setConfigItemInDB(self, name, value):
         # Open database connection
         print("===trying to connect for setconfigitem in db===")
         try:
@@ -132,12 +132,37 @@ class Config(object):
             print("dberror getting cursor")
 
             # Prepare SQL query to update a single item in the database settings table.
-        sql = "UPDATE  config SET %s = %f" % (name, value)
+        #sql = "UPDATE  config SET %s = %d" % (name, value)
+
+        #sql = "UPDATE  config SET %s = %f" % (name, value)
+
+        #sql = "UPDATE  config SET %s = %s"
+        # % (name, value)
+        print("type", type(value))
+        if (type(value) is str):
+            #value = value
+            print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWW string WWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
+        else:
+            value=str(value)
+        sqlstr = "UPDATE  config SET %s = '%s'" % (name, value)            
+        #sqlstr = "UPDATE config SET " + name +" = " + value
+        print("?????????????????   ", sqlstr)
+        #sql = "UPDATE config SET (name) VALUES (value)"
+        #cur.execute("INSERT INTO Writers(Name) VALUES('Jack London')")
         # Execute the SQL command
+        
+        #query = """ UPDATE  config SET %s = %s """
+ 
+        #data = (name, value)
+    
+    
         try:
-            self.cursor.execute(sql)
-        except:
+            self.cursor.execute(sqlstr)
+            #self.cursor.execute(query, data)
+
+        except MySQLdb.Error, e:
             print("dberror executing sql query")
+            print "dberror Error %d: %s" % (e.args[0], e.args[1])
         sys.stdout.write("executing sql..")
 
         # Commit your changes in the database
