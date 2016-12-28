@@ -507,6 +507,8 @@ def main():
         print('=Process uptime: %s' % (processUptime))
         print('=System message: %s' % (systemMessage))
         #print('=System uptime: %s' % (systemUptime))
+        
+        cfg.updateCentralConfigTable()
 
 
 

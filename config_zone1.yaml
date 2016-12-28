@@ -54,3 +54,7 @@ central_db_hostname: "192.168.0.201"
 central_db_username: "myiot"
 central_db_password: "myiot"
 central_db_dbname: "zone1_sensordata_db"
+
+#placeholder items - used for items pushed from system
+processUptime: "00:00:00"
+systemMessage: "sys message"

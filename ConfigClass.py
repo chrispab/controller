@@ -10,6 +10,8 @@ import sys
 
 
 class Config(object):
+    
+    config = 0
 
 
     def __init__(self):
@@ -41,10 +43,13 @@ class Config(object):
         return config
         
     def writeConfigToDB(self):
-        print("==Writing settings to db ..")
+        print("==Writing local config obj to local db ..")
         self.setConfigItemInDB( 'tempSPLOn', self.config['tempSPLOn'])
         self.setConfigItemInDB( 'tempSPLOff', self.config['tempSPLOff'])
-        self.updateCentralConfigTable(self.config) 
+        self.setConfigItemInDB( 'processUptime', self.config['processUptime'])
+        self.setConfigItemInDB( 'systemMessage', self.config['systemMessage'])        
+        
+        self.updateCentralConfigTable() 
         return
         
     #def setConfigItemInDB(self, name, value):
@@ -239,7 +244,7 @@ class Config(object):
         return
 
 
-    def updateCentralConfigTable(self, config): #pass config object
+    def updateCentralConfigTable(self): #pass config object
 
         print("===try to update config table from local db to central. trying to connect to central server===")
         # Open database connection
@@ -261,7 +266,7 @@ class Config(object):
             
         #######################################    
         # Prepare SQL query to update a single item in the database settings table.
-        sql = "UPDATE  config SET %s = %f" % ('tempSPLOn', config['tempSPLOn'])
+        sql = "UPDATE  config SET %s = %f" % ('tempSPLOn', self.config['tempSPLOn'])
         # Execute the SQL command
         try:
             self.central_cursor.execute(sql)
@@ -270,7 +275,7 @@ class Config(object):
         sys.stdout.write("executing sql-")
         
         # Prepare SQL query to update a single item in the database settings table.
-        sql = "UPDATE  config SET %s = %f" % ('tempSPLOff', config['tempSPLOff'])
+        sql = "UPDATE  config SET %s = %f" % ('tempSPLOff', self.config['tempSPLOff'])
         # Execute the SQL command
         try:
             self.central_cursor.execute(sql)
@@ -278,7 +283,25 @@ class Config(object):
             print("dberror executing sql query")
         sys.stdout.write("executing sql-")
         ##############################################
-
+        #######################################    
+        # Prepare SQL query to update a single item in the database settings table.
+        sql = "UPDATE  config SET %s = %s" % ('processUptime', self.config['processUptime'])
+        # Execute the SQL command
+        try:
+            self.central_cursor.execute(sql)
+        except:
+            print("dberror executing sql query")
+        sys.stdout.write("executing sql-")
+        
+        # Prepare SQL query to update a single item in the database settings table.
+        sql = "UPDATE  config SET %s = %s" % ('systemMessage', self.config['systemMessage'])
+        # Execute the SQL command
+        try:
+            self.central_cursor.execute(sql)
+        except:
+            print("dberror executing sql query")
+        sys.stdout.write("executing sql-")
+        ##############################################
 
         # Commit your changes in the database
         try:
