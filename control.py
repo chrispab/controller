@@ -32,11 +32,11 @@ import hardware as hw
 
 from support import round_time as round_time
 
-OFF = cfg.getItemValue('RelayOff')  # state for relay OFF
-ON = cfg.getItemValue('RelayOn')  # state for on
+OFF = cfg.getItemValueFromConfig('RelayOff')  # state for relay OFF
+ON = cfg.getItemValueFromConfig('RelayOn')  # state for on
 
-path = cfg.getItemValue('dataPath')
-#extraPath = cfg.getItemValue('extraPath')
+path = cfg.getItemValueFromConfig('dataPath')
+#extraPath = cfg.getItemValueFromConfig('extraPath')
 
 
 # ============================common code start==========================
@@ -56,13 +56,13 @@ class Vent(object):
         self.speed_state_count = 0
         self.speed_state_trigger = 5  # trigger hi state on n counts hi
         self.prev_vent_millis = 0  # last time vent state updated
-        self.vent_on_delta = cfg.getItemValue('ventOnDelta')  # vent on time
-        self.vent_off_delta = cfg.getItemValue('ventOffDelta')  # vent off time
+        self.vent_on_delta = cfg.getItemValueFromConfig('ventOnDelta')  # vent on time
+        self.vent_off_delta = cfg.getItemValueFromConfig('ventOffDelta')  # vent off time
         self.vent_pulse_active = OFF  # settings.ventPulseActive
         self.vent_pulse_delta = 0  # ventPulseDelta
-        self.vent_pulse_on_delta = cfg.getItemValue('ventPulseOnDelta')
-        self.vent_loff_sp_offset = cfg.getItemValue('vent_loff_sp_offset')
-        self.vent_lon_sp_offset = cfg.getItemValue('vent_lon_sp_offset')
+        self.vent_pulse_on_delta = cfg.getItemValueFromConfig('ventPulseOnDelta')
+        self.vent_loff_sp_offset = cfg.getItemValueFromConfig('vent_loff_sp_offset')
+        self.vent_lon_sp_offset = cfg.getItemValueFromConfig('vent_lon_sp_offset')
 
 
         self.vent_override = OFF  # settings.ventOverride
@@ -127,8 +127,8 @@ class Fan(object):
         print("Creating fan")
         self.state = OFF
         self.prev_fan_millis = 0  # last time vent state updated
-        self.fan_on_delta = cfg.getItemValue('fan_on_t')  # vent on time
-        self.fan_off_delta = cfg.getItemValue('fan_off_t')  # vent off time
+        self.fan_on_delta = cfg.getItemValueFromConfig('fan_on_t')  # vent on time
+        self.fan_off_delta = cfg.getItemValueFromConfig('fan_off_t')  # vent off time
 
     def control(self, current_millis):
         print('==fan ctl==')
@@ -158,16 +158,16 @@ class Heater(object):
     def __init__(self):
         print("creating heater")
         self.state = OFF
-        self.heater_off_delta = cfg.getItemValue('heater_off_t')  # min time heater is on or off for
-        self.heater_on_delta = cfg.getItemValue('heater_on_t')  # min time heater is on or off for
+        self.heater_off_delta = cfg.getItemValueFromConfig('heater_off_t')  # min time heater is on or off for
+        self.heater_on_delta = cfg.getItemValueFromConfig('heater_on_t')  # min time heater is on or off for
         self.prev_heater_millis = 0  # last time heater switched on or off
-        self.heater_sp_offset = cfg.getItemValue('heater_sp_offset')
+        self.heater_sp_offset = cfg.getItemValueFromConfig('heater_sp_offset')
 
     def control(self, current_temp, target_temp, current_millis, d_state):
         print('==Heat ctl==')
         # if d_state == ON:
         current_hour = datetime.datetime.now().hour
-        if current_hour in cfg.getItemValue('heat_off_hours'):  # l on and not hh:xx pm
+        if current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
             self.state = OFF
             print('..d on, in heat off hours - skipping lon heatctl')
             # oveeride
@@ -223,7 +223,7 @@ class Logger(object):
         self.previous_proc_temp = 0
         # self.previousHeater = 0
         self.previous_CSV_write_millis = 0
-        self.min_CSV_write_interval = cfg.getItemValue('min_CSV_write_interval')
+        self.min_CSV_write_interval = cfg.getItemValueFromConfig('min_CSV_write_interval')
         #self.datastore = Database()
 
 
@@ -484,11 +484,11 @@ def main():
         ventSpeedState = ctl1.vent1.speed_state
         if lightState == ON:
             print('=LOn=')
-            target_temp = cfg.getItemValue('tempSPLOn')
+            target_temp = cfg.getItemValueFromConfig('tempSPLOn')
 
         else:  # off
             print('=LOff=')
-            target_temp = cfg.getItemValue('tempSPLOff')
+            target_temp = cfg.getItemValueFromConfig('tempSPLOff')
         print(target_temp)
         
         ctl1.fan1.control(current_millis)

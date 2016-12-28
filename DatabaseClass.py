@@ -24,7 +24,7 @@ class Database(object):
         print("===trying to connect for setconfigitem in db===")
         try:
             self.db = MySQLdb.connect(
-                cfg.getItemValue('db_hostname'), cfg.getItemValue('db_username'), cfg.getItemValue('db_password'), cfg.getItemValue('db_dbname'))
+                cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))
         except MySQLdb.Error, e:
             print("error connecting to dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
@@ -55,7 +55,7 @@ class Database(object):
         print("===trying to connect for setconfigitem in db===")
         try:
             self.db = MySQLdb.connect(
-                cfg.getItemValue('db_hostname'), cfg.getItemValue('db_username'), cfg.getItemValue('db_password'), cfg.getItemValue('db_dbname'))
+                cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))
         except MySQLdb.Error, e:
             print("error connecting to dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
@@ -102,7 +102,7 @@ class Database(object):
         print("===about to try writing record to db..trying to connect===")
         try:
             self.db = MySQLdb.connect(
-                cfg.getItemValue('db_hostname'), cfg.getItemValue('db_username'), cfg.getItemValue('db_password'), cfg.getItemValue('db_dbname'))
+                cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))
         except MySQLdb.Error, e:
             print("error connecting to dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
@@ -154,8 +154,8 @@ class Database(object):
         print("===try to update config table from local db to central. trying to connect to central server===")
         # Open database connection
         try:
-            self.central_db = MySQLdb.connect(cfg.getItemValue('central_db_hostname'), cfg.getItemValue('central_db_username'),
-                                              cfg.getItemValue('central_db_password'), cfg.getItemValue('central_db_dbname'), connect_timeout=15)
+            self.central_db = MySQLdb.connect(cfg.getItemValueFromConfig('central_db_hostname'), cfg.getItemValueFromConfig('central_db_username'),
+                                              cfg.getItemValueFromConfig('central_db_password'), cfg.getItemValueFromConfig('central_db_dbname'), connect_timeout=15)
         except MySQLdb.Error, e:
             print("error connecting to dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
@@ -217,8 +217,8 @@ class Database(object):
         print("===try batch update from local db to central db--trying to connect to central server===")
         # Open database connection
         try:
-            self.central_db = MySQLdb.connect(cfg.getItemValue('central_db_hostname'), cfg.getItemValue('central_db_username'),
-                                              cfg.getItemValue('central_db_password'), cfg.getItemValue('central_db_dbname'), connect_timeout=15)
+            self.central_db = MySQLdb.connect(cfg.getItemValueFromConfig('central_db_hostname'), cfg.getItemValueFromConfig('central_db_username'),
+                                              cfg.getItemValueFromConfig('central_db_password'), cfg.getItemValueFromConfig('central_db_dbname'), connect_timeout=15)
 
         except MySQLdb.Error, e:
             print("error connecting to dberror")
@@ -260,7 +260,7 @@ class Database(object):
         # get rs from local db
         try:
             self.local_db = MySQLdb.connect(
-                cfg.getItemValue('db_hostname'), cfg.getItemValue('db_username'), cfg.getItemValue('db_password'), cfg.getItemValue('db_dbname'))
+                cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))
         except MySQLdb.Error, e:
             print("error connecting to local dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])

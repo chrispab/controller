@@ -26,8 +26,8 @@ heat_off_hours: [ 21,22,23,0,1,2,3,4,5,6,7,8 ]   #hours when heater should NOT o
 RelayOff: 1 #state for relay OFF
 RelayOn: 0  #state for on
 
-heater_on_t: 20000  #min time heater is on or off for
-heater_off_t: 97000  #min time heater is on or off for
+heater_on_t: 25000  #min time heater is on or off for
+heater_off_t: 53000  #min time heater is on or off for
 heater_sp_offset: 0
 
 ventOnDelta: 3000 #duration vent is on in millis

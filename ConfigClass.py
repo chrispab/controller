@@ -56,16 +56,16 @@ class Config(object):
         #self.setConfigItem(name, value)
         #return
         
-    def getConfigItemFromDB(self, name, value):
-        return value
+    #def getConfigItemFromDB(self, name, value):
+        #return value
         
-    def getItemValue(self, item):
+    def getItemValueFromConfig(self, item):
         value = self.config[item]
         return value
         
-    def readConfigFromDB(self):
-        config = 1
-        return config
+    #def readConfigFromDB(self):
+        #config = 1
+        #return config
 
 
 
@@ -91,10 +91,10 @@ class Config(object):
 
     def getConfigItem(self, name):
         # Open database connection
-        print("===trying to connect for setconfigitem in db===")
+        print("===trying to connect for getConfigItemFromDB===")
         try:
             self.db = MySQLdb.connect(
-                self.getItemValue('db_hostname'), self.getItemValue('db_username'), self.getItemValue('db_password'), self.getItemValue('db_dbname'))
+                self.getItemValueFromConfig('db_hostname'), self.getItemValueFromConfig('db_username'), self.getItemValueFromConfig('db_password'), self.getItemValueFromConfig('db_dbname'))
         except MySQLdb.Error, e:
             print("error connecting to dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
@@ -105,19 +105,22 @@ class Config(object):
         except:
             print("dberror getting cursor")
 
-        sql = "SELECT %s FROM config ORDER BY id DESC LIMIT 1" % (name)
+        sql = "SELECT %s FROM config" % (name)
         
         # Execute the SQL command
         try:
             value = self.cursor.execute(sql)
         except:
             print("dberror executing sql query getting setting val from db")
-
+        
+        value=self.cursor.fetchone()
+        
         if self.db.open:
             self.db.close()
             print("++ final close ++")
-
-        return
+            
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!  ", value,sql)
+        return value[0]
 
 
     def setConfigItemInDB(self, name, value):
@@ -125,7 +128,7 @@ class Config(object):
         print("===trying to connect for setconfigitem in db===")
         try:
             self.db = MySQLdb.connect(
-                self.getItemValue('db_hostname'), self.getItemValue('db_username'), self.getItemValue('db_password'), self.getItemValue('db_dbname'))
+                self.getItemValueFromConfig('db_hostname'), self.getItemValueFromConfig('db_username'), self.getItemValueFromConfig('db_password'), self.getItemValueFromConfig('db_dbname'))
         except MySQLdb.Error, e:
             print("error connecting to dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
@@ -197,7 +200,7 @@ class Config(object):
         print("===about to try writing record to db..trying to connect===")
         try:
             self.db = MySQLdb.connect(
-                self.getItemValue('db_hostname'), self.getItemValue('db_username'), self.getItemValue('db_password'), self.getItemValue('db_dbname'))
+                self.getItemValueFromConfig('db_hostname'), self.getItemValueFromConfig('db_username'), self.getItemValueFromConfig('db_password'), self.getItemValueFromConfig('db_dbname'))
         except MySQLdb.Error, e:
             print("error connecting to dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
@@ -249,8 +252,8 @@ class Config(object):
         print("===try to update config table from local db to central. trying to connect to central server===")
         # Open database connection
         try:
-            self.central_db = MySQLdb.connect(self.getItemValue('central_db_hostname'), self.getItemValue('central_db_username'),
-                                              self.getItemValue('central_db_password'), self.getItemValue('central_db_dbname'), connect_timeout=15)
+            self.central_db = MySQLdb.connect(self.getItemValueFromConfig('central_db_hostname'), self.getItemValueFromConfig('central_db_username'),
+                                              self.getItemValueFromConfig('central_db_password'), self.getItemValueFromConfig('central_db_dbname'), connect_timeout=15)
         except MySQLdb.Error, e:
             print("error connecting to dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
@@ -285,7 +288,15 @@ class Config(object):
         ##############################################
         #######################################    
         # Prepare SQL query to update a single item in the database settings table.
-        sql = "UPDATE  config SET %s = %s" % ('processUptime', self.config['processUptime'])
+        processUptime = self.getItemValueFromConfig('processUptime')
+        
+        processUptime = self.getConfigItem('processUptime')
+        
+        print("^^^^^^^^^^^^^^^^^^^^^^^ ", processUptime)
+        #processUptime = "100"
+        sql = "UPDATE  config SET %s = '%s'" % ('processUptime', processUptime)
+        print(" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", sql)
+        
         # Execute the SQL command
         try:
             self.central_cursor.execute(sql)
@@ -294,7 +305,10 @@ class Config(object):
         sys.stdout.write("executing sql-")
         
         # Prepare SQL query to update a single item in the database settings table.
-        sql = "UPDATE  config SET %s = %s" % ('systemMessage', self.config['systemMessage'])
+        systemMessage = self.getConfigItem('systemMessage')
+        
+
+        sql = "UPDATE  config SET %s = '%s'" % ('systemMessage', systemMessage)
         # Execute the SQL command
         try:
             self.central_cursor.execute(sql)
@@ -330,8 +344,8 @@ class Config(object):
         print("===try batch update from local db to central db--trying to connect to central server===")
         # Open database connection
         try:
-            self.central_db = MySQLdb.connect(self.getItemValue('central_db_hostname'), self.getItemValue('central_db_username'),
-                                              self.getItemValue('central_db_password'), self.getItemValue('central_db_dbname'), connect_timeout=15)
+            self.central_db = MySQLdb.connect(self.getItemValueFromConfig('central_db_hostname'), self.getItemValueFromConfig('central_db_username'),
+                                              self.getItemValueFromConfig('central_db_password'), self.getItemValueFromConfig('central_db_dbname'), connect_timeout=15)
 
         except MySQLdb.Error, e:
             print("error connecting to dberror")
@@ -373,7 +387,7 @@ class Config(object):
         # get rs from local db
         try:
             self.local_db = MySQLdb.connect(
-                self.getItemValue('db_hostname'), self.getItemValue('db_username'), self.getItemValue('db_password'), self.getItemValue('db_dbname'))
+                self.getItemValueFromConfig('db_hostname'), self.getItemValueFromConfig('db_username'), self.getItemValueFromConfig('db_password'), self.getItemValueFromConfig('db_dbname'))
         except MySQLdb.Error, e:
             print("error connecting to local dberror")
             print "dberror Error %d: %s" % (e.args[0], e.args[1])
