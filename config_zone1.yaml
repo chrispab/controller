@@ -13,7 +13,7 @@ hardware: "RaspberryPi2"
 readDelay: 3 #sensor read delay
 ##
 tempSPLOn: 22.5   #target 22.5 mp set point max with lon
-tempSPLOff: 15.3 #16.9 #target = 16.9, target loff
+tempSPLOff: 16.0 #16.9 #target = 16.9, target loff
 
 lightOnT: "21:00:00"    # time light on hh:mm:ss
 lightOffT: "09:00:00"   # time off
@@ -57,4 +57,4 @@ central_db_dbname: "zone1_sensordata_db"
 
 #placeholder items - used for items pushed from system
 processUptime: "00:00:00"
-systemMessage: "sys message"
+systemMessage: "system message"

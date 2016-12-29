@@ -1,5 +1,6 @@
 import MySQLdb
 import sys
+from DBCore import *
 
 ##import settings #old settings py file
 #import socket # to get hostname 
@@ -16,102 +17,36 @@ class Database(object):
 
     def __init__(self):
         print("Creating db object")
-        #
-
-
-    def getConfigItem(self, name):
-        # Open database connection
-        print("===trying to connect for setconfigitem in db===")
-        try:
-            self.db = MySQLdb.connect(
-                cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))
-        except MySQLdb.Error, e:
-            print("error connecting to dberror")
-            print "dberror Error %d: %s" % (e.args[0], e.args[1])
-        sys.stdout.write("===connected-")
-        # prepare a cursor object using cursor() method
-        try:
-            self.cursor = self.db.cursor()
-        except:
-            print("dberror getting cursor")
-
-        sql = "SELECT %s FROM config ORDER BY id DESC LIMIT 1" % (name)
-        
-        # Execute the SQL command
-        try:
-            value = self.cursor.execute(sql)
-        except:
-            print("dberror executing sql query getting setting val from db")
-
-        if self.db.open:
-            self.db.close()
-            print("++ final close ++")
-
+        self.dbc = DBCore()
         return
-
-
-    def setConfigItem(self, name, value):
-        # Open database connection
-        print("===trying to connect for setconfigitem in db===")
-        try:
-            self.db = MySQLdb.connect(
-                cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))
-        except MySQLdb.Error, e:
-            print("error connecting to dberror")
-            print "dberror Error %d: %s" % (e.args[0], e.args[1])
-        sys.stdout.write("===connected..")
-        # prepare a cursor object using cursor() method
-        try:
-            self.cursor = self.db.cursor()
-        except:
-            print("dberror getting cursor")
-
-            # Prepare SQL query to update a single item in the database settings table.
-        sql = "UPDATE  config SET %s = %f" % (name, value)
-        # Execute the SQL command
-        try:
-            self.cursor.execute(sql)
-        except:
-            print("dberror executing sql query")
-        sys.stdout.write("executing sql..")
-
-        # Commit your changes in the database
-        try:
-            self.db.commit()
-            sys.stdout.write("committed-")
-
-            # disconnect from server
-            sys.stdout.write("ready for closing-")
-        except MySQLdb.Error, e:
-            try:
-                self.db.rollback()
-            except:
-                print("db rollback failed dberror")
-            #raise e
-            print("+++++++++++++DB WRITE PROBLEM +++++++++")
-        finally:
-            if self.db.open:
-                self.db.close()
-                print("++ final close ++")
-
-        return value
-
 
     def writedb(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
         # Open database connection
-        print("===about to try writing record to db..trying to connect===")
-        try:
-            self.db = MySQLdb.connect(
-                cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))
-        except MySQLdb.Error, e:
-            print("error connecting to dberror")
-            print "dberror Error %d: %s" % (e.args[0], e.args[1])
-        sys.stdout.write("===connected-")
+        print("===about to try writing sample record to localdb..trying to connect===")
+        self.dbConn = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), 
+                cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))        
+        
+        #try:
+            #self.db = MySQLdb.connect(
+                #cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), 
+                #cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))
+        #except MySQLdb.Error, e:
+            #print("error connecting to dberror")
+            #print "dberror Error %d: %s" % (e.args[0], e.args[1])
+        #sys.stdout.write("===connected-")
+        
+        
+        
+        
+        
         # prepare a cursor object using cursor() method
-        try:
-            self.cursor = self.db.cursor()
-        except:
-            print("dberror getting cursor")
+        
+        self.cursor = self.dbc.getDBCursor(self.dbConn)
+
+        #try:
+            #self.cursor = self.db.cursor()
+        #except:
+            #print("dberror getting cursor")
 
             # Prepare SQL query to INSERT a record into the database.
         sql = "INSERT INTO thdata(sample_dt, \
@@ -119,97 +54,39 @@ class Database(object):
             VALUES ('%s', '%s', '%s', '%s', '%s', '%s' )" % \
             (sample_dt, temperature, humidity, heaterstate, ventstate, fanstate)
         # Execute the SQL command
-        try:
-            self.cursor.execute(sql)
-        except:
-            print("dberror executing sql query")
-        sys.stdout.write("===executing sql-")
+        #try:
+            #self.cursor.execute(sql)
+        #except:
+            #print("dberror executing sql query")
+        #sys.stdout.write("===executing sql-")
+        self.dbc.execute(self.cursor, sql)
 
         # Commit your changes in the database
-        try:
-            self.db.commit()
-            sys.stdout.write("===committed-")
+        self.dbc.commitClose(self.dbConn)
 
-            # disconnect from server
-            sys.stdout.write("ready for closing-")
-        except MySQLdb.Error, e:
-            try:
-                self.db.rollback()
-            except:
-                print("db rollback failed dberror")
-            #raise e
-            print("+++++++++++++DB WRITE PROBLEM +++++++++")
-        finally:
-            if self.db.open:
-                self.db.close()
-                print("++ final close ++")
+        #try:
+            #self.db.commit()
+            #sys.stdout.write("===committed-")
+
+            ## disconnect from server
+            #sys.stdout.write("ready for closing-")
+        #except MySQLdb.Error, e:
+            #try:
+                #self.db.rollback()
+            #except:
+                #print("db rollback failed dberror")
+            ##raise e
+            #print("+++++++++++++DB WRITE PROBLEM +++++++++")
+        #finally:
+            #if self.db.open:
+                #self.db.close()
+                #print("++ final close ++")
 
         self.update_central_db()    # sync local recs update to central db
 
         return
 
 
-    def updateCentralConfigTable(self, config): #pass config object
-
-        print("===try to update config table from local db to central. trying to connect to central server===")
-        # Open database connection
-        try:
-            self.central_db = MySQLdb.connect(cfg.getItemValueFromConfig('central_db_hostname'), cfg.getItemValueFromConfig('central_db_username'),
-                                              cfg.getItemValueFromConfig('central_db_password'), cfg.getItemValueFromConfig('central_db_dbname'), connect_timeout=15)
-        except MySQLdb.Error, e:
-            print("error connecting to dberror")
-            print "dberror Error %d: %s" % (e.args[0], e.args[1])
-            print("returning 1")
-            return
-        sys.stdout.write("===connected-")
-
-        # prepare a cursor object using cursor() method
-        try:
-            self.central_cursor = self.central_db.cursor()
-        except:
-            print("dberror getting cursor")
-            
-        #######################################    
-        # Prepare SQL query to update a single item in the database settings table.
-        sql = "UPDATE  config SET %s = %f" % ('tempSPLOn', config['tempSPLOn'])
-        # Execute the SQL command
-        try:
-            self.central_cursor.execute(sql)
-        except:
-            print("dberror executing sql query")
-        sys.stdout.write("executing sql-")
-        
-        # Prepare SQL query to update a single item in the database settings table.
-        sql = "UPDATE  config SET %s = %f" % ('tempSPLOff', config['tempSPLOff'])
-        # Execute the SQL command
-        try:
-            self.central_cursor.execute(sql)
-        except:
-            print("dberror executing sql query")
-        sys.stdout.write("executing sql-")
-        ##############################################
-
-
-        # Commit your changes in the database
-        try:
-            self.central_db.commit()
-            sys.stdout.write("committed-")
-
-            # disconnect from server
-            sys.stdout.write("ready for closing-")
-        except MySQLdb.Error, e:
-            try:
-                self.central_db.rollback()
-            except:
-                print("db rollback failed dberror")
-            #raise e
-            print("+++++++++++++DB WRITE PROBLEM +++++++++")
-        finally:
-            if self.central_db.open:
-                self.central_db.close()
-                print("++ final close ++")
-
-        return
 
 
     def update_central_db(self):
