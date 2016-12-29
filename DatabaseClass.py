@@ -25,68 +25,24 @@ class Database(object):
         print("===about to try writing sample record to localdb..trying to connect===")
         self.dbConn = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), 
                 cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))        
-        
-        #try:
-            #self.db = MySQLdb.connect(
-                #cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), 
-                #cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))
-        #except MySQLdb.Error, e:
-            #print("error connecting to dberror")
-            #print "dberror Error %d: %s" % (e.args[0], e.args[1])
-        #sys.stdout.write("===connected-")
-        
-        
-        
-        
-        
+
         # prepare a cursor object using cursor() method
-        
         self.cursor = self.dbc.getDBCursor(self.dbConn)
 
-        #try:
-            #self.cursor = self.db.cursor()
-        #except:
-            #print("dberror getting cursor")
-
-            # Prepare SQL query to INSERT a record into the database.
+        # Prepare SQL query to INSERT a record into the database.
         sql = "INSERT INTO thdata(sample_dt, \
             temperature, humidity, heaterstate, ventstate, fanstate) \
             VALUES ('%s', '%s', '%s', '%s', '%s', '%s' )" % \
             (sample_dt, temperature, humidity, heaterstate, ventstate, fanstate)
         # Execute the SQL command
-        #try:
-            #self.cursor.execute(sql)
-        #except:
-            #print("dberror executing sql query")
-        #sys.stdout.write("===executing sql-")
         self.dbc.execute(self.cursor, sql)
 
         # Commit your changes in the database
         self.dbc.commitClose(self.dbConn)
 
-        #try:
-            #self.db.commit()
-            #sys.stdout.write("===committed-")
-
-            ## disconnect from server
-            #sys.stdout.write("ready for closing-")
-        #except MySQLdb.Error, e:
-            #try:
-                #self.db.rollback()
-            #except:
-                #print("db rollback failed dberror")
-            ##raise e
-            #print("+++++++++++++DB WRITE PROBLEM +++++++++")
-        #finally:
-            #if self.db.open:
-                #self.db.close()
-                #print("++ final close ++")
-
         self.update_central_db()    # sync local recs update to central db
 
         return
-
-
 
 
     def update_central_db(self):
