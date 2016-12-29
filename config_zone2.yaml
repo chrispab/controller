@@ -11,7 +11,7 @@ platform_name: "PCDuino"
 hardware: "PCDuino"
 readDelay: 3
 
-tempSPLOn: 24.0   #target 24.o veg mp set point max with lon
+tempSPLOn: 23.5   #target 24.o veg mp set point max with lon
 tempSPLOff: 19.0 #target = 21.0 veg, target loff
 
 lightOnT: "20:00:00"    # time light on hh:mm:ss
@@ -35,7 +35,7 @@ ventOnDelta: 3000   #duration vent is on in millis
 ventOffDelta: 197000 #vent off duration in miili sec
 ventPulseOnDelta: 3000 #60 secs cooling on delta
 vent_lon_sp_offset: 0.0 #offset
-vent_loff_sp_offset: 0.0 #
+vent_loff_sp_offset: 2.0 #
 
 fan_on_t: 5000    #vent on time ms
 fan_off_t: 45000 #vent off time ms
