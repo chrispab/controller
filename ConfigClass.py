@@ -45,7 +45,7 @@ class Config(object):
         return config
         
     def writeConfigToDB(self):
-        print("==Writing local config obj to local db ..")
+        sys.stdout.write("==writeconfigtodb ..")
         self.setConfigItemInDB( 'tempSPLOn', self.config['tempSPLOn'])
         self.setConfigItemInDB( 'tempSPLOff', self.config['tempSPLOff'])
         self.setConfigItemInDB( 'processUptime', self.config['processUptime'])
@@ -82,7 +82,7 @@ class Config(object):
 
     def setConfigItemInDB(self, name, value):
         # Open database connection
-        print("===trying to connect for setconfigitem in db===")
+        sys.stdout.write("===setconfigitemIndb===")
         
         self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
         self.getItemValueFromConfig('db_username'),self.getItemValueFromConfig('db_password'),
@@ -94,7 +94,7 @@ class Config(object):
         #print("type", type(value))
         if (type(value) is str):
             #value = value
-            print(" string detected")
+            sys.stdout.write("$string detected$")
         else:
             value=str(value)
         sqlstr = "UPDATE  config SET %s = '%s'" % (name, value)            
@@ -109,9 +109,9 @@ class Config(object):
     def updateCentralConfigTable(self): #pass config object
 
         # Open database connection
-        print("===attempt to  connect to updatecentralconfigtable ===")
+        sys.stdout.write("===updatecentralconfigtable ===")
         self.dbCentralConn = self.dbc.getDBConn(self.getItemValueFromConfig('central_db_hostname'), self.getItemValueFromConfig('central_db_username'),
-                                        self.getItemValueFromConfig('central_db_password'), self.getItemValueFromConfig('central_db_dbname'), connect_timeout=15)
+                                        self.getItemValueFromConfig('central_db_password'), self.getItemValueFromConfig('central_db_dbname'))
 
         self.central_cursor = self.dbc.getDBCursor(self.dbCentralConn)
    
@@ -148,33 +148,30 @@ class Config(object):
 
     def getConfigItemFromLocalDB(self, name):
         # Open database connection
-        print("==trying to connect for getConfigItemFromLocalDBFromDB===")
-        try:
-            self.db = MySQLdb.connect(
-                self.getItemValueFromConfig('db_hostname'), self.getItemValueFromConfig('db_username'), self.getItemValueFromConfig('db_password'), self.getItemValueFromConfig('db_dbname'))
-        except MySQLdb.Error, e:
-            print("error connecting to dberror")
-            print "dberror Error %d: %s" % (e.args[0], e.args[1])
-        sys.stdout.write("===connected-")
-        # prepare a cursor object using cursor() method
-        try:
-            self.cursor = self.db.cursor()
-        except:
-            print("dberror getting cursor")
+        sys.stdout.write("===getConfigItemFromLocalDB===")
+        self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
+        self.getItemValueFromConfig('db_username'),self.getItemValueFromConfig('db_password'),
+        self.getItemValueFromConfig('db_dbname'))
+        
+        #get db cursor
+        self.cursor = self.dbc.getDBCursor(self.dbConn)
 
         sql = "SELECT %s FROM config" % (name)
         
         # Execute the SQL command
-        try:
-            value = self.cursor.execute(sql)
-        except:
-            print("dberror executing sql query getting setting val from db")
+        self.dbc.execute(self.cursor, sql)
+        
+        #try:
+            #value = self.cursor.execute(sql)
+        #except:
+            #print("dberror executing sql query getting setting val from db")
         
         value=self.cursor.fetchone()
-        
-        if self.db.open:
-            self.db.close()
-            print("++ final close ++")
+        self.dbc.commitClose(self.dbConn)
+
+        #if self.db.open:
+            #self.db.close()
+            #sys.stdout.write("++ final close ++")
             
         #print("!!!!!!!!!!!!!!!!!!!!!!!!!  ", value,sql)
         return value[0]

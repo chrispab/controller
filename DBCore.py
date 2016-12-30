@@ -1,16 +1,6 @@
 import MySQLdb
 import sys
 
-##import settings #old settings py file
-#import socket # to get hostname 
-
-##note: hostName expected zone1 or zone2
-#hostName = socket.gethostname()
-#settingsFileName = 'settings_' + hostName
-#print(settingsFileName)
-##import as settings
-#settings = __import__(settingsFileName)
-#from ConfigObject import cfg # singleton global
 
 class DBCore(object):
         
@@ -18,35 +8,34 @@ class DBCore(object):
     cursor = 0
         
     def __init__(self):
-
-        
         print("Creating db Core object")
         #
         return
 
 
-    def getDBConn(self, hostName, userName, password, databaseName, connect_timeout=15):
+    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=15):
         # Open database connection
-        sys.stdout.write("*** Attempt to connect to DB ***")
+        sys.stdout.write("* get DB conn *")
         try:
-            self.dbConn = MySQLdb.connect(hostName, userName, password, databaseName)
+            self.dbConn = MySQLdb.connect(host = hostName, 
+                            user = userName, passwd = password, 
+                            db = databaseName, connect_timeout = conn_timeout)
         except MySQLdb.Error, e:
-            print("*** error connecting to DB ***")
-            print "*** DB Error %d: %s ***" % (e.args[0], e.args[1])
-        sys.stdout.write("*** connected ***")
-
-        
+            print("* error connecting to DB * ")
+            print "* DB Error %d: %s * " % (e.args[0], e.args[1])
+        sys.stdout.write("* connected *")        
         return self.dbConn
         
 
     def getDBCursor (self, dbConn):
         ## prepare a cursor object using cursor() method
         try:
-            self.cursor = self.dbConn.cursor()
+            self.cursor = dbConn.cursor()
         except MySQLdb.Error, e:
             print("*** dberror getting cursor ***")
             print "*** DB Error %d: %s ***" % (e.args[0], e.args[1])
         return self.cursor
+        
         
     def execute(self, cursor, sqlstr):
         result = 0
@@ -55,7 +44,7 @@ class DBCore(object):
         except MySQLdb.Error, e:
             print("*** dberror executing sql query ***")
             print "*** dberror Error %d: %s ***" % (e.args[0], e.args[1])
-        sys.stdout.write("*** executing sql ***")
+        sys.stdout.write("* executing sql *")
         return result
         
     def executemany(self, cursor, sqlstr, rs):
@@ -64,7 +53,7 @@ class DBCore(object):
         except MySQLdb.Error, e:
             print("*** dberror executing sql query ***")
             print "*** dberror Error %d: %s ***" % (e.args[0], e.args[1])
-        sys.stdout.write("*** executing sql ***")
+        sys.stdout.write("* executing sql *")
         return result
         
 
@@ -72,10 +61,10 @@ class DBCore(object):
         # Commit your changes in the database
         try:
             dbConn.commit()
-            sys.stdout.write("*** committed ***")
+            sys.stdout.write("* committed *")
 
             # disconnect from server
-            sys.stdout.write("*** ready for closing ***")
+            sys.stdout.write("* ready to close *")
         except MySQLdb.Error, e:
             try:
                 dbConn.rollback()
@@ -85,17 +74,17 @@ class DBCore(object):
             print("*** DB WRITE PROBLEM ***")
         finally:
             self.close(dbConn)
-            print("*** final close commitClose **")
+            print("* final commitClose *")
         return
 
     def commit(self, dbConn):
         # Commit your changes in the database
         try:
             dbConn.commit()
-            sys.stdout.write("*** committed ***")
+            sys.stdout.write("* committed *")
 
             # disconnect from server
-            sys.stdout.write("*** ready for closing ***")
+            sys.stdout.write("* ready to close *")
         except MySQLdb.Error, e:
             try:
                 dbConn.rollback()
@@ -105,7 +94,7 @@ class DBCore(object):
             print("*** DB WRITE PROBLEM ***")
         finally:
             self.close(dbConn)
-            print("*** final close commitClose **")
+            print("* final commit Close *")
         return
                 
     def close(self, dbConn):
@@ -113,6 +102,6 @@ class DBCore(object):
 
         if  dbConn.open:
             dbConn.close()
-            print("** fclose dbConn **")
+            sys.stdout.write("* fclose dbConn *")
         return
         

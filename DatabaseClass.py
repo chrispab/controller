@@ -2,15 +2,7 @@ import MySQLdb
 import sys
 from DBCore import *
 
-##import settings #old settings py file
-#import socket # to get hostname 
 
-##note: hostName expected zone1 or zone2
-#hostName = socket.gethostname()
-#settingsFileName = 'settings_' + hostName
-#print(settingsFileName)
-##import as settings
-#settings = __import__(settingsFileName)
 from ConfigObject import cfg # singleton global
 
 class Database(object):
@@ -52,27 +44,10 @@ class Database(object):
         self.dbConnCentral = self.dbc.getDBConn(cfg.getItemValueFromConfig('central_db_hostname'), cfg.getItemValueFromConfig('central_db_username'),
                                               cfg.getItemValueFromConfig('central_db_password'), cfg.getItemValueFromConfig('central_db_dbname'))          
         
-        #try:
-            #self.central_db = MySQLdb.connect(cfg.getItemValueFromConfig('central_db_hostname'), cfg.getItemValueFromConfig('central_db_username'),
-                                              #cfg.getItemValueFromConfig('central_db_password'), cfg.getItemValueFromConfig('central_db_dbname'), connect_timeout=15)
-
-        #except MySQLdb.Error, e:
-            #print("error connecting to dberror")
-            #print "dberror Error %d: %s" % (e.args[0], e.args[1])
-            #print("returning 1")
-            #return
-        #sys.stdout.write("===connected-")
-
-
 
         # prepare a cursor object using cursor() method
         self.cursorCentral = self.dbc.getDBCursor(self.dbConnCentral)
 
-        
-        #try:
-            #self.central_cursor = self.central_db.cursor()
-        #except:
-            #print("dberror getting cursor")
 
         # Prepare SQL query to get timestamp of last record in the central
         # database.
@@ -80,13 +55,7 @@ class Database(object):
                 # Execute the SQL command
         last_sample_time = self.dbc.execute(self.cursorCentral, sql)
         
-        #try:
-            #last_sample_time = self.central_cursor.execute(sql)
-        #except MySQLdb.Error, e:
-            #print("dberror getting last sample time from central db")
-            #last_sample_time
-##############################################################################################
-##############################################################################################
+
         sys.stdout.write("last sample time from central db: %s - " % (last_sample_time) )
         row = self.cursorCentral.fetchone()    # get result if any
         sys.stdout.write("row :%s - " % (row))
@@ -105,14 +74,6 @@ class Database(object):
         
         self.dbConnLocal = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), 
                 cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))        
-        
-        #try:
-            #self.local_db = MySQLdb.connect(
-                #cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))
-        #except MySQLdb.Error, e:
-            #print("error connecting to local dberror")
-            #print "dberror Error %d: %s" % (e.args[0], e.args[1])
-        #sys.stdout.write("===connected-")
 
         # prepare a cursor object using cursor() method
         self.cursorLocal = self.dbc.getDBCursor(self.dbConnLocal)
@@ -129,9 +90,7 @@ class Database(object):
         print("--Records to update central db: %s" % (rs_to_update_central_db))
             # rs_to_update_central_db)
         sys.stdout.write("data got from local server - in list ready to upload-")
-        #except MySQLdb.Error, e:
-            #print("dberror getting last sample time from central db")
-            #print "dberror Error %d: %s" % (e.args[0], e.args[1])
+
 
         sys.stdout.write("executing sql to update to remote db to sync with local db=")
         # if rs_to_update_central_db.count > 0:    #if there are records to add
@@ -145,32 +104,8 @@ class Database(object):
             self.dbc.executemany(self.cursorCentral, sql, rs_to_update_central_db)
             self.dbc.commitClose(self.dbConnCentral)
 
-                #self.central_db.commit()
-                #self.central_db.close()
-            #except MySQLdb.Error, e:
-                #print("error updating central db dberror")
-                #print "dberror Error %d: %s" % (e.args[0], e.args[1])
-            #sys.stdout.write("===connected-")
 
             # Commit your changes in the database
         self.dbc.commitClose(self.dbConnLocal)
-
-        #try:
-            #self.local_db.commit()
-            #sys.stdout.write("committed-")
-
-            ## disconnect from server
-            #sys.stdout.write("ready for closing-")
-        #except MySQLdb.Error, e:
-            #try:
-                #self.local_db.rollback()
-            #except:
-                #print("db rollback failed dberror")
-            ##raise e
-            #print("+++++++++++++DB WRITE PROBLEM +++++++++")
-        #finally:
-            #if self.local_db.open:
-                #self.local_db.close()
-                #print("++ final close ++")
 
         return
