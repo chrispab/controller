@@ -28,7 +28,6 @@ class DBCore(object):
         
 
     def getDBCursor (self, dbConn):
-        ## prepare a cursor object using cursor() method
         try:
             self.cursor = dbConn.cursor()
         except MySQLdb.Error, e:
@@ -74,7 +73,7 @@ class DBCore(object):
             print("*** DB WRITE PROBLEM ***")
         finally:
             self.close(dbConn)
-            print("* final commitClose *")
+            sys.stdout.write("* commitClose *")
         return
 
     def commit(self, dbConn):
@@ -94,7 +93,7 @@ class DBCore(object):
             print("*** DB WRITE PROBLEM ***")
         finally:
             self.close(dbConn)
-            print("* final commit Close *")
+            sys.stdout.write("* commit *")
         return
                 
     def close(self, dbConn):
@@ -102,6 +101,6 @@ class DBCore(object):
 
         if  dbConn.open:
             dbConn.close()
-            sys.stdout.write("* fclose dbConn *")
+            sys.stdout.write("* close *")
         return
         

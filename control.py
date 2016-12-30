@@ -471,7 +471,7 @@ def main():
     start_time = time.time()
     humidity, temperature = ctl1.sensor1.read()
     while 1:
-        print("=main=")
+        print("\n=main=")
         print(socket.gethostname())
         print("=current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.update_current_millis()
@@ -504,7 +504,7 @@ def main():
         systemMessage = ctl1.timer1.getUpTime().strip()
         cfg.setConfigItemInDB('processUptime', processUptime)
         cfg.setConfigItemInDB('systemMessage', systemMessage )
-        print('=Process uptime: %s' % (processUptime))
+        print('\n=Process uptime: %s' % (processUptime))
         print('=System message: %s' % (systemMessage))
         #print('=System uptime: %s' % (systemUptime))
         

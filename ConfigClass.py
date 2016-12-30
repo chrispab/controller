@@ -82,7 +82,7 @@ class Config(object):
 
     def setConfigItemInDB(self, name, value):
         # Open database connection
-        sys.stdout.write("===setconfigitemIndb===")
+        sys.stdout.write("\n===setconfigitemIndb===")
         
         self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
         self.getItemValueFromConfig('db_username'),self.getItemValueFromConfig('db_password'),
@@ -109,7 +109,7 @@ class Config(object):
     def updateCentralConfigTable(self): #pass config object
 
         # Open database connection
-        sys.stdout.write("===updatecentralconfigtable ===")
+        sys.stdout.write("\n===updatecentralconfigtable ===")
         self.dbCentralConn = self.dbc.getDBConn(self.getItemValueFromConfig('central_db_hostname'), self.getItemValueFromConfig('central_db_username'),
                                         self.getItemValueFromConfig('central_db_password'), self.getItemValueFromConfig('central_db_dbname'))
 
@@ -148,7 +148,7 @@ class Config(object):
 
     def getConfigItemFromLocalDB(self, name):
         # Open database connection
-        sys.stdout.write("===getConfigItemFromLocalDB===")
+        sys.stdout.write("\n===getConfigItemFromLocalDB===")
         self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
         self.getItemValueFromConfig('db_username'),self.getItemValueFromConfig('db_password'),
         self.getItemValueFromConfig('db_dbname'))
