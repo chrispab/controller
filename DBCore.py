@@ -43,19 +43,29 @@ class DBCore(object):
         ## prepare a cursor object using cursor() method
         try:
             self.cursor = self.dbConn.cursor()
-        except:
+        except MySQLdb.Error, e:
             print("*** dberror getting cursor ***")
-
+            print "*** DB Error %d: %s ***" % (e.args[0], e.args[1])
         return self.cursor
         
     def execute(self, cursor, sqlstr):
+        result = 0
         try:
-            cursor.execute(sqlstr)
+            result = cursor.execute(sqlstr)
         except MySQLdb.Error, e:
             print("*** dberror executing sql query ***")
             print "*** dberror Error %d: %s ***" % (e.args[0], e.args[1])
         sys.stdout.write("*** executing sql ***")
-        return
+        return result
+        
+    def executemany(self, cursor, sqlstr, rs):
+        try:
+            result =cursor.executemany( sqlstr, rs)
+        except MySQLdb.Error, e:
+            print("*** dberror executing sql query ***")
+            print "*** dberror Error %d: %s ***" % (e.args[0], e.args[1])
+        sys.stdout.write("*** executing sql ***")
+        return result
         
 
     def commitClose(self, dbConn):
@@ -71,7 +81,7 @@ class DBCore(object):
                 dbConn.rollback()
             except:
                 print("*** db rollback failed dberror ***")
-            #raise e
+                print "*** DB Error %d: %s ***" % (e.args[0], e.args[1])
             print("*** DB WRITE PROBLEM ***")
         finally:
             self.close(dbConn)
@@ -91,7 +101,7 @@ class DBCore(object):
                 dbConn.rollback()
             except:
                 print("*** db rollback failed dberror ***")
-            #raise e
+                print "*** DB Error %d: %s ***" % (e.args[0], e.args[1])
             print("*** DB WRITE PROBLEM ***")
         finally:
             self.close(dbConn)
