@@ -32,9 +32,11 @@ class DBCore(object):
     def getDBCursor (self, dbConn):
         try:
             self.cursor = dbConn.cursor()
+            sys.stdout.write("* got db cursor *")
         except MySQLdb.Error, e:
             print("*** dberror getting cursor ***")
             print "*** DB Error %d: %s ***" % (e.args[0], e.args[1])
+            self.cursor = 0
         return self.cursor
         
         
@@ -50,6 +52,7 @@ class DBCore(object):
         
     def executemany(self, cursor, sqlstr, rs):
         try:
+            sys.stdout.write("* executing sql *")
             result =cursor.executemany( sqlstr, rs)
         except MySQLdb.Error, e:
             print("*** dberror executing sql query ***")
@@ -63,7 +66,6 @@ class DBCore(object):
         try:
             dbConn.commit()
             sys.stdout.write("* committed *")
-
             # disconnect from server
             sys.stdout.write("* ready to close *")
         except MySQLdb.Error, e:
@@ -99,10 +101,13 @@ class DBCore(object):
         return
                 
     def close(self, dbConn):
-        # Commit your changes in the database
-
-        if  dbConn.open:
-            dbConn.close()
-            sys.stdout.write("* close *")
+        # Close the database conn
+        try:            
+            if  dbConn.open:
+                dbConn.close()
+                sys.stdout.write("* close *")
+        except MySQLdb.Error, e:
+            print("*** dberror closing conn ***")
+            print "*** DB Error %d: %s ***" % (e.args[0], e.args[1])
         return
         

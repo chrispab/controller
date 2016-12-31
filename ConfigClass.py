@@ -45,13 +45,15 @@ class Config(object):
         return config
         
     def writeConfigToDB(self):
-        sys.stdout.write("==writeconfigtodb ..")
-        self.setConfigItemInDB( 'tempSPLOn', self.config['tempSPLOn'])
-        self.setConfigItemInDB( 'tempSPLOff', self.config['tempSPLOff'])
-        self.setConfigItemInDB( 'processUptime', self.config['processUptime'])
-        self.setConfigItemInDB( 'systemMessage', self.config['systemMessage'])        
-        
-        self.updateCentralConfigTable() 
+        sys.stdout.write("\n==writeconfigtodb ..")
+        try:
+            self.setConfigItemInDB( 'tempSPLOn', self.config['tempSPLOn'])
+            self.setConfigItemInDB( 'tempSPLOff', self.config['tempSPLOff'])
+            self.setConfigItemInDB( 'processUptime', self.config['processUptime'])
+            self.setConfigItemInDB( 'systemMessage', self.config['systemMessage'])        
+            self.updateCentralConfigTable()
+        except:
+            print("????? writeConfigToDB error caught ?????")
         return
 
     def getItemValueFromConfig(self, item):
@@ -85,8 +87,9 @@ class Config(object):
         sys.stdout.write("\n===setconfigitemIndb===")
         
         self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
-        self.getItemValueFromConfig('db_username'),self.getItemValueFromConfig('db_password'),
-        self.getItemValueFromConfig('db_dbname'))
+                        self.getItemValueFromConfig('db_username'),
+                        self.getItemValueFromConfig('db_password'),
+                        self.getItemValueFromConfig('db_dbname'))
         
         #get db cursor
         self.cursor = self.dbc.getDBCursor(self.dbConn)
@@ -107,76 +110,84 @@ class Config(object):
         return value
 
     def updateCentralConfigTable(self): #pass config object
-
-        # Open database connection
-        sys.stdout.write("\n===updatecentralconfigtable ===")
-        self.dbCentralConn = self.dbc.getDBConn(self.getItemValueFromConfig('central_db_hostname'), self.getItemValueFromConfig('central_db_username'),
-                                        self.getItemValueFromConfig('central_db_password'), self.getItemValueFromConfig('central_db_dbname'))
-        if self.dbCentralConn == 0:
-            print("^^^^^^^^^^^^^^^^^ err trying to access central db")
-            return 
-
-        self.central_cursor = self.dbc.getDBCursor(self.dbCentralConn)
-   
-        # Prepare SQL query to update a single item in the database settings table.
-        sql = "UPDATE  config SET %s = %f" % ('tempSPLOn', self.config['tempSPLOn'])
-        # Execute the SQL command
-        self.dbc.execute(self.central_cursor, sql)        
-
-        # Prepare SQL query to update a single item in the database settings table.
-        sql = "UPDATE  config SET %s = %f" % ('tempSPLOff', self.config['tempSPLOff'])
-        # Execute the SQL command
-        self.dbc.execute(self.central_cursor, sql)        
-  
-        #processUptime = self.getItemValueFromConfig('processUptime')
-        
-        processUptime = self.getConfigItemFromLocalDB('processUptime')
-        
-        #print("^^^^^^^^^^^^^^^^^^^^^^^ ", processUptime)
-        sql = "UPDATE  config SET %s = '%s'" % ('processUptime', processUptime)
-        #print(" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", sql)
-        # Execute the SQL command
-        self.dbc.execute(self.central_cursor, sql)        
-
-        systemMessage = self.getConfigItemFromLocalDB('systemMessage')
-        sql = "UPDATE  config SET %s = '%s'" % ('systemMessage', systemMessage)
-        ## Execute the SQL command
-        self.dbc.execute(self.central_cursor, sql)        
-
-        # Commit your changes in the database
-        self.dbc.commitClose(self.dbCentralConn)
+        try:
+            # Open database connection
+            sys.stdout.write("\n===updatecentralconfigtable ===")
+            self.dbCentralConn = self.dbc.getDBConn(self.getItemValueFromConfig('central_db_hostname'), self.getItemValueFromConfig('central_db_username'),
+                                            self.getItemValueFromConfig('central_db_password'), self.getItemValueFromConfig('central_db_dbname'))
+            #if self.dbCentralConn == 0:
+                #print("^^^^^^^^^^^^^^^^^ err trying to access central db")
+                #return 
+    
+            self.central_cursor = self.dbc.getDBCursor(self.dbCentralConn)
+       
+            # Prepare and execute SQL query to update a single item in the database settings table.
+            sql = "UPDATE  config SET %s = %f" % ('tempSPLOn', self.config['tempSPLOn'])
+            self.dbc.execute(self.central_cursor, sql)        
+    
+            # Prepare SQL query to update a single item in the database settings table.
+            sql = "UPDATE  config SET %s = %f" % ('tempSPLOff', self.config['tempSPLOff'])
+            # Execute the SQL command
+            self.dbc.execute(self.central_cursor, sql)        
+      
+            #processUptime = self.getItemValueFromConfig('processUptime')
+            
+            processUptime = self.getConfigItemFromLocalDB('processUptime')
+            
+            #print("^^^^^^^^^^^^^^^^^^^^^^^ ", processUptime)
+            sql = "UPDATE  config SET %s = '%s'" % ('processUptime', processUptime)
+            #print(" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", sql)
+            # Execute the SQL command
+            self.dbc.execute(self.central_cursor, sql)        
+    
+            systemMessage = self.getConfigItemFromLocalDB('systemMessage')
+            sql = "UPDATE  config SET %s = '%s'" % ('systemMessage', systemMessage)
+            ## Execute the SQL command
+            self.dbc.execute(self.central_cursor, sql)        
+    
+            # Commit your changes in the database
+            self.dbc.commitClose(self.dbCentralConn)
+        except:
+            print("????? bad update_central_db exception thrown ???")
+            e = sys.exc_info()[0]
+            print( "????? Error: %s ?????" % e )
 
         return
 
 
     def getConfigItemFromLocalDB(self, name):
-        # Open database connection
-        sys.stdout.write("\n===getConfigItemFromLocalDB===")
-        self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
-        self.getItemValueFromConfig('db_username'),self.getItemValueFromConfig('db_password'),
-        self.getItemValueFromConfig('db_dbname'))
-        
-        #get db cursor
-        self.cursor = self.dbc.getDBCursor(self.dbConn)
-
-        sql = "SELECT %s FROM config" % (name)
-        
-        # Execute the SQL command
-        self.dbc.execute(self.cursor, sql)
-        
-        #try:
-            #value = self.cursor.execute(sql)
-        #except:
-            #print("dberror executing sql query getting setting val from db")
-        
-        value=self.cursor.fetchone()
-        self.dbc.commitClose(self.dbConn)
-
-        #if self.db.open:
-            #self.db.close()
-            #sys.stdout.write("++ final close ++")
+        try:
+            # Open database connection
+            sys.stdout.write("\n===getConfigItemFromLocalDB===")
+            self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
+            self.getItemValueFromConfig('db_username'),self.getItemValueFromConfig('db_password'),
+            self.getItemValueFromConfig('db_dbname'))
             
-        #print("!!!!!!!!!!!!!!!!!!!!!!!!!  ", value,sql)
+            #get db cursor
+            self.cursor = self.dbc.getDBCursor(self.dbConn)
+    
+            sql = "SELECT %s FROM config" % (name)
+            
+            # Execute the SQL command
+            self.dbc.execute(self.cursor, sql)
+            
+            #try:
+                #value = self.cursor.execute(sql)
+            #except:
+                #print("dberror executing sql query getting setting val from db")
+            
+            value=self.cursor.fetchone()
+            self.dbc.commitClose(self.dbConn)
+    
+            #if self.db.open:
+                #self.db.close()
+                #sys.stdout.write("++ final close ++")
+                
+            #print("!!!!!!!!!!!!!!!!!!!!!!!!!  ", value,sql)
+        except:
+            print("????? bad update_central_db exception thrown ???")
+            e = sys.exc_info()[0]
+            print( "????? Error: %s ?????" % e )
         return value[0]
 
 
