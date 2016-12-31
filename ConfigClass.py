@@ -112,6 +112,9 @@ class Config(object):
         sys.stdout.write("\n===updatecentralconfigtable ===")
         self.dbCentralConn = self.dbc.getDBConn(self.getItemValueFromConfig('central_db_hostname'), self.getItemValueFromConfig('central_db_username'),
                                         self.getItemValueFromConfig('central_db_password'), self.getItemValueFromConfig('central_db_dbname'))
+        if self.dbCentralConn == 0:
+            print("^^^^^^^^^^^^^^^^^ err trying to access central db")
+            return 
 
         self.central_cursor = self.dbc.getDBCursor(self.dbCentralConn)
    
@@ -125,7 +128,7 @@ class Config(object):
         # Execute the SQL command
         self.dbc.execute(self.central_cursor, sql)        
   
-        processUptime = self.getItemValueFromConfig('processUptime')
+        #processUptime = self.getItemValueFromConfig('processUptime')
         
         processUptime = self.getConfigItemFromLocalDB('processUptime')
         

@@ -14,7 +14,7 @@ class Database(object):
 
     def writedb(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
         # Open database connection
-        print("===about to try writing sample record to localdb..trying to connect===")
+        print("===writedb===")
         self.dbConn = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), 
                 cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))        
 
@@ -39,20 +39,21 @@ class Database(object):
 
     def update_central_db(self):
         
-        print("===try batch update from local db to central db--trying to connect to central server===")
+        print("===update_central_db===")
         # Open database connection
-        self.dbConnCentral = self.dbc.getDBConn(cfg.getItemValueFromConfig('central_db_hostname'), cfg.getItemValueFromConfig('central_db_username'),
-                                              cfg.getItemValueFromConfig('central_db_password'), cfg.getItemValueFromConfig('central_db_dbname'))          
+        self.dbConnCentral = self.dbc.getDBConn(cfg.getItemValueFromConfig('central_db_hostname'), 
+                                cfg.getItemValueFromConfig('central_db_username'), 
+                                cfg.getItemValueFromConfig('central_db_password'), 
+                                cfg.getItemValueFromConfig('central_db_dbname'))          
         
 
         # prepare a cursor object using cursor() method
         self.cursorCentral = self.dbc.getDBCursor(self.dbConnCentral)
 
 
-        # Prepare SQL query to get timestamp of last record in the central
-        # database.
+        # Prepare SQL query to get timestamp of last record in the central database.
         sql = "SELECT sample_dt FROM thdata ORDER BY id DESC LIMIT 1"
-                # Execute the SQL command
+        # Execute the SQL command
         last_sample_time = self.dbc.execute(self.cursorCentral, sql)
         
 

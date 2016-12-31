@@ -20,10 +20,12 @@ class DBCore(object):
             self.dbConn = MySQLdb.connect(host = hostName, 
                             user = userName, passwd = password, 
                             db = databaseName, connect_timeout = conn_timeout)
+            sys.stdout.write("* connected *")
         except MySQLdb.Error, e:
             print("* error connecting to DB * ")
             print "* DB Error %d: %s * " % (e.args[0], e.args[1])
-        sys.stdout.write("* connected *")        
+            self.dbConn = 0
+        
         return self.dbConn
         
 
