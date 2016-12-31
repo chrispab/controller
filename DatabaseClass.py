@@ -12,10 +12,10 @@ class Database(object):
         self.dbc = DBCore()
         return
 
-    def writedb(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
+    def writeSampleToLocalDB(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
         # Open database connection
         try:
-            print("===writedb===")
+            print("===writeSampleToLocalDB===")
             self.dbConn = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), 
                             cfg.getItemValueFromConfig('db_username'), 
                             cfg.getItemValueFromConfig('db_password'),
@@ -38,7 +38,7 @@ class Database(object):
             self.update_central_db()    # sync local recs update to central db
         
         except:
-            print("????? bad writedb exception thrown ???")
+            print("????? bad writeSampleToLocalDB exception thrown ???")
             e = sys.exc_info()[0]
             print( "????? Error: %s ?????" % e )
             
@@ -55,7 +55,6 @@ class Database(object):
                                     cfg.getItemValueFromConfig('central_db_password'), 
                                     cfg.getItemValueFromConfig('central_db_dbname'))          
             
-    
             # prepare a cursor object using cursor() method
             self.cursorCentral = self.dbc.getDBCursor(self.dbConnCentral)
     

@@ -363,7 +363,7 @@ class Logger(object):
             writer.writerow(data)
             self.previous_CSV_write_millis = self.current_millis  # note time row written
         #self.datastore.writedb(self.current_time, self.temperature, self.humidity, self.heater_state, self.vent_state, self.fan_state)
-        db.writedb(data[0], data[1], data[
+        db.writeSampleToLocalDB(data[0], data[1], data[
                                2], data[3], data[4], data[5])
 
         return

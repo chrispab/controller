@@ -15,7 +15,7 @@ class DBCore(object):
 
     def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=15):
         # Open database connection
-        sys.stdout.write("* get DB conn *")
+        sys.stdout.write("* getDBconn *")
         try:
             self.dbConn = MySQLdb.connect(host = hostName, 
                             user = userName, passwd = password, 
@@ -30,6 +30,7 @@ class DBCore(object):
         
 
     def getDBCursor (self, dbConn):
+        sys.stdout.write("* getDBCursor *")
         try:
             self.cursor = dbConn.cursor()
             sys.stdout.write("* got db cursor *")
