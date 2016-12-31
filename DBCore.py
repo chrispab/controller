@@ -1,6 +1,6 @@
 import MySQLdb
 import sys
-
+import logging
 
 class DBCore(object):
         
@@ -15,12 +15,12 @@ class DBCore(object):
 
     def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=15):
         # Open database connection
-        sys.stdout.write("* getDBconn *")
+        logging.info("* getDBconn *")
         try:
             self.dbConn = MySQLdb.connect(host = hostName, 
                             user = userName, passwd = password, 
                             db = databaseName, connect_timeout = conn_timeout)
-            sys.stdout.write("* connected *")
+            logging.info("* connected *")
         except MySQLdb.Error, e:
             print("* error connecting to DB * ")
             print "* DB Error %d: %s * " % (e.args[0], e.args[1])
@@ -30,10 +30,10 @@ class DBCore(object):
         
 
     def getDBCursor (self, dbConn):
-        sys.stdout.write("* getDBCursor *")
+        logging.info("* getDBCursor *")
         try:
             self.cursor = dbConn.cursor()
-            sys.stdout.write("* got db cursor *")
+            logging.info("* got db cursor *")
         except MySQLdb.Error, e:
             print("*** dberror getting cursor ***")
             print "*** DB Error %d: %s ***" % (e.args[0], e.args[1])
@@ -48,17 +48,17 @@ class DBCore(object):
         except MySQLdb.Error, e:
             print("*** dberror executing sql query ***")
             print "*** dberror Error %d: %s ***" % (e.args[0], e.args[1])
-        sys.stdout.write("* executing sql *")
+        logging.info("* executing sql *")
         return result
         
     def executemany(self, cursor, sqlstr, rs):
         try:
-            sys.stdout.write("* executing sql *")
+            logging.info("* executing sql *")
             result =cursor.executemany( sqlstr, rs)
         except MySQLdb.Error, e:
             print("*** dberror executing sql query ***")
             print "*** dberror Error %d: %s ***" % (e.args[0], e.args[1])
-        sys.stdout.write("* executing sql *")
+        logging.info("* executing sql *")
         return result
         
 
@@ -66,9 +66,9 @@ class DBCore(object):
         # Commit your changes in the database
         try:
             dbConn.commit()
-            sys.stdout.write("* committed *")
+            logging.info("* committed *")
             # disconnect from server
-            sys.stdout.write("* ready to close *")
+            logging.info("* ready to close *")
         except MySQLdb.Error, e:
             try:
                 dbConn.rollback()
@@ -78,17 +78,17 @@ class DBCore(object):
             print("*** DB WRITE PROBLEM ***")
         finally:
             self.close(dbConn)
-            sys.stdout.write("* commitClose *")
+            logging.info("* commitClose *")
         return
 
     def commit(self, dbConn):
         # Commit your changes in the database
         try:
             dbConn.commit()
-            sys.stdout.write("* committed *")
+            logging.info("* committed *")
 
             # disconnect from server
-            sys.stdout.write("* ready to close *")
+            logging.info("* ready to close *")
         except MySQLdb.Error, e:
             try:
                 dbConn.rollback()
@@ -98,7 +98,7 @@ class DBCore(object):
             print("*** DB WRITE PROBLEM ***")
         finally:
             self.close(dbConn)
-            sys.stdout.write("* commit *")
+            logging.info("* commit *")
         return
                 
     def close(self, dbConn):
@@ -106,7 +106,7 @@ class DBCore(object):
         try:            
             if  dbConn.open:
                 dbConn.close()
-                sys.stdout.write("* close *")
+                logging.info("* close *")
         except MySQLdb.Error, e:
             print("*** dberror closing conn ***")
             print "*** DB Error %d: %s ***" % (e.args[0], e.args[1])

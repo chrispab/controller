@@ -38,10 +38,7 @@ class Config(object):
         print("==Reading config settings from yaml file==")
         print yaml.dump(config)
         f.close()
-        #self.config = config
-        
-        #print("$$$$$$$$$$$$$$$$$$$$$$$$$$$: ",os.path.abspath( cfgFilename ))
-        
+
         return config
         
     def writeConfigToDB(self):
@@ -109,7 +106,6 @@ class Config(object):
             self.dbc.execute(self.cursor, sqlstr)
             
             self.dbc.commitClose(self.dbConn)
-            
         except:
             print("????? bad setConfigItemInDB exception thrown ???")
             e = sys.exc_info()[0]
@@ -126,7 +122,6 @@ class Config(object):
                                     self.getItemValueFromConfig('central_db_password'),
                                     self.getItemValueFromConfig('central_db_dbname'))
                                     
-    
             self.central_cursor = self.dbc.getDBCursor(self.dbCentralConn)
        
             # Prepare and execute SQL query to update a single item in the database settings table.
@@ -176,7 +171,6 @@ class Config(object):
                         
             value=self.cursor.fetchone()
             self.dbc.commitClose(self.dbConn)
-    
         except:
             print("????? bad update_central_db exception thrown ???")
             e = sys.exc_info()[0]

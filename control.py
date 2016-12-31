@@ -11,7 +11,10 @@ import yaml
 import datetime as dt
 import sys    # for stdout print
 import socket # to get hostname 
+import logging
 
+#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 
 #my classes
 #from ConfigClass import Config #config object with settings in
@@ -242,7 +245,7 @@ class Logger(object):
         self.proc_temp = proc_temp
 
         self.state_changed = False
-        print('==Update CSV==')
+        sys.stdout.write('==Update CSV==')
 
         # check each for state change and set new prewrite states
         if self.vent_state != self.previous_vent_state:  # any change in vent
@@ -328,7 +331,7 @@ class Logger(object):
 
 
     def _write_to_CSV(self):
-        print('===write data line to CSV')
+        sys.stdout.write('=== _write_to_CSV data record ===')
         data = ['time', 'temp', 'humi', 'heaterstate',
                 'ventstate', 'fanstate', 'procTemp']
         # round timestamp to nearest second
@@ -440,7 +443,7 @@ class Light(object):
         if (((currT > tOn) or (currT < tOff)) and ( X )):
             lightState = ON
 
-        print ("==light check. ON: %s, OFF: %s, NOW: %s, state: %d" % (tOn.strftime("%H:%M:%S"), tOff.strftime("%H:%M:%S"), currT.strftime("%H:%M:%S"), lightState))
+        logging.debug("==light state check. ON: %s, OFF: %s, NOW: %s, state: %d" % (tOn.strftime("%H:%M:%S"), tOff.strftime("%H:%M:%S"), currT.strftime("%H:%M:%S"), lightState))
 
         self.d_state = lightState
         return self.d_state
@@ -460,14 +463,16 @@ class Controller(object):
         self.light = Light()
         self.logger1 = Logger()
         self.timer1 = system_timer()
-        #self.config = Config()
 
 
-print("--- crispy startup - Creating the controller---")
+print("--- Creating the controller---")
 ctl1 = Controller()
+logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
+
 
 
 def main():
+    #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
     start_time = time.time()
     humidity, temperature = ctl1.sensor1.read()
     while 1:
@@ -485,11 +490,10 @@ def main():
         if lightState == ON:
             print('=LOn=')
             target_temp = cfg.getItemValueFromConfig('tempSPLOn')
-
         else:  # off
             print('=LOff=')
             target_temp = cfg.getItemValueFromConfig('tempSPLOff')
-        print(target_temp)
+        logging.info(target_temp)
         
         ctl1.fan1.control(current_millis)
         ctl1.vent1.control(temperature, target_temp, lightState, current_millis)
@@ -498,15 +502,15 @@ def main():
         ctl1.board1.switch_relays(heaterState, ventState, fanState, ventSpeedState)  # switch relays according to State vars
         ctl1.logger1.update_CSV_If_changes(temperature, humidity, ventState, fanState, heaterState, ventSpeedState,
             current_millis, ctl1.timer1.current_time, ctl1.sensor1.proc_temp)  # write to csv if any state changes
+        
         end_time = time.time()
         processUptime = end_time - start_time
         processUptime = str(timedelta(seconds=int(processUptime)))
         systemMessage = ctl1.timer1.getUpTime().strip()
         cfg.setConfigItemInDB('processUptime', processUptime)
         cfg.setConfigItemInDB('systemMessage', systemMessage )
-        print('\n=Process uptime: %s' % (processUptime))
-        print('=System message: %s' % (systemMessage))
-        #print('=System uptime: %s' % (systemUptime))
+        logging.debug('=Process uptime: %s' % (processUptime))
+        logging.debug('=System message: %s' % (systemMessage))
         
         cfg.updateCentralConfigTable()
 

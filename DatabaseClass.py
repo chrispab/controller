@@ -15,7 +15,7 @@ class Database(object):
     def writeSampleToLocalDB(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
         # Open database connection
         try:
-            print("===writeSampleToLocalDB===")
+            sys.stdout.write("\n===writeSampleToLocalDB===")
             self.dbConn = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), 
                             cfg.getItemValueFromConfig('db_username'), 
                             cfg.getItemValueFromConfig('db_password'),
@@ -48,7 +48,7 @@ class Database(object):
     def update_central_db(self):
 
         try:
-            print("===update_central_db===")
+            sys.stdout.write("\n===update_central_db===")
             # Open database connection
             self.dbConnCentral = self.dbc.getDBConn(cfg.getItemValueFromConfig('central_db_hostname'), 
                                     cfg.getItemValueFromConfig('central_db_username'), 
@@ -62,12 +62,12 @@ class Database(object):
             sql = "SELECT sample_dt FROM thdata ORDER BY id DESC LIMIT 1"
             last_sample_time = self.dbc.execute(self.cursorCentral, sql)
             
-            sys.stdout.write("last sample time from central db: %s - " % (last_sample_time) )
+            logging.debug("last sample time from central db: %s - " % (last_sample_time) )
             row = self.cursorCentral.fetchone()    # get result if any
-            sys.stdout.write("row :%s - " % (row))
+            logging.debug("row :%s - " % (row))
     
             if row > 0:
-                sys.stdout.write("last sample time: %s - " % (row[0]) )
+                logging.debug("last sample time: %s - " % (row[0]) )
                 last_sample_time = row[0]
             if row == None:
                 last_sample_time = "2016-11-01 00:00:00"
@@ -84,10 +84,10 @@ class Database(object):
     
             rs_to_update_central_db = self.dbc.execute(self.cursorLocal, sql)
             rs_to_update_central_db = list(self.cursorLocal.fetchall())
-            print("--Records to update central db: %s" % (rs_to_update_central_db))
-            sys.stdout.write("data got from local server - in list ready to upload-")
+            logging.debug("--Records to update central db: %s" % (rs_to_update_central_db))
+            logging.debug("data got from local server - in list ready to upload-")
     
-            sys.stdout.write("executing sql to update to remote db to sync with local db=")
+            logging.debug("executing sql to update to remote db to sync with local db=")
             # if rs_to_update_central_db.count > 0: 
             if self.cursorLocal.rowcount > 0:  # if there are records to add to central db
                # update central db
