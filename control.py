@@ -12,9 +12,12 @@ import datetime as dt
 import sys    # for stdout print
 import socket # to get hostname 
 import logging
+import sendemail as emailMe
+
 
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
 logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
+#logging.basicConfig(format='[%(filename)s:%(lineno)s - %(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 
 #my classes
 #from ConfigClass import Config #config object with settings in
@@ -53,7 +56,7 @@ class Relay(object):
 class Vent(object):
 
     def __init__(self):
-        print("creating vent")
+        logging.info("creating vent")
         self.state = OFF
         self.speed_state = OFF
         self.speed_state_count = 0
@@ -71,7 +74,7 @@ class Vent(object):
         self.vent_override = OFF  # settings.ventOverride
 
     def control(self, current_temp, target_temp, d_state, current_millis):
-        print('==Vent ctl==')
+        logging.info('==Vent ctl==')
 
         if d_state == ON:
             self.speed_state = ON  # high speed
@@ -85,21 +88,21 @@ class Vent(object):
             self.vent_override = ON
             self.state = ON
             self.prev_vent_millis = current_millis  # retrigeer time period
-            print("..VENT ON Loff - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
+            logging.info("..VENT ON Loff - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
 
         if ((d_state == ON) and (current_temp > target_temp + self.vent_lon_sp_offset)):
             self.vent_override = ON
             self.state = ON
             self.prev_vent_millis = current_millis  # retrigeer time period
-            print("..VENT ON - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
+            logging.info("..VENT ON - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
         # temp below target, change state to OFF after pulse delay
         elif (self.vent_override == ON) and ((current_millis - self.prev_vent_millis) >= self.vent_pulse_on_delta):
             self.state = OFF
             self.vent_override = OFF
             self.prev_vent_millis = current_millis
-            print("..VENT OFF - temp ok, OVERRIDE - OFF")
+            logging.info("..VENT OFF - temp ok, OVERRIDE - OFF")
         elif self.vent_override == ON:
-            print('..Vent on - override in progress')
+            logging.info('..Vent on - override in progress')
 
         # periodic vent control - only execute if vent ovveride not active
         if self.vent_override == OFF:  # process periodic vent activity
@@ -107,50 +110,50 @@ class Vent(object):
                 # iftime is up, so change the state to ON
                 if current_millis - self.prev_vent_millis >= self.vent_off_delta:
                     self.state = ON
-                    print("..VENT ON cycle period start")
+                    logging.info("..VENT ON cycle period start")
                     self.prev_vent_millis = current_millis
                 else:
-                    print('..Vent off - during cycle OFF period')
+                    logging.info('..Vent off - during cycle OFF period')
             else:
                 # vent is on, we must wait for the duration to expire before
                 # turning it off
                 # time up, change state to OFF
                 if (current_millis - self.prev_vent_millis) >= self.vent_on_delta:
                     self.state = OFF
-                    print("..VENT OFF cycle period start")
+                    logging.info("..VENT OFF cycle period start")
                     self.prev_vent_millis = current_millis
                 else:
-                    print('..Vent on - during cycle ON period')
+                    logging.info('..Vent on - during cycle ON period')
         return
 
 
 class Fan(object):
 
     def __init__(self):
-        print("Creating fan")
+        logging.info("Creating fan")
         self.state = OFF
         self.prev_fan_millis = 0  # last time vent state updated
         self.fan_on_delta = cfg.getItemValueFromConfig('fan_on_t')  # vent on time
         self.fan_off_delta = cfg.getItemValueFromConfig('fan_off_t')  # vent off time
 
     def control(self, current_millis):
-        print('==fan ctl==')
+        logging.info('==fan ctl==')
         # if fan off, we must wait for the interval to expire before turning it
         # on
-        print('==current millis: %s' % (current_millis))
-        print('==current fan state: %s' % (self.state))
+        logging.info('==current millis: %s' % (current_millis))
+        logging.info('==current fan state: %s' % (self.state))
         if self.state == OFF:
             # iftime is up, so change the state to ON
             if current_millis - self.prev_fan_millis >= self.fan_off_delta:
                 self.state = ON
-                print("..FAN ON")
+                logging.info("..FAN ON")
                 self.prev_fan_millis = current_millis
         # else if fanState is ON
         else:
             # time is up, so change the state to LOW
             if (current_millis - self.prev_fan_millis) >= self.fan_on_delta:
                 self.state = OFF
-                print("..FAN OFF")
+                logging.info("..FAN OFF")
                 self.prev_fan_millis = current_millis
         #self.state = ON
         return
@@ -159,7 +162,7 @@ class Fan(object):
 class Heater(object):
 
     def __init__(self):
-        print("creating heater")
+        logging.info("creating heater")
         self.state = OFF
         self.heater_off_delta = cfg.getItemValueFromConfig('heater_off_t')  # min time heater is on or off for
         self.heater_on_delta = cfg.getItemValueFromConfig('heater_on_t')  # min time heater is on or off for
@@ -167,38 +170,41 @@ class Heater(object):
         self.heater_sp_offset = cfg.getItemValueFromConfig('heater_sp_offset')
 
     def control(self, current_temp, target_temp, current_millis, d_state):
-        print('==Heat ctl==')
-        # if d_state == ON:
+        logging.info('==Heat ctl==')
+        #calc new heater on t based on t gap
+        self.heater_on_delta = ((target_temp - current_temp) * 90 * 1000)  + cfg.getItemValueFromConfig('heater_on_t')
+        logging.warning('==Heat tdelta on: %s',self.heater_on_delta)
+
+        
+        
+        #check for heater OFF hours #todo improve this
         current_hour = datetime.datetime.now().hour
         if current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
             self.state = OFF
-            print('..d on, in heat off hours - skipping lon heatctl')
-            # oveeride
-            #self.state = ON
-        else:  # d state on or off here
-            print('..do lon or off heatctl')
+            logging.info('..d on, in heat off hours - skipping lon heatctl')
+        else:  # d state on or off here also in heat on hrs
+            logging.info('..do heatctl')
             if current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
                 self.state = OFF
-                print("...temp over sp - HEATER OFF")
+                logging.info("...temp over sp - HEATER OFF")
                 self.prev_heater_millis = current_millis
-            elif self.state == ON:  # t below tsp if time is up, so change the state to OFF
+            elif self.state == ON:  # t below tsp if time is up, so check if change the state to OFF
                 if current_millis - self.prev_heater_millis >= self.heater_on_delta:
                     self.state = OFF
-                    print("...in heat auto cycle - switch HEATER OFF")
+                    logging.info("...in heat auto cycle - switch HEATER OFF after pulse on")
                     self.prev_heater_millis = current_millis
                 else:
-                    print(
-                        '...in heat auto cycle - Heater still on - during low temp heat pulse')
+                   logging.info('in heat auto cycle - Heater still on - during low temp heat pulse')
             elif current_millis - self.prev_heater_millis >= self.heater_off_delta:  # heater is off, turn on after delta
                 self.state = ON
-                print("...in heat auto cycle - switch HEATER ON")
+                logging.info("...in heat auto cycle - switch HEATER ON")
                 self.prev_heater_millis = current_millis
             else:
-                print("...in heat auto cycle - during heat OFF period")
+                logging.info("...in heat auto cycle - during heat OFF period")
         # else:
             #print("..in d-off, no heat ctl")
-
-        print(' ')
+        state = ('OFF' if self.state else 'ON')
+        logging.warning('Heater state: %s' , ('OFF' if self.state else 'ON') )
         return
 
 
@@ -207,7 +213,7 @@ class Logger(object):
     # roundT = roundTime
 
     def __init__(self):
-        print("creating logger object")
+        logging.info("creating logger object")
         self.temperature = 0
         self.humidity = 0
         self.heater_state = OFF
@@ -245,54 +251,54 @@ class Logger(object):
         self.proc_temp = proc_temp
 
         self.state_changed = False
-        sys.stdout.write('==Update CSV==')
+        logging.info('==Update CSV==')
 
         # check each for state change and set new prewrite states
         if self.vent_state != self.previous_vent_state:  # any change in vent
             if self.previous_vent_state == OFF:  # must be going OFF to ON
                 # write a low record immediately before hi record
-                print("--new prevvent low row appended to CSV -----")
+                logging.info("--new prevvent low row appended to CSV -----")
                 self.vent_state = OFF
                 self.state_changed = True
             else:  # if self.previous_vent_state == ON:  # must be going ON TO OFF
                 # write a on record immediately before hi record
-                print("-- new prevvent hi row appended to CSV -----")
+                logging.info("-- new prevvent hi row appended to CSV -----")
                 self.vent_state = ON
                 self.state_changed = True
 
         if self.vent_speed_state != self.previous_vent_speed_state:  # any change in vent speed
             if self.previous_vent_speed_state == OFF:  # was lo speed
                 # write a low record immediately before hi record
-                print("-- new prevvspeed low row appended to CSV -----")
+                logging.info("-- new prevvspeed low row appended to CSV -----")
                 self.vent_speed_state = OFF
                 self.state_changed = True
             else:  # was hi speed going low
                 # write a on record immediately before hi record
-                print("-- new prevvspeed hi row appended to CSV -----")
+                logging.info("-- new prevvspeed hi row appended to CSV -----")
                 self.vent_speed_state = ON
                 self.state_changed = True
 
         if self.fan_state != self.previous_fan_state:  # any change in vent
             if self.previous_fan_state == OFF:  # must be going OFF to ON
                 # write a low record immediately before hi record
-                print("-- new prevfanstate low row appended to CSV -----")
+                logging.info("-- new prevfanstate low row appended to CSV -----")
                 self.fan_state = OFF
                 self.state_changed = True
             else:  # must be going ON TO OFF
                 # write a on record immediately before hi record
-                print("-- new  prevfanstate hi row appended to CSV -----")
+                logging.info("-- new  prevfanstate hi row appended to CSV -----")
                 self.fan_state = ON
                 self.state_changed = True
 
         if self.heater_state != self.previous_heater_state:  # any change in vent
             if self.previous_heater_state == OFF:  # must be going OFF to ON
                 # write a low record immediately before hi record
-                print("-- new heaterstate low row appended to CSV -----")
+                logging.info("-- new heaterstate low row appended to CSV -----")
                 self.heater_state = OFF
                 self.state_changed = True
             else:  # must be going ON TO OFF
                 # write a on record immediately before hi record
-                print("-- new  heaterstate hi row appended to CSV -----")
+                logging.info("-- new  heaterstate hi row appended to CSV -----")
                 self.heater_state = ON
                 self.state_changed = True
 
@@ -311,9 +317,9 @@ class Logger(object):
             if ((self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval))
                     or (self.temperature != self.previous_temperature)):  # any change
                 if self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval):
-                    print("..interval passed ..time for new CSV write")
+                    logging.info("..interval passed ..time for new CSV write")
                 else:
-                    print("..new data row appended to CSV cos of temp change")
+                    logging.warning("..new data row generated")
                 self._write_to_CSV()
                 self.previous_CSV_write_millis = self.current_millis  # reset timer
 
@@ -331,7 +337,7 @@ class Logger(object):
 
 
     def _write_to_CSV(self):
-        sys.stdout.write('=== _write_to_CSV data record ===')
+        logging.info('=== _write_to_CSV data record ===')
         data = ['time', 'temp', 'humi', 'heaterstate',
                 'ventstate', 'fanstate', 'procTemp']
         # round timestamp to nearest second
@@ -366,8 +372,7 @@ class Logger(object):
             writer.writerow(data)
             self.previous_CSV_write_millis = self.current_millis  # note time row written
         #self.datastore.writedb(self.current_time, self.temperature, self.humidity, self.heater_state, self.vent_state, self.fan_state)
-        db.writeSampleToLocalDB(data[0], data[1], data[
-                               2], data[3], data[4], data[5])
+        db.writeSampleToLocalDB(data[0], data[1], data[2], data[3], data[4], data[5])
 
         return
 
@@ -375,7 +380,7 @@ class Logger(object):
 class system_timer(object):
 
     def __init__(self):
-        print("creating system timer")
+        logging.info("creating system timer")
         self.current_hour = datetime.datetime.now().hour
         self.current_time = 0
         self.start_millis = 0
@@ -406,7 +411,7 @@ class system_timer(object):
 
 class Light(object):
     def __init__(self):
-        print("creating light object")
+        logging.info("creating light object")
         self.state = OFF
         self.tOn = dt.time()
         self.tOff = dt.time()
@@ -426,7 +431,7 @@ class Light(object):
         
     #return true if testTime between timeOn and TimeOff, else false if in off period
     def getLightState(self ):   
-        #print('==light - get light state==')
+        logging.info('==light - get light state==')
 
         tOff = cfg.getTOff()
         tOn = cfg.getTOn()
@@ -453,8 +458,8 @@ class Light(object):
 class Controller(object):
 
     def __init__(self):
-        print("init controller")
-        print("---Creating system Objects---")
+        logging.info("init controller")
+        logging.info("---Creating system Objects---")
         self.board1 = hw.platform()
         self.sensor1 = hw.sensor()
         self.vent1 = Vent()
@@ -465,9 +470,9 @@ class Controller(object):
         self.timer1 = system_timer()
 
 
-print("--- Creating the controller---")
+logging.info("--- Creating the controller---")
 ctl1 = Controller()
-logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
+#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
 
 
 
@@ -476,22 +481,28 @@ def main():
     start_time = time.time()
     humidity, temperature = ctl1.sensor1.read()
     while 1:
-        print("\n=main=")
-        print(socket.gethostname())
-        print("=current time: %s" % (ctl1.timer1.current_time))
+        logging.info("\n=main=")
+        logging.info(socket.gethostname())
+        logging.info("current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.update_current_millis()
         current_millis = ctl1.timer1.current_millis
+        
+        startT = time.time()
         humidity, temperature = ctl1.sensor1.read()
+        endT= time.time()
+        duration = endT-startT
+        logging.warning(duration)
+        
         lightState = ctl1.light.getLightState()
         heaterState = ctl1.heater1.state
         ventState = ctl1.vent1.state
         fanState = ctl1.fan1.state
         ventSpeedState = ctl1.vent1.speed_state
         if lightState == ON:
-            print('=LOn=')
+            logging.info('=LOn=')
             target_temp = cfg.getItemValueFromConfig('tempSPLOn')
         else:  # off
-            print('=LOff=')
+            logging.info('=LOff=')
             target_temp = cfg.getItemValueFromConfig('tempSPLOff')
         logging.info(target_temp)
         

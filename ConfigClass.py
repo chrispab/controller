@@ -7,6 +7,7 @@ import socket # to get hostname
 import MySQLdb
 import sys
 from DBCore import *
+import logging
 
 
 class Config(object):
@@ -16,7 +17,7 @@ class Config(object):
     dbConn =0
 
     def __init__(self):
-        print("creating config object")
+        logging.info("creating config object")
         self.dbc = DBCore()
         #write init config from file to db
         self.config = self.readConfigFromFile()
@@ -24,25 +25,25 @@ class Config(object):
 
         self.writeConfigToDB()
 
-        print("__written temp lon sp to db config__");
+        logging.info("__written temp lon sp to db config__");
         return
 
     def readConfigFromFile(self):
         cfgFilename = "config_" + socket.gethostname() + ".yaml"
-        print(cfgFilename)
+        logging.info(cfgFilename)
         fileStr = os.path.abspath( cfgFilename )
         #f = open('/home/pi/controlleroo/config.yaml')
         f = open(fileStr)
         # use safe_load instead load
         config = yaml.safe_load(f)
-        print("==Reading config settings from yaml file==")
-        print yaml.dump(config)
+        logging.info("==Reading config settings from yaml file==")
+        logging.info(yaml.dump(config))
         f.close()
 
         return config
         
     def writeConfigToDB(self):
-        sys.stdout.write("\n==writeconfigtodb ..")
+        logging.info("\n==writeconfigtodb ..")
         try:
             self.setConfigItemInDB( 'tempSPLOn', self.config['tempSPLOn'])
             self.setConfigItemInDB( 'tempSPLOff', self.config['tempSPLOff'])
@@ -84,7 +85,7 @@ class Config(object):
     def setConfigItemInDB(self, name, value):
         try:
             # Open database connection
-            sys.stdout.write("\n===setconfigitemIndb===")
+            logging.info("\n===setconfigitemIndb===")
             
             self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
                             self.getItemValueFromConfig('db_username'),
@@ -97,7 +98,7 @@ class Config(object):
             #print("type", type(value))
             if (type(value) is str):
                 #value = value
-                sys.stdout.write("$string detected$")
+                logging.info("$string detected$")
             else:
                 value=str(value)
             sqlstr = "UPDATE  config SET %s = '%s'" % (name, value)            
@@ -116,7 +117,7 @@ class Config(object):
     def updateCentralConfigTable(self):
         try:
             # Open database connection
-            sys.stdout.write("\n===updatecentralconfigtable ===")
+            logging.info("\n===updatecentralconfigtable ===")
             self.dbCentralConn = self.dbc.getDBConn(self.getItemValueFromConfig('central_db_hostname'),
                                     self.getItemValueFromConfig('central_db_username'),
                                     self.getItemValueFromConfig('central_db_password'),
@@ -157,7 +158,7 @@ class Config(object):
     def getConfigItemFromLocalDB(self, name):
         try:
             # Open database connection
-            sys.stdout.write("\n===getConfigItemFromLocalDB===")
+            logging.info("\n===getConfigItemFromLocalDB===")
             self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
             self.getItemValueFromConfig('db_username'),self.getItemValueFromConfig('db_password'),
             self.getItemValueFromConfig('db_dbname'))

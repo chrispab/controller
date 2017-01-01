@@ -8,7 +8,7 @@ class DBCore(object):
     cursor = 0
         
     def __init__(self):
-        print("Creating db Core object")
+        logging.info("Creating db Core object")
         #
         return
 

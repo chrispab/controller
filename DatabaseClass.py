@@ -1,6 +1,7 @@
 import MySQLdb
 import sys
 from DBCore import *
+import logging
 
 
 from ConfigObject import cfg # singleton global
@@ -8,14 +9,14 @@ from ConfigObject import cfg # singleton global
 class Database(object):
 
     def __init__(self):
-        print("Creating db object")
+        logging.info("Creating db object")
         self.dbc = DBCore()
         return
 
     def writeSampleToLocalDB(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
         # Open database connection
         try:
-            sys.stdout.write("\n===writeSampleToLocalDB===")
+            logging.info("\n===writeSampleToLocalDB===")
             self.dbConn = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), 
                             cfg.getItemValueFromConfig('db_username'), 
                             cfg.getItemValueFromConfig('db_password'),
@@ -48,7 +49,7 @@ class Database(object):
     def update_central_db(self):
 
         try:
-            sys.stdout.write("\n===update_central_db===")
+            logging.info("\n===update_central_db===")
             # Open database connection
             self.dbConnCentral = self.dbc.getDBConn(cfg.getItemValueFromConfig('central_db_hostname'), 
                                     cfg.getItemValueFromConfig('central_db_username'), 

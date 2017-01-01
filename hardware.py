@@ -8,7 +8,7 @@
 from time import sleep
 import datetime
 import sendemail as emailMe
-
+import logging
 
 ##import settings
 #import socket # to get hostname 
@@ -67,7 +67,7 @@ elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":    # pcduino plat
 class sensor(object):
 
     def __init__(self):
-        print("create sensor object")
+        logging.info("create sensor object")
         self.humidity = 55.5
         self.temperature = 18.0
         #self.prevTempHumiMillis = 0   #last time sensor read
@@ -77,14 +77,18 @@ class sensor(object):
         self.prevHumi = 0
         self.readErrs = 0
         self._power_cycle()
+        self.platformName = cfg.getItemValueFromConfig('platform_name')
+        self.delay= 0
+        
+        
             
     def _read_sensor(self):
-        if cfg.getItemValueFromConfig('platform_name') == "RPi2":
+        if self.platformName == "RPi2":
             sensor = Adafruit_DHT.DHT22
             self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, sensorPin)
             #sleep(settings.readDelay)
             
-        elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
+        elif self.platformName == "PCDuino":
             if dht22.getth() == 0:
                 #humidity, temperature = Adafruit_DHT.read_retry(sensor, sensorPin)
                 self.temperature = round(dht22.cvar.temperature, 1)
@@ -100,7 +104,7 @@ class sensor(object):
         #read till ret 0-ok. timeout if no valid data after timeout
         #global currentMillis        #current time
 
-        print ("...try to read sensor at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
+        logging.info("...try to read sensor at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
         self.readErrs = 0    #reset err count
         self.prevTemp = self.temperature
         self.prevHumi = self.humidity
@@ -111,29 +115,33 @@ class sensor(object):
         
         #repeat read until valid data or too many errorserror
         while (self.humidity is None or self.temperature is None) and self.readErrs < 10:
-            print("..ERROR TRYING TO READ SENSOR on sensor read")
+            logging.warning("..ERROR TRYING TO READ SENSOR on sensor read")
             self.readErrs += 1
-            sleep(cfg.getItemValueFromConfig('readDelay')) #wait secs before re-read
-            self.humidity, self.temperature = self._read_sensor()    # get temp, humi
+            if self.platformName == "PCDuino":
+                self.delay = 0
+            if self.platformName == "RPi2":
+                self.delay = cfg.getItemValueFromConfig('readDelay')
+            sleep(self.delay) #wait secs before re-read
+            self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
     
         if self.readErrs == 10:  # powercyle if 10 read errors
-            print("..ten read errors logged")
+            logging.warning("..ten read errors logged")
             self._power_cycle()
-            print ("..POWER CYCLE complete during sensor read")
-            print ("..DODGY TEMP READING USING")
+            logging.warning("..POWER CYCLE complete during sensor read")
+            logging.error("..DODGY TEMP READING USING")
             if cfg.getItemValueFromConfig('emailEnabled') == True:
                 self.message = 'Power cycling sensor due to too many errors'
                 try:
                     emailMe.sendemail('PowerCycle', self.message)
                 except:
-                    print("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING")
+                    logging.error("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING")
             self.temperature = self.prevTemp  #restore prev sample readings
             self.humidity = self.prevHumi
         else:#good read CRC if here
             if ( abs(self.temperature - self.prevTemp) < 10) and ( (self.humidity >= 10)
                 and (self.humidity <= 100)): #if temp diff smallish, assume good sample
                 #print( "..read sensor SUCCESS" )
-                print ("..read sensor success at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
+                logging.info("..read sensor success at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
                 #self.prevTempHumiMillis = self.currentMillis
                 self.temperature = round(self.temperature, 1)
                 self.humidity = round(self.humidity, 1)
@@ -141,24 +149,24 @@ class sensor(object):
                 #filter temp function
                 self.proc_temp = self.proc_temp + ( 0.333 * (self.temperature - self.proc_temp))
                 self.proc_temp = round(self.proc_temp, 3)
-                print ('..temp: %2.1f, humi: %2.1f' %(self.temperature, self.humidity))
+                logging.warning('Temp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
             else:
                 #bad sample even though good crc
-                print ('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))
-                print ('..DODGY TEMP READING USING - OLD VALS---------------- ')
+                logging.warning('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))
+                logging.warning('..DODGY TEMP READING USING - OLD VALS---------------- ')
                 if cfg.getItemValueFromConfig('emailEnabled') == True:
                     self.message = 'Readings, Temp = '+ str(self.temperature) + ',  Humi = '+ str(self.humidity)
                     try:
                         emailMe.sendemail('Spike in Reading', self.message)
                     except:
-                        print("ERROR SENDING EMAIL - DODGY READING")
+                        logging.error("ERROR SENDING EMAIL - DODGY READING")
                 self.temperature = self.prevTemp  #restore prev sample readings
                 self.humidity = self.prevHumi
         
         return self.humidity, self.temperature   
          
     def _power_cycle(self):
-            print("entering power cycle")
+            logging.warning("entering power cycle")
             if cfg.getItemValueFromConfig('platform_name') == "RPi2":
                 GPIO.setup(powerPin, GPIO.OUT)  #set pin as OP
                 GPIO.output(powerPin, 0)        #set low to power off sensor
@@ -174,7 +182,7 @@ class sensor(object):
         
 class platform(object):
     def __init__(self):
-        print('creating platform board')
+        logging.info('creating platform board')
         #Make sure the GPIO pins are ready:
         if cfg.getItemValueFromConfig('platform_name') == "RPi2":
             GPIO.setmode(GPIO.BCM)
@@ -186,7 +194,7 @@ class platform(object):
         pass
         
     def _setupIO_pins(self):
-        print('initialising io pins')
+        logging.info('initialising io pins')
         if cfg.getItemValueFromConfig('platform_name') == "RPi2":
             GPIO.setup(heaterRelay, GPIO.OUT)   #set pin as OP
             GPIO.output(heaterRelay, 1)         #heat off
