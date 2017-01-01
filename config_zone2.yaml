@@ -13,6 +13,8 @@ readDelay: 3
 
 tempSPLOn: 23.5   #target 24.o veg mp set point max with lon
 tempSPLOff: 19.0 #target = 21.0 veg, target loff
+tempAlertHi = 26.1  #hi temp alert temp
+tempAlertLo = 15.0  #lo temp alert
 
 lightOnT: "20:00:00"    # time light on hh:mm:ss
 lightOffT: "14:00:00"   # time off

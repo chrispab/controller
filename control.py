@@ -513,6 +513,8 @@ def main():
         logging.debug('=System message: %s' % (systemMessage))
         
         cfg.updateCentralConfigTable()
+        
+        
 
 
 

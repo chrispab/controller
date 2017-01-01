@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import smtplib
 from email.mime.text import MIMEText
+import secureFile
 
 
 def sendemail(subject, message):
@@ -28,6 +29,6 @@ if __name__ == "__main__":
    
    message = 'readings, Temp='+ str(temp) + '  Humi='+ str(humi)
    sendemail('Spike in Reading', message)
-   #sendEmail( 'Pi Subject test', 'this is the message im sending')
+   #sendEmail( 'Pi Subject test', 'this is the test message im sending')
    
    
