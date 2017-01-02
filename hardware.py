@@ -83,17 +83,12 @@ class sensor(object):
         self.prevReadTime = datetime.datetime.now()
         self._prime_read_sensor()    # get temp, humi
         
+        
     def _prime_read_sensor(self):
         self.readErrs = 0
 
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
     
-        #self.prevTempHumiMillis = self.currentMillis
-        self.temperature = round(self.temperature, 1)
-        self.humidity = round(self.humidity, 1)
-        print("_rs temp: %s" % self.temperature)
-        print("_rs humi: %s" % self.humidity)
-        
         #repeat read until valid data or too many errorserror
         while (self.humidity is None or self.temperature is None) and self.readErrs < 10:
             logging.warning("..ERROR TRYING TO READ SENSOR on sensor read")
@@ -105,8 +100,14 @@ class sensor(object):
             #self.prevTempHumiMillis = self.currentMillis
             self.temperature = round(self.temperature, 1)
             self.humidity = round(self.humidity, 1)
-            print("_rs temp: %s" % self.temperature)
-            print("_rs humi: %s" % self.humidity)
+            logging.info("_rs temp: %s" % self.temperature)
+            logging.info("_rs humi: %s" % self.humidity)
+            
+        #self.prevTempHumiMillis = self.currentMillis
+        self.temperature = round(self.temperature, 1)
+        self.humidity = round(self.humidity, 1)
+        logging.info("_rs temp: %s" % self.temperature)
+        logging.info("_rs humi: %s" % self.humidity)
             
             
     
@@ -156,7 +157,7 @@ class sensor(object):
             self.humidity = self.prevHumi
             return self.humidity, self.temperature
 
-        print("** AQUIring **")
+        logging.info("** AQUIring **")
 
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
         
@@ -192,7 +193,7 @@ class sensor(object):
                 logging.info("..read sensor success at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
                 
                 self.prevReadTime = datetime.datetime.now()
-                print("Prev read time: %s" % self.prevReadTime)
+                logging.info("Prev read time: %s" % self.prevReadTime)
                 
                 #self.prevTempHumiMillis = self.currentMillis
                 self.temperature = round(self.temperature, 1)
