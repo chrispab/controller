@@ -81,14 +81,40 @@ class sensor(object):
         self.platformName = cfg.getItemValueFromConfig('platform_name')
         self.delay= cfg.getItemValueFromConfig('readDelay')
         self.prevReadTime = datetime.datetime.now()
-        self._read_sensor()    # get temp, humi
+        self._prime_read_sensor()    # get temp, humi
         
+    def _prime_read_sensor(self):
+        self.readErrs = 0
+
+        self.humidity, self.temperature = self._read_sensor()    # get temp, humi
+    
+        #self.prevTempHumiMillis = self.currentMillis
+        self.temperature = round(self.temperature, 1)
+        self.humidity = round(self.humidity, 1)
+        print("_rs temp: %s" % self.temperature)
+        print("_rs humi: %s" % self.humidity)
         
+        #repeat read until valid data or too many errorserror
+        while (self.humidity is None or self.temperature is None) and self.readErrs < 10:
+            logging.warning("..ERROR TRYING TO READ SENSOR on sensor read")
+            self.readErrs += 1
+
+            sleep(self.delay) #wait secs before re-read
+            self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
             
+            #self.prevTempHumiMillis = self.currentMillis
+            self.temperature = round(self.temperature, 1)
+            self.humidity = round(self.humidity, 1)
+            print("_rs temp: %s" % self.temperature)
+            print("_rs humi: %s" % self.humidity)
+            
+            
+    
     def _read_sensor(self):
         if self.platformName == "RPi2":
             sensor = Adafruit_DHT.DHT22
             self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, sensorPin)
+
             #sleep(settings.readDelay)
             
         elif self.platformName == "PCDuino":
@@ -102,6 +128,10 @@ class sensor(object):
             #sleep(settings.readDelay)
 
         return self.humidity, self.temperature
+        
+        
+        
+        
 
     def read(self):
         #read till ret 0-ok. timeout if no valid data after timeout

@@ -43,6 +43,7 @@ class DBCore(object):
     def execute(self, cursor, sqlstr):
         result = 0
         try:
+            #print("sql: %s" % sqlstr)
             result = cursor.execute(sqlstr)
         except MySQLdb.Error, e:
             logging.error("*** dberror executing sql query ***")
