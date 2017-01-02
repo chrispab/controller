@@ -7,6 +7,7 @@
 # general im ports
 from time import sleep
 import datetime
+from datetime import timedelta, time
 import sendemail as emailMe
 import logging
 
@@ -53,7 +54,7 @@ elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":    # pcduino plat
     led1_pin = "gpio0"
     led2_pin = "gpio1"
     powerPin = "gpio2"
-    relaypins=("gpio3","gpio4","gpio5","gpio6")
+    relaypins = ("gpio3","gpio4","gpio5","gpio6")
     heaterRelay = "gpio3"
     ventRelay = "gpio4"
     fanRelay = "gpio5"
@@ -78,7 +79,9 @@ class sensor(object):
         self.readErrs = 0
         self._power_cycle()
         self.platformName = cfg.getItemValueFromConfig('platform_name')
-        self.delay= 0
+        self.delay= cfg.getItemValueFromConfig('readDelay')
+        self.prevReadTime = datetime.datetime.now()
+        self._read_sensor()    # get temp, humi
         
         
             
@@ -109,20 +112,35 @@ class sensor(object):
         self.prevTemp = self.temperature
         self.prevHumi = self.humidity
         
-        sleep(cfg.getItemValueFromConfig('readDelay'))
-        
+        #calc if 3 seconds passed - if not then either wait or pass
+        #choose to pass to allow other processing
+        timeGap = datetime.datetime.now() -self.prevReadTime
+        #print("Time Gap : %s" %timeGap)
+        #sleep(cfg.getItemValueFromConfig('readDelay'))
+        #timeToGo = timeGap < time.delta(seconds-3)
+        if (timeGap < timedelta(seconds=3)):
+            #sleep(self.delay)
+            #print("Time Gap to go : %s" %timeGap)
+            #print("** JUMPING OUT OF AQUISITION **")
+            self.temperature = self.prevTemp  #restore prev sample readings
+            self.humidity = self.prevHumi
+            return self.humidity, self.temperature
+
+        print("** AQUIring **")
+
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
         
         #repeat read until valid data or too many errorserror
         while (self.humidity is None or self.temperature is None) and self.readErrs < 10:
             logging.warning("..ERROR TRYING TO READ SENSOR on sensor read")
             self.readErrs += 1
-            if self.platformName == "PCDuino":
-                self.delay = 0
-            if self.platformName == "RPi2":
-                self.delay = cfg.getItemValueFromConfig('readDelay')
+            #if self.platformName == "PCDuino":
+                #self.delay = 0
+            #if self.platformName == "RPi2":
+            #self.delay = cfg.getItemValueFromConfig('readDelay')
             sleep(self.delay) #wait secs before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
+
     
         if self.readErrs == 10:  # powercyle if 10 read errors
             logging.warning("..ten read errors logged")
@@ -142,6 +160,10 @@ class sensor(object):
                 and (self.humidity <= 100)): #if temp diff smallish, assume good sample
                 #print( "..read sensor SUCCESS" )
                 logging.info("..read sensor success at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
+                
+                self.prevReadTime = datetime.datetime.now()
+                print("Prev read time: %s" % self.prevReadTime)
+                
                 #self.prevTempHumiMillis = self.currentMillis
                 self.temperature = round(self.temperature, 1)
                 self.humidity = round(self.humidity, 1)

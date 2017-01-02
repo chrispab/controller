@@ -3,7 +3,7 @@ import time
 
 
 def round_time(dt=None, roundTo=60):
-   """Round a datetime object to any time laps in seconds
+   """Round a datetime object to any time lapse in seconds
    dt : datetime.datetime object, default now.
    roundTo : Closest number of seconds to round to, default 1 minute.
    Author: Thierry Husson 2012 - Use it as you want but don't blame me.

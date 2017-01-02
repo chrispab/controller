@@ -51,9 +51,9 @@ class Config(object):
             self.setConfigItemInDB( 'systemMessage', self.config['systemMessage'])        
             self.updateCentralConfigTable()
         except:
-            print("????? bad setConfigItemInDB exception thrown ???")
+            logging.error("????? bad setConfigItemInDB exception thrown ???")
             e = sys.exc_info()[0]
-            print( "????? Error: %s ?????" % e )
+            logging.error( "????? Error: %s ?????" % e )
         return
 
     def getItemValueFromConfig(self, item):
@@ -64,7 +64,7 @@ class Config(object):
     def writeConfigToFile(self, config):
         fileStr = os.path.abspath("config_new.yaml")
         f = open(fileStr, "w")
-        print("==Writing config settings to new yaml file config_new.yaml==")
+        logging.info("==Writing config settings to new yaml file config_new.yaml==")
         yaml.dump(config, f)
         f.close()
         return
@@ -108,9 +108,9 @@ class Config(object):
             
             self.dbc.commitClose(self.dbConn)
         except:
-            print("????? bad setConfigItemInDB exception thrown ???")
+            logging.error("????? bad setConfigItemInDB exception thrown ???")
             e = sys.exc_info()[0]
-            print( "????? Error: %s ?????" % e )
+            logging.error( "????? Error: %s ?????" % e )
 
         return
 
@@ -148,9 +148,9 @@ class Config(object):
             # Commit changes in the database
             self.dbc.commitClose(self.dbCentralConn)
         except:
-            print("????? bad update_central_db exception thrown ???")
+            logging.error("????? bad update_central_db exception thrown ???")
             e = sys.exc_info()[0]
-            print( "????? Error: %s ?????" % e )
+            logging.error( "????? Error: %s ?????" % e )
 
         return
 
@@ -173,10 +173,8 @@ class Config(object):
             value=self.cursor.fetchone()
             self.dbc.commitClose(self.dbConn)
         except:
-            print("????? bad update_central_db exception thrown ???")
+            logging.error("????? bad update_central_db exception thrown ???")
             e = sys.exc_info()[0]
-            print( "????? Error: %s ?????" % e )
+            logging.error( "????? Error: %s ?????" % e )
             
         return value[0]
-
-

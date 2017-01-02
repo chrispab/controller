@@ -21,7 +21,6 @@ class Database(object):
                             cfg.getItemValueFromConfig('db_username'), 
                             cfg.getItemValueFromConfig('db_password'),
                             cfg.getItemValueFromConfig('db_dbname'))        
-            #print(">>>>>>>>>>>>>>>>>>>>>> dbConn got okay >>>>>>>>>>>>>>>>>>>>>")
             # prepare a cursor object using cursor() method
             self.cursor = self.dbc.getDBCursor(self.dbConn)
     
@@ -39,9 +38,9 @@ class Database(object):
             self.update_central_db()    # sync local recs update to central db
         
         except:
-            print("????? bad writeSampleToLocalDB exception thrown ???")
+            logging.error("????? bad writeSampleToLocalDB exception thrown ???")
             e = sys.exc_info()[0]
-            print( "????? Error: %s ?????" % e )
+            logging.error( "????? Error: %s ?????" % e )
             
         return
 
@@ -100,8 +99,8 @@ class Database(object):
             # Commit your changes in the database
             self.dbc.commitClose(self.dbConnLocal)
         except:
-            print("????? bad update_central_db exception thrown ???")
+            logging.error("????? bad update_central_db exception thrown ???")
             e = sys.exc_info()[0]
-            print( "????? Error: %s ?????" % e )
+            logging.error( "????? Error: %s ?????" % e )
             
         return
