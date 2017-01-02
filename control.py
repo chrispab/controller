@@ -14,36 +14,22 @@ import socket # to get hostname
 import logging
 import sendemail as emailMe
 
-
+#logger options
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
 logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 #logging.basicConfig(format='[%(filename)s:%(lineno)s - %(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 
-#my classes
-#from ConfigClass import Config #config object with settings in
-#from DatabaseClass import Database
+#my singleton objects
 from DatabaseObject import db # singleton global
 from ConfigObject import cfg # singleton global
 
-
-##note: hostName expected zone1 or zone2
-#hostName = socket.gethostname()
-#settingsFileName = 'settings_' + hostName
-#print(settingsFileName)
-##import as settings
-#settings = __import__(settingsFileName)
-
-
 import hardware as hw
-
 from support import round_time as round_time
 
 OFF = cfg.getItemValueFromConfig('RelayOff')  # state for relay OFF
 ON = cfg.getItemValueFromConfig('RelayOn')  # state for on
 
 path = cfg.getItemValueFromConfig('dataPath')
-#extraPath = cfg.getItemValueFromConfig('extraPath')
-
 
 # ============================common code start==========================
 
@@ -69,19 +55,20 @@ class Vent(object):
         self.vent_pulse_on_delta = cfg.getItemValueFromConfig('ventPulseOnDelta')
         self.vent_loff_sp_offset = cfg.getItemValueFromConfig('vent_loff_sp_offset')
         self.vent_lon_sp_offset = cfg.getItemValueFromConfig('vent_lon_sp_offset')
-
+        self.platformName = cfg.getItemValueFromConfig('hardware')
 
         self.vent_override = OFF  # settings.ventOverride
 
     def control(self, current_temp, target_temp, d_state, current_millis):
         logging.info('==Vent ctl==')
+        self.speed_state = OFF  # lo speed
+        if (self.platformName == 'RaspberryPi2'):
+            if d_state == ON:
+                self.speed_state = ON  # high speed
+            else:
+                self.speed_state = OFF  # lo speed
 
-        if d_state == ON:
-            self.speed_state = ON  # high speed
-        else:
-            self.speed_state = OFF  # lo speed
-
-        #self.speed_state = OFF  # lo speed
+        
 
         # loff vent/cooling
         if ((d_state == OFF) and (current_temp > target_temp + self.vent_loff_sp_offset)):

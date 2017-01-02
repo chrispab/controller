@@ -9,7 +9,7 @@
 platform_name: "RPi2"
 #platform_name = "PCDuino"
 hardware: "RaspberryPi2"
-#hardware = "PCDuino"
+#hardware = "PCDuino3"
 readDelay: 3 #sensor read delay
 ##
 tempSPLOn: 22.5   #target 22.5 mp set point max with lon

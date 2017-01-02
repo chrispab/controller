@@ -8,7 +8,7 @@
 #platform_name: "RPi2"
 platform_name: "PCDuino"
 #hardware: "RaspberryPi2"
-hardware: "PCDuino"
+hardware: "PCDuino3"
 readDelay: 3
 
 tempSPLOn: 23.5   #target 24.o veg mp set point max with lon
