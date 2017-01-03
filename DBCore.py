@@ -12,7 +12,7 @@ class DBCore(object):
         return
 
 
-    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=15):
+    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=1):
         # Open database connection
         logging.info("* getDBconn *")
         try:

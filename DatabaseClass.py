@@ -16,7 +16,7 @@ class Database(object):
     def writeSampleToLocalDB(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
         # Open database connection
         try:
-            logging.info("\n===writeSampleToLocalDB===")
+            logging.info("===writeSampleToLocalDB===")
             self.dbConn = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), 
                             cfg.getItemValueFromConfig('db_username'), 
                             cfg.getItemValueFromConfig('db_password'),
@@ -48,7 +48,7 @@ class Database(object):
     def update_central_db(self):
 
         try:
-            logging.info("\n===update_central_db===")
+            logging.info("===update_central_db===")
             # Open database connection
             self.dbConnCentral = self.dbc.getDBConn(cfg.getItemValueFromConfig('central_db_hostname'), 
                                     cfg.getItemValueFromConfig('central_db_username'), 

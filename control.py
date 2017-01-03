@@ -17,8 +17,12 @@ import sendemail as emailMe
 #logger options
 ###############
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
-logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
+#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 #logging.basicConfig(format='[%(filename)s:%(lineno)s - %(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
+#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s',filename='myenvctl.log', filemode='w', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
+#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
+
 
 #my singleton objects
 from DatabaseObject import db # singleton global

@@ -43,7 +43,7 @@ class Config(object):
         return config
         
     def writeConfigToDB(self):
-        logging.info("\n==writeconfigtodb ..")
+        logging.info("==writeconfigtodb ..")
         try:
             self.setConfigItemInDB( 'tempSPLOn', self.config['tempSPLOn'])
             self.setConfigItemInDB( 'tempSPLOff', self.config['tempSPLOff'])
@@ -85,7 +85,7 @@ class Config(object):
     def setConfigItemInDB(self, name, value):
         try:
             # Open database connection
-            logging.info("\n===setconfigitemIndb===")
+            logging.info("===setconfigitemIndb===")
             
             self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
                             self.getItemValueFromConfig('db_username'),
@@ -117,7 +117,7 @@ class Config(object):
     def updateCentralConfigTable(self):
         try:
             # Open database connection
-            logging.info("\n===updatecentralconfigtable ===")
+            logging.info("===updatecentralconfigtable ===")
             self.dbCentralConn = self.dbc.getDBConn(self.getItemValueFromConfig('central_db_hostname'),
                                     self.getItemValueFromConfig('central_db_username'),
                                     self.getItemValueFromConfig('central_db_password'),
@@ -147,6 +147,8 @@ class Config(object):
     
             # Commit changes in the database
             self.dbc.commitClose(self.dbCentralConn)
+            
+            logging.warning("success writing data to central DB")
         except:
             logging.error("????? bad update_central_db exception thrown ???")
             e = sys.exc_info()[0]
@@ -158,7 +160,7 @@ class Config(object):
     def getConfigItemFromLocalDB(self, name):
         try:
             # Open database connection
-            logging.info("\n===getConfigItemFromLocalDB===")
+            logging.info("===getConfigItemFromLocalDB===")
             self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
             self.getItemValueFromConfig('db_username'),self.getItemValueFromConfig('db_password'),
             self.getItemValueFromConfig('db_dbname'))

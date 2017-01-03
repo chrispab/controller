@@ -81,7 +81,10 @@ class sensor(object):
         self.platformName = cfg.getItemValueFromConfig('platform_name')
         self.delay= cfg.getItemValueFromConfig('readDelay')
         self.prevReadTime = datetime.datetime.now()
+        self.sensorPin = 4
+
         self._prime_read_sensor()    # get temp, humi
+        #self.sensorPin = 4
         
         
     def _prime_read_sensor(self):
@@ -91,17 +94,17 @@ class sensor(object):
     
         #repeat read until valid data or too many errorserror
         while (self.humidity is None or self.temperature is None) and self.readErrs < 10:
-            logging.warning("..ERROR TRYING TO READ SENSOR on sensor read")
+            logging.warning("..ERROR TRYING TO READ SENSOR on PRIME sensor read")
             self.readErrs += 1
 
             sleep(self.delay) #wait secs before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
             
-            #self.prevTempHumiMillis = self.currentMillis
-            self.temperature = round(self.temperature, 1)
-            self.humidity = round(self.humidity, 1)
-            logging.info("_rs temp: %s" % self.temperature)
-            logging.info("_rs humi: %s" % self.humidity)
+            ##self.prevTempHumiMillis = self.currentMillis
+            #self.temperature = round(self.temperature, 1)
+            #self.humidity = round(self.humidity, 1)
+            #logging.info("_rs temp: %s" % self.temperature)
+            #logging.info("_rs humi: %s" % self.humidity)
             
         #self.prevTempHumiMillis = self.currentMillis
         self.temperature = round(self.temperature, 1)
@@ -114,7 +117,9 @@ class sensor(object):
     def _read_sensor(self):
         if self.platformName == "RPi2":
             sensor = Adafruit_DHT.DHT22
-            self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, sensorPin)
+            logging.warning("in _read_sensor about to read sensor")
+
+            self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, self.sensorPin)
 
             #sleep(settings.readDelay)
             
@@ -145,14 +150,14 @@ class sensor(object):
         
         #calc if 3 seconds passed - if not then either wait or pass
         #choose to pass to allow other processing
-        timeGap = datetime.datetime.now() -self.prevReadTime
+        timeGap = datetime.datetime.now() - self.prevReadTime
         #print("Time Gap : %s" %timeGap)
         #sleep(cfg.getItemValueFromConfig('readDelay'))
         #timeToGo = timeGap < time.delta(seconds-3)
         if (timeGap < timedelta(seconds=3)):
             #sleep(self.delay)
             #print("Time Gap to go : %s" %timeGap)
-            #print("** JUMPING OUT OF AQUISITION **")
+            logging.info("** JUMPING OUT OF AQUISITION **")
             self.temperature = self.prevTemp  #restore prev sample readings
             self.humidity = self.prevHumi
             return self.humidity, self.temperature
@@ -223,9 +228,14 @@ class sensor(object):
             if cfg.getItemValueFromConfig('platform_name') == "RPi2":
                 GPIO.setup(powerPin, GPIO.OUT)  #set pin as OP
                 GPIO.output(powerPin, 0)        #set low to power off sensor
+                logging.warning("power cycle 1st sleep")
+
                 sleep(1.0 * 3000 / 1000)
                 GPIO.output(powerPin, 1)        #hi to power on sensor
+                logging.warning("power cycle 2nd sleep")
+
                 sleep(1.0 * 3000 / 1000)
+                
             elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
                 gpio.pinMode(powerPin, gpio.OUTPUT)
                 gpio.digitalWrite(powerPin, gpio.LOW)   #power off
