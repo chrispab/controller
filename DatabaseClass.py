@@ -16,7 +16,7 @@ class Database(object):
     def writeSampleToLocalDB(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
         # Open database connection
         try:
-            logging.info("===writeSampleToLocalDB===")
+            logging.warning("===writeSampleToLocalDB===")
             self.dbConn = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), 
                             cfg.getItemValueFromConfig('db_username'), 
                             cfg.getItemValueFromConfig('db_password'),
@@ -35,7 +35,7 @@ class Database(object):
             # Commit your changes in the database
             self.dbc.commitClose(self.dbConn)
     
-            self.update_central_db()    # sync local recs update to central db
+            #self.update_central_db()    # sync local recs update to central db
         
         except:
             logging.error("????? bad writeSampleToLocalDB exception thrown ???")
@@ -48,7 +48,7 @@ class Database(object):
     def update_central_db(self):
 
         try:
-            logging.info("===update_central_db===")
+            logging.warning("===update_central_db samples===")
             # Open database connection
             self.dbConnCentral = self.dbc.getDBConn(cfg.getItemValueFromConfig('central_db_hostname'), 
                                     cfg.getItemValueFromConfig('central_db_username'), 

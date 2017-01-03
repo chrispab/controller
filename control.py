@@ -17,10 +17,10 @@ import sendemail as emailMe
 #logger options
 ###############
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
-#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
+logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 #logging.basicConfig(format='[%(filename)s:%(lineno)s - %(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s',filename='myenvctl.log', filemode='w', level=logging.DEBUG)
-logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
+#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
 
@@ -36,7 +36,8 @@ ON = cfg.getItemValueFromConfig('RelayOn')  # state for on
 
 path = cfg.getItemValueFromConfig('dataPath')
 
-
+processUptime = 0
+systemMessage = 0
 
 # ============================common code start==========================
 
@@ -324,6 +325,8 @@ class Logger(object):
 
 
     def _write_to_CSV(self):
+        global processUptime
+        global systemMessage
         logging.info('=== _write_to_CSV data record ===')
         data = ['time', 'temp', 'humi', 'heaterstate',
                 'ventstate', 'fanstate', 'procTemp']
@@ -359,7 +362,17 @@ class Logger(object):
             writer.writerow(data)
             self.previous_CSV_write_millis = self.current_millis  # note time row written
         #self.datastore.writedb(self.current_time, self.temperature, self.humidity, self.heater_state, self.vent_state, self.fan_state)
+        
+        
         db.writeSampleToLocalDB(data[0], data[1], data[2], data[3], data[4], data[5])
+        db.update_central_db()
+        
+        cfg.setConfigItemInDB('processUptime', processUptime)
+        cfg.setConfigItemInDB('systemMessage', systemMessage )
+        logging.debug('=Process uptime: %s' % (processUptime))
+        logging.debug('=System message: %s' % (systemMessage))
+        
+        cfg.updateCentralConfigTable()
 
         return
 
@@ -457,12 +470,17 @@ class Controller(object):
 #main routine
 #############
 logging.info("--- Creating the controller---")
+
+
 ctl1 = Controller()
 
 
 def main():
     start_time = time.time()
     humidity, temperature = ctl1.sensor1.read()
+    
+    global processUptime
+    global systemMessage
     while 1:
         logging.info("=main=")
         logging.debug(socket.gethostname())
@@ -501,12 +519,7 @@ def main():
         processUptime = end_time - start_time
         processUptime = str(timedelta(seconds=int(processUptime)))
         systemMessage = ctl1.timer1.getUpTime().strip()
-        cfg.setConfigItemInDB('processUptime', processUptime)
-        cfg.setConfigItemInDB('systemMessage', systemMessage )
-        logging.debug('=Process uptime: %s' % (processUptime))
-        logging.debug('=System message: %s' % (systemMessage))
-        
-        cfg.updateCentralConfigTable()
+
 
 
 if __name__ == "__main__":
