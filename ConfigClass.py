@@ -127,21 +127,21 @@ class Config(object):
                 logging.warning("---Central db conn returned 0 -- exiting")
                 return
 
-            logging.warning("getDBConn done OK")
+            logging.info("getDBConn done OK")
                                     
             self.central_cursor = self.dbc.getDBCursor(self.dbCentralConn)
        
             # Prepare and execute SQL query to update a single item in the database settings table.
             sql = "UPDATE  config SET %s = %f" % ('tempSPLOn', self.config['tempSPLOn'])
             self.dbc.execute(self.central_cursor, sql)        
-            logging.warning("update central config: %s", sql)
+            logging.info("update central config: %s", sql)
 
     
             # Prepare SQL query to update a single item in the database settings table.
             sql = "UPDATE  config SET %s = %f" % ('tempSPLOff', self.config['tempSPLOff'])
             # Execute the SQL command
             self.dbc.execute(self.central_cursor, sql)  
-            logging.warning("update central config: %s", sql)
+            logging.info("update central config: %s", sql)
       
                   
             processUptime = self.getConfigItemFromLocalDB('processUptime')
@@ -149,14 +149,14 @@ class Config(object):
             sql = "UPDATE  config SET %s = '%s'" % ('processUptime', processUptime)
             # Execute the SQL command
             self.dbc.execute(self.central_cursor, sql)   
-            logging.warning("update central config: %s", sql)
+            logging.info("update central config: %s", sql)
 
             systemMessage = self.getConfigItemFromLocalDB('systemMessage')
             
             sql = "UPDATE  config SET %s = '%s'" % ('systemMessage', systemMessage)
             ## Execute the SQL command
             self.dbc.execute(self.central_cursor, sql)
-            logging.warning("update central config: %s", sql)
+            logging.info("update central config: %s", sql)
         
     
             # Commit changes in the database

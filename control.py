@@ -295,21 +295,22 @@ class Logger(object):
             #self.state_changed = True
 
         if self.state_changed == True:
-            self._write_to_CSV()  # write modded pre change state(s)
+            logging.warning("O/P State Change - prewrite")
+            self.dataHasChanged()  # write modded pre change state(s)
             self.vent_state = vent_state
             self.vent_speed_state = vent_speed_state
             self.heater_state = heater_state
             self.fan_state = fan_state
-            self._write_to_CSV()  # write modded post change state(s)
+            self.dataHasChanged()  # write modded post change state(s)
             self.previous_CSV_write_millis = self.current_millis  # reset timer
-        else:  # no state change check temp and timer
+        else:  # no state change check temp change or and timer csv write interval done
             if ((self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval))
                     or (self.temperature != self.previous_temperature)):  # any change
                 if self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval):
                     logging.warning("..interval passed ..time for new CSV write")
                 else:
                     logging.warning("..new data row generated")
-                self._write_to_CSV()
+                self.dataHasChanged()
                 self.previous_CSV_write_millis = self.current_millis  # reset timer
 
         self.previous_temperature = self.temperature
@@ -322,12 +323,32 @@ class Logger(object):
 
         return
 
+    #routine called when any data has changed state temp or periodic timer
+    def dataHasChanged(self):
 
-
-    def _write_to_CSV(self):
         global processUptime
         global systemMessage
-        logging.info('=== _write_to_CSV data record ===')
+        
+        logging.warning("Data Has Changed")
+        data = self._write_to_CSV()
+        
+        db.writeSampleToLocalDB(data[0], data[1], data[2], data[3], data[4], data[5])
+
+        db.update_central_db()
+        
+        cfg.setConfigItemInDB('processUptime', processUptime)
+        cfg.setConfigItemInDB('systemMessage', systemMessage )
+        logging.debug('=Process uptime: %s' % (processUptime))
+        logging.debug('=System message: %s' % (systemMessage))
+        
+        cfg.updateCentralConfigTable()
+        
+        return
+        
+
+    def _write_to_CSV(self):
+
+        logging.warning('=== _write_to_CSV data record ===')
         data = ['time', 'temp', 'humi', 'heaterstate',
                 'ventstate', 'fanstate', 'procTemp']
         # round timestamp to nearest second
@@ -363,18 +384,7 @@ class Logger(object):
             self.previous_CSV_write_millis = self.current_millis  # note time row written
         #self.datastore.writedb(self.current_time, self.temperature, self.humidity, self.heater_state, self.vent_state, self.fan_state)
         
-        
-        db.writeSampleToLocalDB(data[0], data[1], data[2], data[3], data[4], data[5])
-        db.update_central_db()
-        
-        cfg.setConfigItemInDB('processUptime', processUptime)
-        cfg.setConfigItemInDB('systemMessage', systemMessage )
-        logging.debug('=Process uptime: %s' % (processUptime))
-        logging.debug('=System message: %s' % (systemMessage))
-        
-        cfg.updateCentralConfigTable()
-
-        return
+        return data
 
 
 class system_timer(object):
