@@ -165,7 +165,7 @@ class Heater(object):
         self.prev_heater_millis = 0  # last time heater switched on or off
         self.heater_sp_offset = cfg.getItemValueFromConfig('heater_sp_offset')
 
-    def control(self, current_temp, target_temp, current_millis, d_state):
+    def control(self, current_temp, target_temp, d_state, current_millis):
         logging.info('==Heat ctl==')
         #calc new heater on t based on t gap
         self.heater_on_delta = ((target_temp - current_temp) * 80 * 1000)  + cfg.getItemValueFromConfig('heater_on_t')
@@ -291,7 +291,7 @@ class Controller(object):
         self.heater1 = Heater()
         self.fan1 = Fan()
         self.light = Light()
-        self.logger1 = Logger()
+        self.stateMonitor = Logger()
         self.timer1 = system_timer()
 
 
@@ -337,11 +337,12 @@ def main():
         
         ctl1.fan1.control(current_millis)
         ctl1.vent1.control(temperature, target_temp, lightState, current_millis)
-        ctl1.heater1.control(temperature, target_temp, current_millis, lightState)
+        ctl1.heater1.control(temperature, target_temp, lightState, current_millis)
         ctl1.fan1.control(current_millis)
         ctl1.board1.switch_relays(heaterState, ventState, fanState, ventSpeedState)  # switch relays according to State vars
-        ctl1.logger1.update_CSV_If_changes(temperature, humidity, ventState, fanState, heaterState, ventSpeedState,
-            current_millis, ctl1.timer1.current_time, ctl1.sensor1.proc_temp)  # write to csv if any state changes
+        ctl1.stateMonitor.checkForChanges(temperature, humidity, ventState, 
+                                    fanState, heaterState, ventSpeedState,
+                                    current_millis, ctl1.timer1.current_time)  # write to csv if any state changes
         
         end_time = time.time()
         processUptime = end_time - start_time

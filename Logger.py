@@ -38,9 +38,9 @@ class Logger(object):
         self.min_CSV_write_interval = cfg.getItemValueFromConfig('min_CSV_write_interval')
 
 
-    def update_CSV_If_changes(self, temperature, humidity, vent_state,
-                              fan_state, heater_state, vent_speed_state, current_millis,
-                              current_time, proc_temp):
+    def checkForChanges(self, temperature, humidity, vent_state,
+                              fan_state, heater_state, vent_speed_state,
+                              current_millis, current_time):
         self.temperature = temperature
         self.humidity = humidity
         self.vent_state = vent_state
@@ -49,10 +49,10 @@ class Logger(object):
         self.vent_speed_state = vent_speed_state
         self.current_millis = current_millis
         self.current_time = current_time
-        self.proc_temp = proc_temp
+        #self.proc_temp = proc_temp
 
         self.state_changed = False
-        logging.info('==Update CSV==')
+        logging.info('==Check for changes==')
 
         # check each for state change and set new prewrite states
         if self.vent_state != self.previous_vent_state:  # any change in vent
@@ -121,7 +121,7 @@ class Logger(object):
                 if self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval):
                     logging.warning("..interval passed ..time for new CSV write")
                 else:
-                    logging.warning("..new data row generated")
+                    logging.warning("..new data row generated.. new temp")
                 self.dataHasChanged()
                 self.previous_CSV_write_millis = self.current_millis  # reset timer
 
@@ -131,26 +131,20 @@ class Logger(object):
         self.previous_vent_state = self.vent_state
         self.previous_fan_state = self.fan_state
         self.previous_vent_speed_state = self.vent_speed_state
-        self.previous_proc_temp = self.proc_temp
+        #self.previous_proc_temp = self.proc_temp
 
         return
 
-    #routine called when any data has changed state temp or periodic timer
+    #routine called when any data has changed state or temp or periodic timer
     def dataHasChanged(self):
-
-        global processUptime
-        global systemMessage
         
-        logging.warning("Data Has Changed")
+        logging.warning("Data Has Changed- updating things")
         data = self._write_to_CSV()
         
         db.writeSampleToLocalDB(data[0], data[1], data[2], data[3], data[4], data[5])
 
         db.update_central_db()
-        
-        #cfg.setConfigItemInDB('processUptime', processUptime)
-        #cfg.setConfigItemInDB('systemMessage', systemMessage )
-        
+
         processUptime = cfg.getConfigItemFromLocalDB('processUptime')
         systemMessage = cfg.getConfigItemFromLocalDB('systemMessage')
         logging.debug('=Process uptime: %s' % (processUptime))
@@ -165,7 +159,7 @@ class Logger(object):
 
         logging.warning('=== _write_to_CSV data record ===')
         data = ['time', 'temp', 'humi', 'heaterstate',
-                'ventstate', 'fanstate', 'procTemp']
+                'ventstate', 'fanstate']
         # round timestamp to nearest second
         data[0] = round_time(self.current_time, 1)
 #        data[0] = datetime.datetime.now() # round timestamp to nearest second
@@ -188,7 +182,7 @@ class Logger(object):
         else:
             data[5] = 1  # on line on graph
 
-        data[6] = round(self.proc_temp, 1)  # add processed temp value
+        #data[6] = round(self.proc_temp, 1)  # add processed temp value
         #sys.stdout.write(data.tostring() )
         with open(path, "ab") as csv_file:
             # with open(path, 'w', newline='') as csv_file:

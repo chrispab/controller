@@ -13,6 +13,10 @@ class Database(object):
         self.dbc = DBCore()
         return
 
+
+
+        
+        
     def writeSampleToLocalDB(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
         # Open database connection
         try:

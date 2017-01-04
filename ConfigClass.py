@@ -80,6 +80,21 @@ class Config(object):
         return dt.time(hrs,mins)
         ##################################################################################
         ###############################################################################
+        
+    def getDBConnInfoFromConfig(self, dbName):
+        logging.warning("Get DB Conn Info for : %s", dbName)
+        if (dbName == 'local'):
+            dbInfo['db_hostname'] = cfg.getItemValueFromConfig('db_hostname')
+            dbInfo['db_username'] = cfg.getItemValueFromConfig('db_username')
+            dbInfo['db_password'] = cfg.getItemValueFromConfig('db_password')
+            dbInfo['db_dbname'] = cfg.getItemValueFromConfig('db_dbname')
+        elif (dbName == 'central'):
+            dbInfo['db_hostname'] = cfg.getItemValueFromConfig('central_db_hostname')
+            dbInfo['db_username'] = cfg.getItemValueFromConfig('central_db_username')
+            dbInfo['db_password'] = cfg.getItemValueFromConfig('central_db_password')
+            dbInfo['db_dbname'] = cfg.getItemValueFromConfig('central_db_dbname')
+            
+        return dbInfo
 
 
     def setConfigItemInDB(self, name, value):
@@ -143,8 +158,8 @@ class Config(object):
             self.dbc.execute(self.central_cursor, sql)  
             logging.info("update central config: %s", sql)
       
-                  
-            processUptime = self.getConfigItemFromLocalDB('processUptime')
+            #dbInfo = self.getDBConnInfoFromConfig('local')
+            processUptime = self.getConfigItemFromLocalDB( 'processUptime')
             
             sql = "UPDATE  config SET %s = '%s'" % ('processUptime', processUptime)
             # Execute the SQL command
@@ -169,7 +184,31 @@ class Config(object):
 
         return
 
-
+    def getConfigItemFromDB(self, db, itemNname):
+        try:
+            # Open database connection
+            logging.info("===getConfigItemFromDB===")
+            self.dbConn = self.dbc.getDBConn(db['db_hostname'], 
+                            db['db_username'], db['db_password'],
+                            db['db_dbname'])
+            
+            #get db cursor
+            self.cursor = self.dbc.getDBCursor(self.dbConn)
+    
+            # Execute the SQL command
+            sql = "SELECT %s FROM config" % (itemName)
+            self.dbc.execute(self.cursor, sql)
+                        
+            value=self.cursor.fetchone()
+            self.dbc.commitClose(self.dbConn)
+        except:
+            logging.error("????? bad update_central_db exception thrown ???")
+            e = sys.exc_info()[0]
+            logging.error( "????? Error: %s ?????" % e )
+            
+        return value[0]
+        
+        
     def getConfigItemFromLocalDB(self, name):
         try:
             # Open database connection

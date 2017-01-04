@@ -117,7 +117,7 @@ class sensor(object):
     def _read_sensor(self):
         if self.platformName == "RPi2":
             sensor = Adafruit_DHT.DHT22
-            logging.warning("in _read_sensor about to read sensor")
+            logging.info("in _read_sensor about to read sensor")
 
             self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, self.sensorPin)
 
