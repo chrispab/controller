@@ -71,13 +71,17 @@ class Database(object):
             logging.debug("row :%s - " % (row))
     
             if row > 0:
-                logging.debug("last sample time: %s - " % (row[0]) )
+                logging.info("last sample time: %s - " % (row[0]) )
                 last_sample_time = row[0]
-            if row == None:
+            if row == None: #REDUNDANT CODE ????????
                 last_sample_time = "2016-11-01 00:00:00"
+                logging.warning("-- No datsamples to sync to central DB --")
     
             # now get samples from local db with timestamp > last sample time on central db
             sql = "SELECT sample_dt, temperature, humidity, heaterstate, ventstate,fanstate FROM thdata WHERE sample_dt >= '%s'" % last_sample_time
+    ##################################################################################################################
+    # need ms res for timestamps, waiting for mysql version 5.6.4+
+    
     
             # get rs from local db     
             self.dbConnLocal = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), 
@@ -94,11 +98,16 @@ class Database(object):
             logging.debug("executing sql to update to remote db to sync with local db=")
             # if rs_to_update_central_db.count > 0: 
             if self.cursorLocal.rowcount > 0:  # if there are records to add to central db
+                logging.warning("-- datsamples to sync to central DB: %s --", self.cursorLocal.rowcount )
+                
                # update central db
                 sql = "INSERT INTO thdata (sample_dt, temperature, humidity, heaterstate, ventstate, fanstate) \
                      VALUES (%s, %s, %s, '%s', '%s', '%s' )"
                 self.dbc.executemany(self.cursorCentral, sql, rs_to_update_central_db)
                 self.dbc.commitClose(self.dbConnCentral)
+            else:
+                logging.warning("-- No datsamples to sync to central DB --")
+
     
             # Commit your changes in the database
             self.dbc.commitClose(self.dbConnLocal)

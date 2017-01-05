@@ -2,7 +2,6 @@
 # control.py
 # control for enviro controller
 
-# ===================general imports=====================================
 import logging
 #logger options
 ###############
@@ -12,6 +11,8 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s',filename='myenvctl.log', filemode='w', level=logging.DEBUG)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
+
+# ===================general imports=====================================
 
 import csv
 import datetime
@@ -217,11 +218,11 @@ class system_timer(object):
         self.d_state = OFF
         # get time at start of program execution
         self.start_millis = datetime.datetime.now()
-        self.update_current_millis()
+        self.updateClocks()
 
-    def update_current_millis(self):
+    def updateClocks(self):
         self.current_time = datetime.datetime.now()  # get current time
-        # calc elapsed delta since program began
+        # calc elapsed delta ms since program began
         self.delta = self.current_time - self.start_millis
         self.current_millis = int(self.delta.total_seconds() * 1000)
         return
@@ -298,11 +299,9 @@ class Controller(object):
 #main routine
 #############
 logging.info("--- Creating the controller---")
-
-
 ctl1 = Controller()
 
-
+#cfg.
 def main():
     start_time = time.time()
     humidity, temperature = ctl1.sensor1.read()
@@ -313,7 +312,7 @@ def main():
         logging.info("=main=")
         logging.debug(socket.gethostname())
         logging.info("current time: %s" % (ctl1.timer1.current_time))
-        ctl1.timer1.update_current_millis()
+        ctl1.timer1.updateClocks()
         current_millis = ctl1.timer1.current_millis
         
         startT = time.time()
@@ -348,8 +347,8 @@ def main():
         processUptime = end_time - start_time
         processUptime = str(timedelta(seconds=int(processUptime)))
         systemMessage = ctl1.timer1.getUpTime().strip()
-        cfg.setConfigItemInDB('processUptime', processUptime)
-        cfg.setConfigItemInDB('systemMessage', systemMessage )
+        cfg.setConfigItemInLocalDB('processUptime', processUptime)
+        cfg.setConfigItemInLocalDB('systemMessage', systemMessage )
 
 
 

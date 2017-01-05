@@ -23,7 +23,7 @@ class Config(object):
         self.config = self.readConfigFromFile()
         #self.writeConfigToFile(self.config)
 
-        self.writeConfigToDB()
+        self.writeConfigToLocalDB()
 
         logging.info("__written temp lon sp to db config__");
         return
@@ -42,13 +42,13 @@ class Config(object):
 
         return config
         
-    def writeConfigToDB(self):
+    def writeConfigToLocalDB(self):
         logging.info("==writeconfigtodb ..")
         try:
-            self.setConfigItemInDB( 'tempSPLOn', self.config['tempSPLOn'])
-            self.setConfigItemInDB( 'tempSPLOff', self.config['tempSPLOff'])
-            self.setConfigItemInDB( 'processUptime', self.config['processUptime'])
-            self.setConfigItemInDB( 'systemMessage', self.config['systemMessage'])        
+            self.setConfigItemInLocalDB( 'tempSPLOn', self.config['tempSPLOn'])
+            self.setConfigItemInLocalDB( 'tempSPLOff', self.config['tempSPLOff'])
+            self.setConfigItemInLocalDB( 'processUptime', self.config['processUptime'])
+            self.setConfigItemInLocalDB( 'systemMessage', self.config['systemMessage'])        
             self.updateCentralConfigTable()
         except:
             logging.error("????? bad setConfigItemInDB exception thrown ???")
@@ -97,7 +97,7 @@ class Config(object):
         return dbInfo
 
 
-    def setConfigItemInDB(self, name, value):
+    def setConfigItemInLocalDB(self, name, value):
         try:
             # Open database connection
             logging.info("===setconfigitemIndb===")
@@ -202,7 +202,7 @@ class Config(object):
             value=self.cursor.fetchone()
             self.dbc.commitClose(self.dbConn)
         except:
-            logging.error("????? bad update_central_db exception thrown ???")
+            logging.error("????? bad getConfigItemFromDB ???")
             e = sys.exc_info()[0]
             logging.error( "????? Error: %s ?????" % e )
             
