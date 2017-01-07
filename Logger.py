@@ -1,5 +1,7 @@
 import logging
 import csv
+import datetime
+
 
 from ConfigObject import cfg # singleton global
 from DatabaseObject import db # singleton global
@@ -113,6 +115,8 @@ class Logger(object):
             self.vent_speed_state = vent_speed_state
             self.heater_state = heater_state
             self.fan_state = fan_state
+            logging.warning("O/P State Change - actual state")
+
             self.dataHasChanged()  # write modded post change state(s)
             self.previous_CSV_write_millis = self.current_millis  # reset timer
         else:  # no state change check temp change or and timer csv write interval done
@@ -139,6 +143,8 @@ class Logger(object):
     def dataHasChanged(self):
         
         logging.warning("Data Has Changed- updating things")
+        logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
+        logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
         data = self._write_to_CSV()
         
         db.writeSampleToLocalDB(data[0], data[1], data[2], data[3], data[4], data[5])
