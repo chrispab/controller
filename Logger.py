@@ -116,9 +116,10 @@ class Logger(object):
             self.heater_state = heater_state
             self.fan_state = fan_state
             logging.warning("O/P State Change - actual state")
-
             self.dataHasChanged()  # write modded post change state(s)
-            self.previous_CSV_write_millis = self.current_millis  # reset timer
+            self.dataHasChangedAfterToggle()
+           
+
         else:  # no state change check temp change or and timer csv write interval done
             if ((self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval))
                     or (self.temperature != self.previous_temperature)):  # any change
@@ -127,7 +128,7 @@ class Logger(object):
                 else:
                     logging.warning("..new data row generated.. new temp")
                 self.dataHasChanged()
-                self.previous_CSV_write_millis = self.current_millis  # reset timer
+                self.dataHasChangedAfterToggle()
 
         self.previous_temperature = self.temperature
         self.previous_humidity = self.humidity
@@ -142,25 +143,30 @@ class Logger(object):
     #routine called when any data has changed state or temp or periodic timer
     def dataHasChanged(self):
         
-        logging.warning("Data Has Changed- updating things")
+        #logging.warning("Data Has Changed- updating things")
         logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
-        logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
-        data = self._write_to_CSV()
+        #logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
         
+        data = self._write_to_CSV()
         db.writeSampleToLocalDB(data[0], data[1], data[2], data[3], data[4], data[5])
-
+        
+        return
+        
+    #routine called when any data has changed state or temp or periodic timer
+    def dataHasChangedAfterToggle(self):
+        #post state toggle updates now
         db.update_central_db()
-
         processUptime = cfg.getConfigItemFromLocalDB('processUptime')
         systemMessage = cfg.getConfigItemFromLocalDB('systemMessage')
         logging.debug('=Process uptime: %s' % (processUptime))
         logging.debug('=System message: %s' % (systemMessage))
-        
-        cfg.updateCentralConfigTable()
+        cfg.updateCentralConfigTable()            
+
+        self.previous_CSV_write_millis = self.current_millis  # reset timer
         
         return
         
-
+        
     def _write_to_CSV(self):
 
         logging.warning('=== _write_to_CSV data record ===')
