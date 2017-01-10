@@ -5,6 +5,7 @@ import yaml
 import os
 import socket # to get hostname 
 import MySQLdb
+import pymysql.cursors
 import sys
 from DBCore import *
 import logging
@@ -210,6 +211,8 @@ class Config(object):
         
         
     def getConfigItemFromLocalDB(self, name):
+        value=[1]
+        value[0]=1
         try:
             # Open database connection
             logging.info("===getConfigItemFromLocalDB===")
@@ -230,5 +233,6 @@ class Config(object):
             logging.error("????? bad update_central_db exception thrown ???")
             e = sys.exc_info()[0]
             logging.error( "????? Error: %s ?????" % e )
+            #value[0]=1
             
         return value[0]

@@ -11,3 +11,7 @@ venv
 *.yml
 /chartx
 /C_Python_sensor_driver
+
+/Adafruit_Python_DHT-master
+/build
+secureFile.py

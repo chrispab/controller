@@ -52,7 +52,7 @@ class Logger(object):
         self.current_millis = current_millis
         self.current_time = current_time
         #self.proc_temp = proc_temp
-
+        print("current time: %s" % self.current_time)
         self.state_changed = False
         logging.info('==Check for changes==')
 
@@ -118,6 +118,15 @@ class Logger(object):
             logging.warning("O/P State Change - actual state")
 
             self.dataHasChanged()  # write modded post change state(s)
+            
+            #post state toggle updates now
+            db.update_central_db()
+            processUptime = cfg.getConfigItemFromLocalDB('processUptime')
+            systemMessage = cfg.getConfigItemFromLocalDB('systemMessage')
+            logging.debug('=Process uptime: %s' % (processUptime))
+            logging.debug('=System message: %s' % (systemMessage))
+            cfg.updateCentralConfigTable()
+            
             self.previous_CSV_write_millis = self.current_millis  # reset timer
         else:  # no state change check temp change or and timer csv write interval done
             if ((self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval))
@@ -143,20 +152,15 @@ class Logger(object):
     def dataHasChanged(self):
         
         logging.warning("Data Has Changed- updating things")
-        logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
-        logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
+        #logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
+        #logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
         data = self._write_to_CSV()
         
         db.writeSampleToLocalDB(data[0], data[1], data[2], data[3], data[4], data[5])
 
-        db.update_central_db()
+        #db.update_central_db()
 
-        processUptime = cfg.getConfigItemFromLocalDB('processUptime')
-        systemMessage = cfg.getConfigItemFromLocalDB('systemMessage')
-        logging.debug('=Process uptime: %s' % (processUptime))
-        logging.debug('=System message: %s' % (systemMessage))
-        
-        cfg.updateCentralConfigTable()
+
         
         return
         
@@ -167,8 +171,8 @@ class Logger(object):
         data = ['time', 'temp', 'humi', 'heaterstate',
                 'ventstate', 'fanstate']
         # round timestamp to nearest second
-        data[0] = round_time(self.current_time, 1)
-#        data[0] = datetime.datetime.now() # round timestamp to nearest second
+#        data[0] = self.current_time
+        data[0] = datetime.datetime.now() # round timestamp to nearest second
 
         data[1] = self.temperature
         data[2] = self.humidity

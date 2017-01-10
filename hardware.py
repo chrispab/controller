@@ -119,8 +119,9 @@ class sensor(object):
             sensor = Adafruit_DHT.DHT22
             logging.info("in _read_sensor about to read sensor")
 
-            self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, self.sensorPin)
-
+            #self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, self.sensorPin)
+            self.humidity = 51.1
+            self.temperature = 21.3
             #sleep(settings.readDelay)
             
         elif self.platformName == "PCDuino":
@@ -230,11 +231,11 @@ class sensor(object):
                 GPIO.output(powerPin, 0)        #set low to power off sensor
                 logging.warning("power cycle 1st sleep")
 
-                sleep(1.0 * 3000 / 1000)
+                #sleep(1.0 * 3000 / 1000)
                 GPIO.output(powerPin, 1)        #hi to power on sensor
                 logging.warning("power cycle 2nd sleep")
 
-                sleep(1.0 * 3000 / 1000)
+                #sleep(1.0 * 3000 / 1000)
                 
             elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
                 gpio.pinMode(powerPin, gpio.OUTPUT)

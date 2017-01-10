@@ -1,4 +1,5 @@
-import MySQLdb
+#import MySQLdb
+import pymysql.cursors
 import sys
 import logging
 
@@ -16,7 +17,7 @@ class DBCore(object):
         # Open database connection
         logging.info("* getDBconn *")
         try:
-            self.dbConn = MySQLdb.connect(host = hostName, 
+            self.dbConn = pymysql.connect(host = hostName, 
                             user = userName, passwd = password, 
                             db = databaseName, connect_timeout = conn_timeout)
             logging.info("* connected *")
@@ -54,6 +55,8 @@ class DBCore(object):
     def executemany(self, cursor, sqlstr, rs):
         try:
             logging.info("* executing sql *")
+            #print("sql: %s" % sqlstr)
+            #print("sql: %s" % rs)
             result =cursor.executemany( sqlstr, rs)
         except MySQLdb.Error, e:
             logging.error("*** dberror executing sql query ***")
