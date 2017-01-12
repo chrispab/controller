@@ -157,12 +157,12 @@ class sensor(object):
         if (timeGap < timedelta(seconds=3)):
             #sleep(self.delay)
             #print("Time Gap to go : %s" %timeGap)
-            logging.info("** JUMPING OUT OF AQUISITION **")
+            logging.info("** Too soon to read sensor again - JUMPING OUT OF AQUISITION **")
             self.temperature = self.prevTemp  #restore prev sample readings
             self.humidity = self.prevHumi
             return self.humidity, self.temperature
 
-        logging.info("** AQUIring **")
+        logging.info("** aquiring **")
 
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
         
@@ -174,7 +174,8 @@ class sensor(object):
                 #self.delay = 0
             #if self.platformName == "RPi2":
             #self.delay = cfg.getItemValueFromConfig('readDelay')
-            sleep(self.delay) #wait secs before re-read
+            if self.platformName == "PCDuino":
+                sleep(self.delay) #wait secs before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
 
     
@@ -188,7 +189,7 @@ class sensor(object):
                 try:
                     emailMe.sendemail('PowerCycle', self.message)
                 except:
-                    logging.error("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING")
+                    logging.error("...ERROR - SENDING EMAIL? - POWER CYCLE - DODGY READING")
             self.temperature = self.prevTemp  #restore prev sample readings
             self.humidity = self.prevHumi
         else:#good read CRC if here
