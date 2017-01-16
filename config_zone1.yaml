@@ -12,7 +12,7 @@ hardware: "RaspberryPi2"
 #hardware = "PCDuino3"
 readDelay: 3 #sensor read delay
 ##
-tempSPLOn: 21.5   #target 22.5 mp set point max with lon
+tempSPLOn: 21.0   #target 22.5 mp set point max with lon
 tempSPLOff: 15.0 #16.9 #target = 16.9, target loff
 
 tempAlertHi: 26.1  #hi temp alert temp
@@ -33,7 +33,7 @@ heater_on_t: 10000  #min time heater is on or off for
 heater_off_t: 30000  #min time heater is on or off for
 heater_sp_offset: 0
 
-ventOnDelta: 3000 #duration vent is on in millis
+ventOnDelta: 7000 #duration vent is on in millis
 ventOffDelta: 197000 #vent off duration in miili sec
 ventPulseOnDelta: 10000 #60 secs cooling on delta
 vent_lon_sp_offset: -0.1 #offset

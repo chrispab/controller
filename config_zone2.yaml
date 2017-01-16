@@ -12,18 +12,18 @@ hardware: "PCDuino3"
 readDelay: 3
 
 tempSPLOn: 23.0   #target 24.o veg mp set point max with lon
-tempSPLOff: 19.0 #target = 21.0 veg, target loff
+tempSPLOff: 16.0 #target = 21.0 veg, target loff
 
 tempAlertHi: 26.1  #hi temp alert temp
 tempAlertLo: 15.0  #lo temp alert
 
-lightOnT: "20:00:00"    # time light on hh:mm:ss
-lightOffT: "14:00:00"   # time off
+lightOnT: "16:00:00"    # time light on hh:mm:ss
+lightOffT: "10:00:00"   # time off
 
 min_CSV_write_interval: 60000 #interval min bet csv writes
 
 ##----L control params----
-heat_off_hours: [ 20,21,22,23,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 ]   #hours when heater should NOT operate
+heat_off_hours: [10,11,12,13,14,15]   #hours when heater should NOT operate
 
 
 RelayOff: 1 #state for relay OFF
