@@ -3,6 +3,7 @@
 #===config params to store in config obj so tunable via web interface====
 
 #Zone 2 - PCDuino
+
 #Hardware specific config items
 # comment out for hardware used as appropriate
 #platform_name: "RPi2"
