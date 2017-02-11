@@ -2,6 +2,7 @@ import MySQLdb
 import sys
 from DBCore import *
 import logging
+import pprint
 
 
 from ConfigObject import cfg # singleton global
@@ -66,12 +67,12 @@ class Database(object):
             sql = "SELECT sample_dt FROM thdata ORDER BY id DESC LIMIT 1"
             last_sample_time = self.dbc.execute(self.cursorCentral, sql)
             
-            logging.debug("last sample time from central db: %s - " % (last_sample_time) )
+            logging.warning("last sample time from central db: %s" % (last_sample_time) )
             row = self.cursorCentral.fetchone()    # get result if any
-            logging.debug("row :%s - " % (row))
-    
+            logging.warning("row :%s" % (row))
+            #print vars(row)
             if row > 0:
-                logging.info("last sample time: %s - " % (row[0]) )
+                logging.warning("last sample time: %s" % (row[0]) )
                 last_sample_time = row[0]
             if row == None: #REDUNDANT CODE ????????
                 last_sample_time = "2016-11-01 00:00:00"
@@ -89,16 +90,21 @@ class Database(object):
     
             # prepare a cursor object using cursor() method
             self.cursorLocal = self.dbc.getDBCursor(self.dbConnLocal)
+            
+            self.dbc.execute(self.cursorLocal, sql)
     
-            rs_to_update_central_db = self.dbc.execute(self.cursorLocal, sql)
+            #rs_to_update_central_db = self.dbc.execute(self.cursorLocal, sql)
             rs_to_update_central_db = list(self.cursorLocal.fetchall())
             logging.debug("--Records to update central db: %s" % (rs_to_update_central_db))
             logging.debug("data got from local server - in list ready to upload-")
+    
+            pprint.pprint(rs_to_update_central_db)
     
             logging.debug("executing sql to update to remote db to sync with local db=")
             # if rs_to_update_central_db.count > 0: 
             if self.cursorLocal.rowcount > 0:  # if there are records to add to central db
                 logging.warning("-- datsamples to sync to central DB: %s --", self.cursorLocal.rowcount )
+                logging.warning("-- data roe to write: %s --", self.cursorLocal.rowcount )
                 
                # update central db
                 sql = "INSERT INTO thdata (sample_dt, temperature, humidity, heaterstate, ventstate, fanstate) \

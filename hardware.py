@@ -35,13 +35,14 @@ if cfg.getItemValueFromConfig('platform_name') == "RPi2": #rpi platform
     sensor = Adafruit_DHT.DHT22
     #=================hardware dependant pins values etc====================
     #----pin assignments and related hardware defs----
-    powerPin = 2    #pyhs pin 3
-    led2 = 3        #phys pin 5
-    sensorPin = 4   #phys pin 7
-    heaterRelay = 5 #pyhs pin 29
-    ventRelay = 6   #phys pin 31
-    fanRelay = 7    #phys pin 26
-    relay4 = 8      #pyhs pin 24
+    #name       gpionum     physical pin
+    powerPin =      2       #pyhs pin 3 - supplies power to dht sensor - allows power cycling
+    led2 =          3       #phys pin 5  - not currently used - for debug
+    sensorPin =     4       #phys pin 7 - checked
+    heaterRelay =   5       #pyhs pin 29
+    ventRelay =     6       #phys pin 31
+    fanRelay =      7       #phys pin 26
+    relay4 =        8       #pyhs pin 24
 elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":    # pcduino platform
     import gpio
     import dht22 as dht22
@@ -72,7 +73,7 @@ class sensor(object):
         self.humidity = 55.5
         self.temperature = 18.0
         #self.prevTempHumiMillis = 0   #last time sensor read
-        self.proc_temp = 0       # processedsed, filter temp reading
+        self.proc_temp = 0       # processed, filter temp reading
         self.currentTime = 0
         self.prevTemp = 0
         self.prevHumi = 0
@@ -218,7 +219,7 @@ class sensor(object):
                     try:
                         emailMe.sendemail('Spike in Reading', self.message)
                     except:
-                        logging.error("ERROR SENDING EMAIL - DODGY READING")
+                        logging.error("ERROR, SENDING EMAIL - DODGY READING")
                 self.temperature = self.prevTemp  #restore prev sample readings
                 self.humidity = self.prevHumi
         
@@ -229,11 +230,11 @@ class sensor(object):
             if cfg.getItemValueFromConfig('platform_name') == "RPi2":
                 GPIO.setup(powerPin, GPIO.OUT)  #set pin as OP
                 GPIO.output(powerPin, 0)        #set low to power off sensor
-                logging.warning("power cycle 1st sleep")
+                logging.warning("power cycle sensor power low sleep")
 
                 sleep(1.0 * 3000 / 1000)
                 GPIO.output(powerPin, 1)        #hi to power on sensor
-                logging.warning("power cycle 2nd sleep")
+                logging.warning("power cycle sensor power hi sleep")
 
                 sleep(1.0 * 3000 / 1000)
                 

@@ -1,0 +1,62 @@
+# YAML
+
+#===config params to store in config obj so tunable via web interface====
+
+#Zone 3 - RPi
+
+#Hardware specific config items
+# comment out for hardware used as appropriate
+platform_name: "RPi2"
+#platform_name = "PCDuino"
+hardware: "RaspberryPi2"
+#hardware = "PCDuino3"
+readDelay: 3 #sensor read delay
+##
+tempSPLOn: 23.0   #target 24.o veg mp set point max with lon
+tempSPLOff: 16.0 #target = 21.0 veg, target loff
+
+tempAlertHi: 26.1  #hi temp alert temp
+tempAlertLo: 15.0  #lo temp alert
+
+lightOnT: "16:00:00"    # time light on hh:mm:ss
+lightOffT: "10:00:00"   # time off
+
+min_CSV_write_interval: 60000 #interval min bet csv writes
+
+##----L control params----
+heat_off_hours: [0,1,2,3,4,5,6,7,8,9,16,17,18,19,20,21,22,23]   #hours when heater should NOT operate
+
+RelayOff: 1 #state for relay OFF
+RelayOn: 0  #state for on
+
+heater_on_t: 4000  #min time heater is on or off for
+heater_off_t: 30000  #min time heater is on or off for
+heater_sp_offset: 0
+
+ventOnDelta: 3000 #duration vent is on in millis
+ventOffDelta: 197000 #vent off duration in miili sec
+ventPulseOnDelta: 3000 #60 secs cooling on delta
+vent_lon_sp_offset: 0.0 #offset
+vent_loff_sp_offset: 2.0 #
+
+fan_on_t: 15000  #vent on time
+fan_off_t: 45000 #vent off time
+
+dataPath: "data/thdata.csv"
+
+emailEnabled: False
+
+#db params
+db_hostname: "127.0.0.1"
+db_username: "zone3"
+db_password: "zone3"
+db_dbname: "zone3db"
+
+central_db_hostname: "192.168.0.201"
+central_db_username: "zone3"
+central_db_password: "zone3"
+central_db_dbname: "zone3centraldb"
+
+#placeholder items - used for items pushed from system
+processUptime: "00:00:00"
+systemMessage: "system message"
