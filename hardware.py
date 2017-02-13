@@ -208,7 +208,7 @@ class sensor(object):
                 #filter temp function
                 self.proc_temp = self.proc_temp + ( 0.333 * (self.temperature - self.proc_temp))
                 self.proc_temp = round(self.proc_temp, 3)
-                logging.warning('\nTemp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
+                logging.warning('Temp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
             else:
                 #bad sample even though good crc
                 logging.warning('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))

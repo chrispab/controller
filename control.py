@@ -6,8 +6,10 @@ import logging
 #logger options
 ###############
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
+#
 logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 #logging.basicConfig(format='[%(filename)s:%(lineno)s - %(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
+#logging.basicConfig(format='[%(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s',filename='myenvctl.log', filemode='w', level=logging.DEBUG)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
@@ -245,17 +247,7 @@ class Light(object):
         self.tOn = dt.time()
         self.tOff = dt.time()
 
-    def testGetLightState(self): # testing only routine
-        print("??Running get lightstate stet??")
-        tOn = dt.time(21,0,0)
-        tOff = dt.time(9,0,0)
 
-        for hour in range(0,24):
-            for minute in range(0,60):
-                print ( hour, minute, tOn, tOff, dt.time(hour,minute))
-                print(self.getLightState(tOn, tOff, dt.time(hour,minute)))
-                
-        return
         
     #return true if testTime between timeOn and TimeOff, else false if in off period
     def getLightState(self ):   

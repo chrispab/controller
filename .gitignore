@@ -15,3 +15,4 @@ venv
 /Adafruit_Python_DHT-master
 /build
 secureFile.py
+myenvctl.log

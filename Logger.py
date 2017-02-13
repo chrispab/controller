@@ -58,7 +58,7 @@ class Logger(object):
         sys.stdout.write(".")
         sys.stdout.flush()
         self.state_changed = False
-        logging.info('==Check for changes==')
+        logging.info('== Checking for changes ==')
 
         # check each for state change and set new prewrite states
         if self.vent_state != self.previous_vent_state:  # any change in vent
@@ -113,18 +113,17 @@ class Logger(object):
             #self.state_changed = True
 
         if self.state_changed == True:
-            logging.warning("O/P State Change - prewrite")
+            logging.warning("-- O/P State Change - OLD state --")
             self.dataHasChanged()  # write modded pre change state(s)
             self.vent_state = vent_state
             self.vent_speed_state = vent_speed_state
             self.heater_state = heater_state
             self.fan_state = fan_state
-            logging.warning("O/P State Change - actual state")
+            logging.warning("-- O/P State Change - NEW state --")
 
             self.dataHasChanged()  # write modded post change state(s)
             
-            #post state toggle updates now
-            db.update_central_db()
+
             processUptime = cfg.getConfigItemFromLocalDB('processUptime')
             systemMessage = cfg.getConfigItemFromLocalDB('systemMessage')
             logging.debug('=Process uptime: %s' % (processUptime))
@@ -155,16 +154,13 @@ class Logger(object):
     #routine called when any data has changed state or temp or periodic timer
     def dataHasChanged(self):
         
-        logging.warning("Data Has Changed- updating things")
+        logging.warning("*** Data Has Changed- updating csv, dbs ***")
         #logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
         #logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
         data = self._write_to_CSV()
         
         db.writeSampleToLocalDB(data[0], data[1], data[2], data[3], data[4], data[5])
-
-        #db.update_central_db()
-
-
+        db.update_central_db()
         
         return
         
@@ -176,7 +172,7 @@ class Logger(object):
                 'ventstate', 'fanstate']
         # round timestamp to nearest second
 #        data[0] = self.current_time
-        data[0] = datetime.datetime.now() # round timestamp to nearest second
+        data[0] = datetime.datetime.now() 
 
         data[1] = self.temperature
         data[2] = self.humidity
