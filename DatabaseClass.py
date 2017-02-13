@@ -85,7 +85,7 @@ class Database(object):
                     last_sample_time = "2017-01-01 00:00:00"
                     logging.warning("-- No datsamples to sync to central DB --")
         
-
+##WHAT IF central DB is empty????#####
     
             
             # get rs from local db     

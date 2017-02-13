@@ -50,7 +50,11 @@ def requires_auth(f):
 
 
 def getStartSampleIndex(timeList, targetTimeDelta):
-    lastSampleDTO = datetime.strptime(timeList[len(timeList)-1], '%Y-%m-%d %H:%M:%S')# conv to DTO from string format YYY-MM-DD HH:mm:ss
+    
+    #strip last 6 digits fractional part of seconds if exist, keep 1st 19 chars
+    print("???????????????????????????????????????????last sample date time string: %s", timeList[len(timeList)-1][:19])
+    
+    lastSampleDTO = datetime.strptime(timeList[len(timeList)-1][:19], '%Y-%m-%d %H:%M:%S')# conv to DTO from string format YYY-MM-DD HH:mm:ss
     print("++++++++ lastSampleDTO = %s  +++++++++++++++++++++") % lastSampleDTO
     reqStartDTO = lastSampleDTO - targetTimeDelta  #calc target DTO
     print("++++++++ reqStartDTO = %s  +++++++++++++++++++++") % reqStartDTO
@@ -113,14 +117,15 @@ def chartx(timeh):
     del timeList[:0]    #del 1st element of list - start to elem 0
     startsample = getStartSampleIndex(timeList, timedelta( hours = timeh ))   #bisect_right(timeList, targetDateTimeStr)
 
-    labels = [i[0] for i in data[startsample::]]
+    labels = [i[0][:19] for i in data[startsample::]]
     tempvalues = [i[1] for i in data[startsample::]]
     humivalues = [i[2] for i in data[startsample::]]
     heatervalues = [i[3] for i in data[startsample::]]
     ventvalues = [i[4] for i in data[startsample::]]
     fanvalues = [i[5] for i in data[startsample::]]
     
-    proctempvalues = [i[6] for i in data[startsample::]]
+    print(labels)
+    #proctempvalues = [i[6] for i in data[startsample::]]
     timePeriod = timeh
     platformStr = settings.platform_name
     tSPHigh = settings.tSPHi
@@ -137,8 +142,7 @@ def chartx(timeh):
     return render_template('multitc3.html', tempvalues=tempvalues, 
             humivalues=humivalues, heatervalues=heatervalues, 
             ventvalues=ventvalues, fanvalues=fanvalues, 
-            labels=labels, proctempvalues=proctempvalues, 
-            timePeriod=timePeriod, platformStr=platformStr,
+            labels=labels, timePeriod=timePeriod, platformStr=platformStr,
             tSPHigh=tSPHigh, tSPLow=tSPLow,
             tMax=tMax, tMin=tMin, uptime=GetUptime())
 

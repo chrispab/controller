@@ -119,9 +119,9 @@ class sensor(object):
             sensor = Adafruit_DHT.DHT22
             logging.info("in _read_sensor about to read sensor")
 
-            #self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, self.sensorPin)
-            self.humidity = 51.1
-            self.temperature = 21.3
+            self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, self.sensorPin)
+            #self.humidity = 51.1
+            #self.temperature = 21.3
             #sleep(settings.readDelay)
             
         elif self.platformName == "PCDuino":
@@ -208,7 +208,7 @@ class sensor(object):
                 #filter temp function
                 self.proc_temp = self.proc_temp + ( 0.333 * (self.temperature - self.proc_temp))
                 self.proc_temp = round(self.proc_temp, 3)
-                logging.warning('Temp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
+                logging.warning('\nTemp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
             else:
                 #bad sample even though good crc
                 logging.warning('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))

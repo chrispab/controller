@@ -1,6 +1,7 @@
 import logging
 import csv
 import datetime
+import sys
 
 
 from ConfigObject import cfg # singleton global
@@ -52,7 +53,10 @@ class Logger(object):
         self.current_millis = current_millis
         self.current_time = current_time
         #self.proc_temp = proc_temp
-        print("current time: %s" % self.current_time)
+        #print("current time: %s" % self.current_time)
+        #print'.\b'
+        sys.stdout.write(".")
+        sys.stdout.flush()
         self.state_changed = False
         logging.info('==Check for changes==')
 
