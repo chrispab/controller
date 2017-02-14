@@ -44,6 +44,7 @@ class Logger(object):
     def checkForChanges(self, temperature, humidity, vent_state,
                               fan_state, heater_state, vent_speed_state,
                               current_millis, current_time):
+                                  
         self.temperature = temperature
         self.humidity = humidity
         self.vent_state = vent_state
@@ -55,8 +56,8 @@ class Logger(object):
         #self.proc_temp = proc_temp
         #print("current time: %s" % self.current_time)
         #print'.\b'
-        sys.stdout.write(".")
-        sys.stdout.flush()
+        #sys.stdout.write(".")
+        #sys.stdout.flush()
         self.state_changed = False
         logging.info('== Checking for changes ==')
 
@@ -114,13 +115,14 @@ class Logger(object):
 
         if self.state_changed == True:
             logging.warning("-- O/P State Change - OLD state --")
-            self.dataHasChanged()  # write modded pre change state(s)
+            self.dataHasChanged()  # write modded old change state(s)
+            #restore new vals 
             self.vent_state = vent_state
             self.vent_speed_state = vent_speed_state
             self.heater_state = heater_state
             self.fan_state = fan_state
             logging.warning("-- O/P State Change - NEW state --")
-
+            #write new states
             self.dataHasChanged()  # write modded post change state(s)
             
 

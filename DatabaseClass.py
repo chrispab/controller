@@ -75,13 +75,13 @@ class Database(object):
             
             if self.cursorCentral.rowcount == 0: #if central db is empty
                 last_sample_time = "2017-01-01 00:00:00.000"
-                logging.warning("-- No last sample in central db so set time of last to ago: %s" % last_sample_time)                
+                logging.warning("-- No last sample in central db so set time of last to long ago: %s" % last_sample_time)                
             
             else: #  rowcount != 0
-                logging.warning("--- rowcount  : %s ---" % self.cursorCentral.rowcount)                
+                logging.debug("--- rowcount  : %s ---" % self.cursorCentral.rowcount)                
                 
                 row = self.cursorCentral.fetchone()    # get row of data
-                logging.warning("--- row !=0  : %s ---" % row)
+                logging.debug("--- row !=0  : %s ---" % row)
                 #print(row[0])                
                 
                 #logging.warning("row[0] :%s " % (row[0]))
@@ -104,8 +104,7 @@ class Database(object):
             # now get samples from local db with timestamp > last sample time on central db
             sql = "SELECT sample_dt, temperature, humidity, heaterstate, ventstate,fanstate FROM thdata WHERE sample_dt > '%s'" % last_sample_time
             #sql = "SELECT * FROM thdata WHERE sample_dt >= '%s'" % last_sample_time
-    ##################################################################################################################
-    # need ms res for timestamps, waiting for mysql version 5.6.4+
+
             logging.debug("sql: %s" % sql)
             
             rs_to_update_central_db = self.dbc.execute(self.cursorLocal, sql)
@@ -116,15 +115,15 @@ class Database(object):
             logging.debug("executing sql to update to remote db to sync with local db=")
             # if rs_to_update_central_db.count > 0: 
             if self.cursorLocal.rowcount > 0:  # if there are records to add to central db
-                logging.warning("-- datsamples to sync to central DB: %s --", self.cursorLocal.rowcount )
                 
                # update central db
                 sql = "INSERT INTO thdata (sample_dt, temperature, humidity, heaterstate, ventstate, fanstate) \
                      VALUES (%s, %s, %s, '%s', '%s', '%s' )"
                 self.dbc.executemany(self.cursorCentral, sql, rs_to_update_central_db)
                 self.dbc.commitClose(self.dbConnCentral)
+                logging.warning("=== samples synced to central DB: %s ===", self.cursorLocal.rowcount )
             else:
-                logging.warning("-- No datsamples to sync to central DB --")
+                logging.warning("-- No samples to sync to central DB --")
 
     
             # Commit your changes in the database

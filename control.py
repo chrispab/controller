@@ -311,7 +311,7 @@ def main():
         humidity, temperature = ctl1.sensor1.read()
         endT= time.time()
         duration = endT-startT
-        logging.info("Aquisition sampletime: %s",duration)
+        logging.debug("+++ Aquisition sampletime: %s +++",duration)
         
         lightState = ctl1.light.getLightState()
         heaterState = ctl1.heater1.state
@@ -341,6 +341,8 @@ def main():
         systemMessage = ctl1.timer1.getUpTime().strip()
         cfg.setConfigItemInLocalDB('processUptime', processUptime)
         cfg.setConfigItemInLocalDB('systemMessage', systemMessage )
+        sys.stdout.write(">")
+        sys.stdout.flush()
 
 
 
