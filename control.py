@@ -27,6 +27,8 @@ import socket # to get hostname
 import sendemail as emailMe
 from Logger import Logger
 
+import RPi.GPIO as GPIO
+
 
 
 #my singleton objects
@@ -269,8 +271,32 @@ class Light(object):
         logging.debug("==light state check. ON: %s, OFF: %s, NOW: %s, state: %d" % (tOn.strftime("%H:%M:%S"), tOff.strftime("%H:%M:%S"), currT.strftime("%H:%M:%S"), lightState))
 
         self.d_state = lightState
+        
+          #print("hi")
+        count = RCtime(10) # Measure timing using GPIO4
+        print count
+        if ( count > 3000):
+            print("OFF")
+        else:
+            print("ON")
+      
         return self.d_state
 
+# Define function to measure charge time
+def RCtime (PiPin):
+    measurement = 0
+    # Discharge capacitor
+    GPIO.setup(PiPin, GPIO.OUT)
+    GPIO.output(PiPin, GPIO.LOW)
+    time.sleep(0.1)
+    
+    GPIO.setup(PiPin, GPIO.IN)
+    # Count loops until voltage across
+    # capacitor reads high on GPIO
+    while (GPIO.input(PiPin) == GPIO.LOW):
+        measurement += 1
+    
+    return measurement
 
 
 class Controller(object):

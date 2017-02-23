@@ -77,12 +77,14 @@ class sensor(object):
         self.prevTemp = 0
         self.prevHumi = 0
         self.readErrs = 0
-        self._power_cycle()
+
         self.platformName = cfg.getItemValueFromConfig('platform_name')
         self.delay= cfg.getItemValueFromConfig('readDelay')
         self.prevReadTime = datetime.datetime.now()
+        self.powerPin = 2
         self.sensorPin = 4
 
+        self._power_cycle()
         self._prime_read_sensor()    # get temp, humi
         #self.sensorPin = 4
         
@@ -117,7 +119,7 @@ class sensor(object):
     def _read_sensor(self):
         if self.platformName == "RPi2":
             sensor = Adafruit_DHT.DHT22
-            logging.info("in _read_sensor about to read sensor")
+            logging.info("in RPi2 _read_sensor about to read sensor")
 
             self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, self.sensorPin)
             #self.humidity = 51.1
@@ -227,21 +229,21 @@ class sensor(object):
     def _power_cycle(self):
             logging.warning("entering power cycle")
             if cfg.getItemValueFromConfig('platform_name') == "RPi2":
-                GPIO.setup(powerPin, GPIO.OUT)  #set pin as OP
-                GPIO.output(powerPin, 0)        #set low to power off sensor
-                logging.warning("power cycle 1st sleep")
+                GPIO.setup(self.powerPin, GPIO.OUT)  #set pin as OP
+                GPIO.output(self.powerPin, GPIO.LOW)        #set low to power off sensor
+                logging.warning("power cycle off 1st sleep")
 
-                #sleep(1.0 * 3000 / 1000)
-                GPIO.output(powerPin, 1)        #hi to power on sensor
-                logging.warning("power cycle 2nd sleep")
+                sleep(3)
+                GPIO.output(self.powerPin, GPIO.HIGH)        #hi to power on sensor
+                logging.warning("power cycle on 2nd sleep")
 
-                #sleep(1.0 * 3000 / 1000)
+                sleep(3)
                 
             elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
-                gpio.pinMode(powerPin, gpio.OUTPUT)
-                gpio.digitalWrite(powerPin, gpio.LOW)   #power off
+                gpio.pinMode(self.powerPin, gpio.OUTPUT)
+                gpio.digitalWrite(self.powerPin, gpio.LOW)   #power off
                 sleep(1.0 * 3000 / 1000)
-                gpio.digitalWrite(powerPin, gpio.HIGH)  #power on
+                gpio.digitalWrite(self.powerPin, gpio.HIGH)  #power on
                 sleep(1.0 * 3000 / 1000)
         
 class platform(object):
