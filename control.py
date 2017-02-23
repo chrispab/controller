@@ -272,13 +272,20 @@ class Light(object):
 
         self.d_state = lightState
         
-          #print("hi")
+        #new ldr based routine test
+        #print("hi")
         count = RCtime(10) # Measure timing using GPIO4
-        print count
+        #print count
+        sys.stdout.write(str(count))
+        sys.stdout.flush()
         if ( count > 3000):
-            print("OFF")
+            sys.stdout.write("OFF")
+            sys.stdout.flush()
+            #print("OFF")
         else:
-            print("ON")
+            sys.stdout.write("ON")
+            sys.stdout.flush()
+            #print("ON")
       
         return self.d_state
 
