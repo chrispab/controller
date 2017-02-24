@@ -276,8 +276,7 @@ class Light(object):
         #print("hi")
         count = RCtime(10) # Measure timing using GPIO4
         #print count
-        sys.stdout.write(str(count))
-        sys.stdout.flush()
+
         if ( count > 3000):
             sys.stdout.write("OFF")
             sys.stdout.flush()
@@ -286,6 +285,8 @@ class Light(object):
             sys.stdout.write("ON")
             sys.stdout.flush()
             #print("ON")
+        sys.stdout.write(str(count))
+        sys.stdout.flush()
       
         return self.d_state
 
@@ -300,7 +301,7 @@ def RCtime (PiPin):
     GPIO.setup(PiPin, GPIO.IN)
     # Count loops until voltage across
     # capacitor reads high on GPIO
-    while (GPIO.input(PiPin) == GPIO.LOW):
+    while (GPIO.input(PiPin) == GPIO.LOW) and (measurement < 99999):
         measurement += 1
     
     return measurement
