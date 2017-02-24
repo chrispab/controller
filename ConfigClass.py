@@ -44,7 +44,7 @@ class Config(object):
         return config
         
     def writeConfigToLocalDB(self):
-        logging.info("==writeconfigtodb ..")
+        logging.info("== WriteConfigToLocalDB ==")
         try:
             self.setConfigItemInLocalDB( 'tempSPLOn', self.config['tempSPLOn'])
             self.setConfigItemInLocalDB( 'tempSPLOff', self.config['tempSPLOff'])
@@ -147,7 +147,7 @@ class Config(object):
                                     
             self.central_cursor = self.dbc.getDBCursor(self.dbCentralConn)
        
-            # Prepare and execute SQL query to update a single item in the database settings table.
+            # Prepare and execute SQL query to update 'tempSPLOn' in the central db settings table.
             sql = "UPDATE  config SET %s = %f" % ('tempSPLOn', self.config['tempSPLOn'])
             self.dbc.execute(self.central_cursor, sql)        
             logging.info("update central config: %s", sql)

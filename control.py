@@ -270,8 +270,7 @@ class Light(object):
 
         logging.debug("==light state check. ON: %s, OFF: %s, NOW: %s, state: %d" % (tOn.strftime("%H:%M:%S"), tOff.strftime("%H:%M:%S"), currT.strftime("%H:%M:%S"), lightState))
 
-        self.d_state = lightState
-        
+
         #new ldr based routine test
         #print("hi")
         count = RCtime(10) # Measure timing using GPIO4
@@ -280,14 +279,21 @@ class Light(object):
         if ( count > 3000):
             sys.stdout.write("OFF")
             sys.stdout.flush()
+            lightState = OFF
+            
             #print("OFF")
         else:
             sys.stdout.write("ON")
             sys.stdout.flush()
             #print("ON")
+            lightState = ON
+            
         sys.stdout.write(str(count))
         sys.stdout.flush()
       
+        self.d_state = lightState
+        
+        
         return self.d_state
 
 # Define function to measure charge time
@@ -301,7 +307,7 @@ def RCtime (PiPin):
     GPIO.setup(PiPin, GPIO.IN)
     # Count loops until voltage across
     # capacitor reads high on GPIO
-    while (GPIO.input(PiPin) == GPIO.LOW) and (measurement < 99999):
+    while (GPIO.input(PiPin) == GPIO.LOW) and (measurement < 9999):
         measurement += 1
     
     return measurement
@@ -347,16 +353,18 @@ def main():
         duration = endT-startT
         logging.debug("+++ Aquisition sampletime: %s +++",duration)
         
+        #get all states
         lightState = ctl1.light.getLightState()
         heaterState = ctl1.heater1.state
         ventState = ctl1.vent1.state
         fanState = ctl1.fan1.state
         ventSpeedState = ctl1.vent1.speed_state
+        
         if lightState == ON:
-            logging.info('=LOn=')
+            logging.warning('=LOn=')
             target_temp = cfg.getItemValueFromConfig('tempSPLOn')
         else:  # off
-            logging.info('=LOff=')
+            logging.warning('=LOff=')
             target_temp = cfg.getItemValueFromConfig('tempSPLOff')
         logging.info(target_temp)
         
@@ -367,7 +375,7 @@ def main():
         ctl1.board1.switch_relays(heaterState, ventState, fanState, ventSpeedState)  # switch relays according to State vars
         ctl1.stateMonitor.checkForChanges(temperature, humidity, ventState, 
                                     fanState, heaterState, ventSpeedState,
-                                    current_millis, ctl1.timer1.current_time)  # write to csv if any state changes
+                                    current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
         
         end_time = time.time()
         processUptime = end_time - start_time
