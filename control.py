@@ -144,7 +144,7 @@ class Fan(object):
         logging.info('==current millis: %s' % (current_millis))
         logging.info('==current fan state: %s' % (self.state))
         if self.state == OFF:
-            # iftime is up, so change the state to ON
+            # if time is up, so change the state to ON
             if current_millis - self.prev_fan_millis >= self.fan_off_delta:
                 self.state = ON
                 logging.info("..FAN ON")
@@ -383,6 +383,7 @@ def main():
         systemMessage = ctl1.timer1.getUpTime().strip()
         cfg.setConfigItemInLocalDB('processUptime', processUptime)
         cfg.setConfigItemInLocalDB('systemMessage', systemMessage )
+        cfg.setConfigItemInLocalDB('lightState', int(not(lightState)) )
         sys.stdout.write(">")
         sys.stdout.flush()
 
