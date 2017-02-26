@@ -29,7 +29,8 @@ from Logger import Logger
 
 import RPi.GPIO as GPIO
 
-
+import subprocess
+import os
 
 #my singleton objects
 from DatabaseObject import db # singleton global
@@ -277,19 +278,19 @@ class Light(object):
         #print count
 
         if ( count > 3000):
-            sys.stdout.write("OFF")
-            sys.stdout.flush()
+            #sys.stdout.write("OFF")
+            #sys.stdout.flush()
             lightState = OFF
             
             #print("OFF")
         else:
-            sys.stdout.write("ON")
-            sys.stdout.flush()
+            #sys.stdout.write("ON")
+            #sys.stdout.flush()
             #print("ON")
             lightState = ON
             
-        sys.stdout.write(str(count))
-        sys.stdout.flush()
+        #sys.stdout.write(str(count))
+        #sys.stdout.flush()
       
         self.d_state = lightState
         
@@ -361,10 +362,10 @@ def main():
         ventSpeedState = ctl1.vent1.speed_state
         
         if lightState == ON:
-            logging.warning('=LOn=')
+            logging.info('=LOn=')
             target_temp = cfg.getItemValueFromConfig('tempSPLOn')
         else:  # off
-            logging.warning('=LOff=')
+            logging.info('=LOff=')
             target_temp = cfg.getItemValueFromConfig('tempSPLOff')
         logging.info(target_temp)
         
@@ -386,6 +387,9 @@ def main():
         cfg.setConfigItemInLocalDB('lightState', int(not(lightState)) )
         sys.stdout.write(">")
         sys.stdout.flush()
+        
+        #call to systemd watchdog to hold off restart
+        subprocess.call(["/bin/systemd-notify WATCHDOG=1"], shell=True)
 
 
 
