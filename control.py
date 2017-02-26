@@ -225,6 +225,13 @@ class system_timer(object):
         self.start_millis = datetime.datetime.now()
         self.updateClocks()
 
+    def holdOffWatchdog(self):
+        subprocess.call(["/bin/systemd-notify WATCHDOG=1"], shell=True)
+        
+        #sys.stdout.write("WF")
+        #sys.stdout.flush()
+        return
+        
     def updateClocks(self):
         self.current_time = datetime.datetime.now()  # get current time
         # calc elapsed delta ms since program began
@@ -389,7 +396,7 @@ def main():
         sys.stdout.flush()
         
         #call to systemd watchdog to hold off restart
-        subprocess.call(["/bin/systemd-notify WATCHDOG=1"], shell=True)
+        ctl1.timer1.holdOffWatchdog()
 
 
 
