@@ -23,7 +23,7 @@ from datetime import timedelta
 import yaml
 import datetime as dt
 import sys    # for stdout print
-import socket # to get hostname 
+import socket # to get hostname
 import sendemail as emailMe
 from Logger import Logger
 
@@ -84,7 +84,7 @@ class Vent(object):
             else:
                 self.speed_state = OFF  # lo speed
 
-        
+
 
         # loff vent/cooling
         if ((d_state == OFF) and (current_temp > target_temp + self.vent_loff_sp_offset)):
@@ -177,8 +177,8 @@ class Heater(object):
         self.heater_on_delta = ((target_temp - current_temp) * 80 * 1000)  + cfg.getItemValueFromConfig('heater_on_t')
         logging.info('==Heat tdelta on: %s',self.heater_on_delta)
 
-        
-        
+
+
         #check for heater OFF hours #todo improve this
         current_hour = datetime.datetime.now().hour
         if current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
@@ -221,24 +221,35 @@ class system_timer(object):
         self.current_millis = 0
         self.delta = 0
         self.d_state = OFF
+        self.prevWDPulseMillis = 0
+        self.WDPeriod = 30000   #watch dog keepa;ive pulse period
         # get time at start of program execution
         self.start_millis = datetime.datetime.now()
         self.updateClocks()
 
-    def holdOffWatchdog(self):
-        subprocess.call(["/bin/systemd-notify WATCHDOG=1"], shell=True)
-        
+    def holdOffWatchdog(self, current_millis):
+        logging.info('==Hold Off Watchdog==')
+        logging.info('==current millis: %s' % (current_millis))
+        #logging.info('==current fan state: %s' % (self.state))
+        #if self.state == OFF:
+            # if time is up, so change the state to ON
+            if current_millis - self.prevWDPulseMillis >= self.self.WDPeriod:
+                logging.warning("-WOOF-")
+                self.prevWDPulseMillis = current_millis
+                # else if fanState is ON
+                subprocess.call(["/bin/systemd-notify WATCHDOG=1"], shell=True)
+
         #sys.stdout.write("WF")
         #sys.stdout.flush()
         return
-        
+
     def updateClocks(self):
         self.current_time = datetime.datetime.now()  # get current time
         # calc elapsed delta ms since program began
         self.delta = self.current_time - self.start_millis
         self.current_millis = int(self.delta.total_seconds() * 1000)
         return
-    
+
     def getUpTime(self):
         # get uptime from the linux terminal command
         from subprocess import check_output
@@ -247,7 +258,7 @@ class system_timer(object):
         #uptime = output[output.find("up"):output.find("user")-5]
         #uptime = output
         return uptime
-    
+
 
 
 class Light(object):
@@ -258,9 +269,9 @@ class Light(object):
         self.tOff = dt.time()
 
 
-        
+
     #return true if testTime between timeOn and TimeOff, else false if in off period
-    def getLightState(self ):   
+    def getLightState(self ):
         logging.info('==light - get light state==')
 
         tOff = cfg.getTOff()
@@ -269,7 +280,7 @@ class Light(object):
         X = False
         if (tOn > tOff):
             X = True
-            
+
         lightState = OFF
         if (( currT > tOn) and (currT < tOff)):
             lightState = ON
@@ -288,20 +299,20 @@ class Light(object):
             #sys.stdout.write("OFF")
             #sys.stdout.flush()
             lightState = OFF
-            
+
             #print("OFF")
         else:
             #sys.stdout.write("ON")
             #sys.stdout.flush()
             #print("ON")
             lightState = ON
-            
+
         #sys.stdout.write(str(count))
         #sys.stdout.flush()
-      
+
         self.d_state = lightState
-        
-        
+
+
         return self.d_state
 
 # Define function to measure charge time
@@ -311,13 +322,13 @@ def RCtime (PiPin):
     GPIO.setup(PiPin, GPIO.OUT)
     GPIO.output(PiPin, GPIO.LOW)
     time.sleep(0.1)
-    
+
     GPIO.setup(PiPin, GPIO.IN)
     # Count loops until voltage across
     # capacitor reads high on GPIO
     while (GPIO.input(PiPin) == GPIO.LOW) and (measurement < 9999):
         measurement += 1
-    
+
     return measurement
 
 
@@ -345,7 +356,7 @@ ctl1 = Controller()
 def main():
     start_time = time.time()
     humidity, temperature = ctl1.sensor1.read()
-    
+
     global processUptime
     global systemMessage
     while 1:
@@ -354,20 +365,20 @@ def main():
         logging.info("current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.updateClocks()
         current_millis = ctl1.timer1.current_millis
-        
+
         startT = time.time()
         humidity, temperature = ctl1.sensor1.read()
         endT= time.time()
         duration = endT-startT
         logging.debug("+++ Aquisition sampletime: %s +++",duration)
-        
+
         #get all states
         lightState = ctl1.light.getLightState()
         heaterState = ctl1.heater1.state
         ventState = ctl1.vent1.state
         fanState = ctl1.fan1.state
         ventSpeedState = ctl1.vent1.speed_state
-        
+
         if lightState == ON:
             logging.info('=LOn=')
             target_temp = cfg.getItemValueFromConfig('tempSPLOn')
@@ -375,16 +386,16 @@ def main():
             logging.info('=LOff=')
             target_temp = cfg.getItemValueFromConfig('tempSPLOff')
         logging.info(target_temp)
-        
+
         ctl1.fan1.control(current_millis)
         ctl1.vent1.control(temperature, target_temp, lightState, current_millis)
         ctl1.heater1.control(temperature, target_temp, lightState, current_millis)
         ctl1.fan1.control(current_millis)
         ctl1.board1.switch_relays(heaterState, ventState, fanState, ventSpeedState)  # switch relays according to State vars
-        ctl1.stateMonitor.checkForChanges(temperature, humidity, ventState, 
+        ctl1.stateMonitor.checkForChanges(temperature, humidity, ventState,
                                     fanState, heaterState, ventSpeedState,
                                     current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
-        
+
         end_time = time.time()
         processUptime = end_time - start_time
         processUptime = str(timedelta(seconds=int(processUptime)))
@@ -394,7 +405,7 @@ def main():
         cfg.setConfigItemInLocalDB('lightState', int(not(lightState)) )
         sys.stdout.write(">")
         sys.stdout.flush()
-        
+
         #call to systemd watchdog to hold off restart
         ctl1.timer1.holdOffWatchdog()
 
