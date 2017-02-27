@@ -233,11 +233,12 @@ class system_timer(object):
         #logging.info('==current fan state: %s' % (self.state))
         #if self.state == OFF:
             # if time is up, so change the state to ON
-            if current_millis - self.prevWDPulseMillis >= self.self.WDPeriod:
-                logging.warning("-WOOF-")
-                self.prevWDPulseMillis = current_millis
-                # else if fanState is ON
-                subprocess.call(["/bin/systemd-notify WATCHDOG=1"], shell=True)
+        if current_millis - self.prevWDPulseMillis >= self.WDPeriod:
+            logging.warning("-WOOF-")
+            #print('==WOOF==')
+            self.prevWDPulseMillis = current_millis
+            # else if fanState is ON
+            subprocess.call(["/bin/systemd-notify WATCHDOG=1"], shell=True)
 
         #sys.stdout.write("WF")
         #sys.stdout.flush()
@@ -407,7 +408,7 @@ def main():
         sys.stdout.flush()
 
         #call to systemd watchdog to hold off restart
-        ctl1.timer1.holdOffWatchdog()
+        ctl1.timer1.holdOffWatchdog(current_millis)
 
 
 
