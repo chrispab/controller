@@ -238,7 +238,7 @@ class system_timer(object):
             #print('==WOOF==')
             self.prevWDPulseMillis = current_millis
             # else if fanState is ON
-            subprocess.call(["/bin/systemd-notify WATCHDOG=1"], shell=True)
+            subprocess.call("/bin/systemd-notify WATCHDOG=1", shell=True)
 
         #sys.stdout.write("WF")
         #sys.stdout.flush()
