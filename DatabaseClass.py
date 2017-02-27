@@ -55,7 +55,7 @@ class Database(object):
         try:
             logging.warning("=== update_central_db samples ===")
             # Open database connection
-            print "?1?"
+            #print "?1?"
             self.dbConnCentral = self.dbc.getDBConn(cfg.getItemValueFromConfig('central_db_hostname'), 
                                     cfg.getItemValueFromConfig('central_db_username'), 
                                     cfg.getItemValueFromConfig('central_db_password'), 
@@ -64,7 +64,7 @@ class Database(object):
             # prepare a cursor object using cursor() method
             
             self.cursorCentral = self.dbc.getDBCursor(self.dbConnCentral)
-            print "?2?"
+            #print "?2?"
             # Prepare and execute SQL query to get timestamp of last record in the central database.
             sql = "SELECT sample_dt FROM thdata ORDER BY id DESC LIMIT 1"
             self.dbc.execute(self.cursorCentral, sql)
