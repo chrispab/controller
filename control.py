@@ -244,7 +244,7 @@ class system_timer(object):
             
             
             #sd_notify(0, WATCHDOG_READY)
-            subprocess.call('/bin/systemd-notify WATCHDOG=1', shell=True)
+            subprocess.call(['/bin/systemd-notify WATCHDOG=1'], shell=True)
             #subprocess.call(['/bin/systemd-notify','--pid=' + str(os.getpid()),'WATCHDOG=1'] shell=True)
             #subprocess.call(["/bin/systemd-notify","--pid=" + str(os.getpid()),"WATCHDOG=1"] shell=True)
             #subprocess.call(['/bin/systemd-notify','--pid=' + str(os.getpid()),'WATCHDOG=1'], shell=True)
