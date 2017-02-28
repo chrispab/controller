@@ -234,7 +234,7 @@ class system_timer(object):
         #if self.state == OFF:
             # if time is up, so change the state to ON
         if current_millis - self.prevWDPulseMillis >= self.WDPeriod:
-            uptime = cfg.getConfigItemInLocalDB('processUptime')
+            uptime = cfg.getConfigItemFromLocalDB('processUptime')
             logging.warning("== process uptime: %s =", uptime)
 
             logging.warning("- Pat the DOG - WOOF -")
