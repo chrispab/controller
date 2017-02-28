@@ -222,7 +222,7 @@ class system_timer(object):
         self.delta = 0
         self.d_state = OFF
         self.prevWDPulseMillis = 0
-        self.WDPeriod = 5000   #watch dog keepalive pulse period
+        self.WDPeriod = 4000   #watch dog keepalive pulse period
         # get time at start of program execution
         self.start_millis = datetime.datetime.now()
         self.updateClocks()
