@@ -222,7 +222,7 @@ class system_timer(object):
         self.delta = 0
         self.d_state = OFF
         self.prevWDPulseMillis = 0
-        self.WDPeriod = 30000   #watch dog keepa;ive pulse period
+        self.WDPeriod = 15000   #watch dog keepa;ive pulse period
         # get time at start of program execution
         self.start_millis = datetime.datetime.now()
         self.updateClocks()
@@ -238,7 +238,8 @@ class system_timer(object):
             #print('==WOOF==')
             self.prevWDPulseMillis = current_millis
             # else if fanState is ON
-            subprocess.call("/bin/systemd-notify WATCHDOG=1", shell=True)
+            subprocess.call('/bin/systemd-notify WATCHDOG=1', shell=True)
+            #subprocess.call(['/bin/systemd-notify','--pid=' + str(os.getpid()),'WATCHDOG=1'] shell=True)
 
         #sys.stdout.write("WF")
         #sys.stdout.flush()
