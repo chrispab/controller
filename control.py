@@ -222,7 +222,7 @@ class system_timer(object):
         self.delta = 0
         self.d_state = OFF
         self.prevWDPulseMillis = 0
-        self.WDPeriod = 15000   #watch dog keepa;ive pulse period
+        self.WDPeriod = 5000   #watch dog keepalive pulse period
         # get time at start of program execution
         self.start_millis = datetime.datetime.now()
         self.updateClocks()
@@ -234,12 +234,20 @@ class system_timer(object):
         #if self.state == OFF:
             # if time is up, so change the state to ON
         if current_millis - self.prevWDPulseMillis >= self.WDPeriod:
-            logging.warning("-WOOF-")
+            uptime = cfg.getConfigItemInLocalDB('processUptime')
+            logging.warning("== process uptime: %s =", uptime)
+
+            logging.warning("- Pat the DOG - WOOF -")
             #print('==WOOF==')
             self.prevWDPulseMillis = current_millis
             # else if fanState is ON
+            
+            
+            #sd_notify(0, WATCHDOG_READY)
             subprocess.call('/bin/systemd-notify WATCHDOG=1', shell=True)
             #subprocess.call(['/bin/systemd-notify','--pid=' + str(os.getpid()),'WATCHDOG=1'] shell=True)
+            #subprocess.call(["/bin/systemd-notify","--pid=" + str(os.getpid()),"WATCHDOG=1"] shell=True)
+            #subprocess.call(['/bin/systemd-notify','--pid=' + str(os.getpid()),'WATCHDOG=1'], shell=True)
 
         #sys.stdout.write("WF")
         #sys.stdout.flush()
@@ -363,6 +371,8 @@ def main():
     global systemMessage
     while 1:
         logging.info("=main=")
+        #logging.warning("== process uptime: %s =",processUptime)
+
         logging.debug(socket.gethostname())
         logging.info("current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.updateClocks()
