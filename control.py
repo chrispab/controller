@@ -222,7 +222,7 @@ class system_timer(object):
         self.delta = 0
         self.d_state = OFF
         self.prevWDPulseMillis = 0
-        self.WDPeriod = 4000   #watch dog keepalive pulse period
+        self.WDPeriod = 5000   #watch dog keepalive pulse period
         # get time at start of program execution
         self.start_millis = datetime.datetime.now()
         self.updateClocks()
@@ -244,14 +244,32 @@ class system_timer(object):
             
             
             #sd_notify(0, WATCHDOG_READY)
-            subprocess.call(['/bin/systemd-notify WATCHDOG=1'], shell=True)
+            #subprocess.call(['/bin/systemd-notify WATCHDOG=1'], shell=True)
             #subprocess.call(['/bin/systemd-notify','--pid=' + str(os.getpid()),'WATCHDOG=1'] shell=True)
             #subprocess.call(["/bin/systemd-notify","--pid=" + str(os.getpid()),"WATCHDOG=1"] shell=True)
             #subprocess.call(['/bin/systemd-notify','--pid=' + str(os.getpid()),'WATCHDOG=1'], shell=True)
+            
+            sys.stderr.write("starting : python daemon watchdog and fail test script started\n")
+            # notify systemd that we've started
+            retval = sd_notify(0, "READY=1")
+            if retval <> 0:
+                sys.stderr.write("terminating : fatal sd_notify() error for script start\n")
+                exit(1)
+    
+            # after the init, ping the watchdog and check for errors
+            retval = sd_notify(0, "WATCHDOG=1")
+            logging.warning("+++++ Patted the DOG - WOOF +++++")
+            if retval <> 0:
+                sys.stderr.write("terminating : fatal sd_notify() error for watchdog ping\n")
+                exit(1)
 
         #sys.stdout.write("WF")
         #sys.stdout.flush()
         return
+        
+
+    
+    
 
     def updateClocks(self):
         self.current_time = datetime.datetime.now()  # get current time
@@ -341,6 +359,58 @@ def RCtime (PiPin):
 
     return measurement
 
+
+init = True
+
+def sd_notify(unset_environment, s_cmd):
+
+    """
+    Notify service manager about start-up completion and to kick the watchdog.
+
+    https://github.com/kirelagin/pysystemd-daemon/blob/master/sddaemon/__init__.py
+
+    This is a reimplementation of systemd's reference sd_notify().
+    sd_notify() should be used to notify the systemd manager about the
+    completion of the initialization of the application program.
+    It is also used to send watchdog ping information.
+
+    """
+    global init
+
+    sock = None
+
+    try:
+        if not s_cmd:
+            sys.stderr.write("error : missing s_cmd\n")
+            return(1)
+
+        s_adr = os.environ.get('NOTIFY_SOCKET', None)
+        if init : # report this only one time
+            sys.stderr.write("Notify socket = " + str(s_adr) + "\n")
+            # this will normally return : /run/systemd/notify
+            init = False
+
+        if not s_adr:
+            sys.stderr.write("error : missing socket\n")
+            return(1)
+
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+        sock.sendto(s_cmd, s_adr)
+        # sendto() returns number of bytes send
+        # in the original code, the return was tested against > 0 ???
+        if sock.sendto(s_cmd, s_adr) == 0:
+            sys.stderr.write("error : incorrect sock.sendto  return value\n")
+            return(1)
+    except e:
+        pass
+    finally:
+        # terminate the socket connection
+        if sock:
+            sock.close()
+        if unset_environment:
+            if 'NOTIFY_SOCKET' in os.environ:
+                del os.environ['NOTIFY_SOCKET']
+    return(0) # OK
 
 class Controller(object):
 
