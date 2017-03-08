@@ -222,7 +222,7 @@ class system_timer(object):
         self.delta = 0
         self.d_state = OFF
         self.prevWDPulseMillis = 0
-        self.WDPeriod = 5000   #watch dog keepalive pulse period
+        self.WDPeriod = 3000   #watch dog holdoff pulse period
         # get time at start of program execution
         self.start_millis = datetime.datetime.now()
         self.updateClocks()
@@ -249,12 +249,12 @@ class system_timer(object):
             #subprocess.call(["/bin/systemd-notify","--pid=" + str(os.getpid()),"WATCHDOG=1"] shell=True)
             #subprocess.call(['/bin/systemd-notify','--pid=' + str(os.getpid()),'WATCHDOG=1'], shell=True)
             
-            sys.stderr.write("starting : python daemon watchdog and fail test script started\n")
+            #sys.stderr.write("starting : python daemon watchdog and fail test script started\n")
             # notify systemd that we've started
-            retval = sd_notify(0, "READY=1")
-            if retval <> 0:
-                sys.stderr.write("terminating : fatal sd_notify() error for script start\n")
-                exit(1)
+            #retval = sd_notify(0, "READY=1")
+            #if retval <> 0:
+                #sys.stderr.write("terminating : fatal sd_notify() error for script start\n")
+                #exit(1)
     
             # after the init, ping the watchdog and check for errors
             retval = sd_notify(0, "WATCHDOG=1")
