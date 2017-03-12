@@ -33,9 +33,9 @@ heater_on_t: 10000  #min time heater is on or off for
 heater_off_t: 30000  #min time heater is on or off for
 heater_sp_offset: 0
 
-ventOnDelta: 6000 #duration vent is on in millis
-ventOffDelta: 197000 #vent off duration in miili sec
-ventPulseOnDelta: 10000 #60 secs cooling on delta
+ventOnDelta: 21000 #duration vent is on in millis
+ventOffDelta: 127000 #vent off duration in miili sec
+ventPulseOnDelta: 20000 #60 secs cooling on delta
 vent_lon_sp_offset: -0.1 #offset
 vent_loff_sp_offset: 1.0 #
 

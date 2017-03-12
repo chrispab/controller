@@ -323,7 +323,7 @@ class Light(object):
         count = RCtime(10) # Measure timing using GPIO4
         #print count
 
-        if ( count > 3000):
+        if ( count > 2000):
             #sys.stdout.write("OFF")
             #sys.stdout.flush()
             lightState = OFF
