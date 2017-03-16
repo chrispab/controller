@@ -222,7 +222,7 @@ class system_timer(object):
         self.delta = 0
         self.d_state = OFF
         self.prevWDPulseMillis = 0
-        self.WDPeriod = 3000   #watch dog holdoff pulse period
+        self.WDPeriod = 5000   #watch dog holdoff pulse period
         # get time at start of program execution
         self.start_millis = datetime.datetime.now()
         self.updateClocks()
@@ -234,11 +234,12 @@ class system_timer(object):
         #if self.state == OFF:
             # if time is up, so change the state to ON
         if current_millis - self.prevWDPulseMillis >= self.WDPeriod:
-            uptime = cfg.getConfigItemFromLocalDB('processUptime')
-            logging.warning("== process uptime: %s =", uptime)
+            #uptime = cfg.getConfigItemFromLocalDB('processUptime')
+            #logging.warning("== process uptime: %s =", uptime)
 
-            logging.warning("- Pat the DOG - WOOF -")
+            logging.info("- Pat the DOG - WOOF -")
             #print('==WOOF==')
+            #reset timer
             self.prevWDPulseMillis = current_millis
             # else if fanState is ON
             
@@ -261,7 +262,7 @@ class system_timer(object):
             logging.warning("+++++ Patted the DOG - WOOF +++++")
             if retval <> 0:
                 sys.stderr.write("terminating : fatal sd_notify() error for watchdog ping\n")
-                exit(1)
+                #exit(1)
 
         #sys.stdout.write("WF")
         #sys.stdout.flush()
@@ -386,7 +387,7 @@ def sd_notify(unset_environment, s_cmd):
 
         s_adr = os.environ.get('NOTIFY_SOCKET', None)
         if init : # report this only one time
-            sys.stderr.write("Notify socket = " + str(s_adr) + "\n")
+            sys.stderr.write("Notify socket xxx = " + str(s_adr) + "\n")
             # this will normally return : /run/systemd/notify
             init = False
 
@@ -474,17 +475,23 @@ def main():
         ctl1.heater1.control(temperature, target_temp, lightState, current_millis)
         ctl1.fan1.control(current_millis)
         ctl1.board1.switch_relays(heaterState, ventState, fanState, ventSpeedState)  # switch relays according to State vars
-        ctl1.stateMonitor.checkForChanges(temperature, humidity, ventState,
+        stateChanged = ctl1.stateMonitor.checkForChanges(temperature, humidity, ventState,
                                     fanState, heaterState, ventSpeedState,
                                     current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
+        if stateChanged :
+            logging.warning("======== start state changed main ======")
 
-        end_time = time.time()
-        processUptime = end_time - start_time
-        processUptime = str(timedelta(seconds=int(processUptime)))
-        systemMessage = ctl1.timer1.getUpTime().strip()
-        cfg.setConfigItemInLocalDB('processUptime', processUptime)
-        cfg.setConfigItemInLocalDB('systemMessage', systemMessage )
-        cfg.setConfigItemInLocalDB('lightState', int(not(lightState)) )
+            end_time = time.time()
+            processUptime = end_time - start_time
+            processUptime = str(timedelta(seconds=int(processUptime)))
+            systemMessage = ctl1.timer1.getUpTime().strip()
+            cfg.setConfigItemInLocalDB('processUptime', processUptime)
+            cfg.setConfigItemInLocalDB('systemMessage', systemMessage )
+            cfg.setConfigItemInLocalDB('lightState', int(not(lightState)) )
+            cfg.updateCentralConfigTable()
+            #uptime = cfg.getConfigItemFromLocalDB('processUptime')
+            logging.warning("======== process uptime: %s ======", processUptime)
+        
         sys.stdout.write(">")
         sys.stdout.flush()
 

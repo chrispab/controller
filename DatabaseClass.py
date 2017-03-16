@@ -21,7 +21,7 @@ class Database(object):
     def writeSampleToLocalDB(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
         # Open database connection
         try:
-            logging.warning("===writeSampleToLocalDB===")
+            logging.warning("=== write Sample To Local DB ===")
             self.dbConn = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), 
                             cfg.getItemValueFromConfig('db_username'), 
                             cfg.getItemValueFromConfig('db_password'),
@@ -55,30 +55,30 @@ class Database(object):
         try:
             logging.warning("=== update_central_db - samples ===")
             # Open database connection
-            print "?1? pre get cent db conn"
+            logging.info("111 pre get cent db conn")
             self.dbConnCentral = self.dbc.getDBConn(cfg.getItemValueFromConfig('central_db_hostname'), 
                                     cfg.getItemValueFromConfig('central_db_username'), 
                                     cfg.getItemValueFromConfig('central_db_password'), 
                                     cfg.getItemValueFromConfig('central_db_dbname'))          
             if (self.dbConnCentral==0):
-                print "^^^^^^^^^^ dbconncentral returned 0 ^^^^^^^^^^^^^^^^"
-                print "..........................returning.........................."
+                logging.warning("^^^^^^^^^^ dbconncentral returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning("..........................returning..........................")
                 return
             # prepare a cursor object using cursor() method
             
             self.cursorCentral = self.dbc.getDBCursor(self.dbConnCentral)
             if (self.cursorCentral==0):
-                print "^^^^^^^^^^ getdbcursor for central db failed returned 0 ^^^^^^^^^^^^^^^^"
-                print "..........................returning.........................."
+                logging.warning( "^^^^^^^^^^ getdbcursor for central db failed returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning("..........................returning..........................")
                 return            
             
-            print "?2? post get cent db conn"
+            logging.info("222 post get cent db conn")
             # Prepare and execute SQL query to get timestamp of last record in the central database.
             sql = "SELECT sample_dt FROM thdata ORDER BY id DESC LIMIT 1"
             res = self.dbc.execute(self.cursorCentral, sql)
             if (res==0):
-                print "^^^^^^^^^^ execute query returned 0 ^^^^^^^^^^^^^^^^"
-                print "..........................returning.........................."
+                logging.warning("^^^^^^^^^^ execute query returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning("..........................returning..........................")
                 return
             
             logging.debug("get last sample time from central sql: %s" % (sql) )
@@ -131,7 +131,11 @@ class Database(object):
                # update central db
                 sql = "INSERT INTO thdata (sample_dt, temperature, humidity, heaterstate, ventstate, fanstate) \
                      VALUES (%s, %s, %s, '%s', '%s', '%s' )"
-                self.dbc.executemany(self.cursorCentral, sql, rs_to_update_central_db)
+                res = self.dbc.executemany(self.cursorCentral, sql, rs_to_update_central_db)
+                if (res==0):
+                    logging.warning( "^^^^^^^^^^ execute many to central db query returned 0 ^^^^^^^^^^^^^^^^")
+                    logging.warning( "..........................returning..........................")
+                    return                
                 self.dbc.commitClose(self.dbConnCentral)
                 logging.warning("=== samples synced to central DB: %s ===", self.cursorLocal.rowcount )
             else:

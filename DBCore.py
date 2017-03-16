@@ -12,20 +12,21 @@ class DBCore(object):
         logging.info("Creating db Core object")
         return
 
-#    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=1):
-    def getDBConn(self, hostName, userName, password, databaseName):
+    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=60):
+#    def getDBConn(self, hostName, userName, password, databaseName):
         # Open database connection
-        logging.info("* getDBconn *")
+        logging.info("* getDBconn *: %s, %s" % (hostName, databaseName))
         try:
             self.dbConn = pymysql.connect(host = hostName, 
                             user = userName, passwd = password, 
-                            db = databaseName)
-#                            db = databaseName, connect_timeout = conn_timeout)
+#                            db = databaseName)
+                            db = databaseName, connect_timeout = conn_timeout)
 
             logging.info("* connected *")
         except Exception as e:
             logging.error("* error getting DB connection * ")
             logging.error("* DB Error %d: %s * " % (e.args[0], e.args[1]))
+            #print "1!"
             self.dbConn = 0
             
         
@@ -48,10 +49,11 @@ class DBCore(object):
         
         try:
             #print("sql: %s" % sqlstr)
-            result = cursor.execute(sqlstr)
+            cursor.execute(sqlstr)
+            result = 1
         except Exception as e:
-            logging.error("*** dberror executing sql query ***")
-            logging.error("*** dberror Error %d: %s ***" % (e.args[0], e.args[1]))
+            logging.warning("*** dberror executing sql query ***")
+            logging.warning("*** dberror Error %d: %s ***" % (e.args[0], e.args[1]))
             result = 0
         logging.info("* executing sql *")
         return result
@@ -61,7 +63,8 @@ class DBCore(object):
             logging.info("* executing sql *")
             #print("sql: %s" % sqlstr)
             #print("sql: %s" % rs)
-            result =cursor.executemany( sqlstr, rs)
+            cursor.executemany( sqlstr, rs)
+            result = 1
         except Exception as e:
             logging.error("*** dberror executing sql query ***")
             logging.error("*** dberror Error %d: %s ***" % (e.args[0], e.args[1]))

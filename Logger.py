@@ -126,11 +126,11 @@ class Logger(object):
             self.dataHasChanged()  # write modded post change state(s)
             
 
-            processUptime = cfg.getConfigItemFromLocalDB('processUptime')
-            systemMessage = cfg.getConfigItemFromLocalDB('systemMessage')
-            logging.debug('=Process uptime: %s' % (processUptime))
-            logging.debug('=System message: %s' % (systemMessage))
-            cfg.updateCentralConfigTable()
+            #processUptime = cfg.getConfigItemFromLocalDB('processUptime')
+            #systemMessage = cfg.getConfigItemFromLocalDB('systemMessage')
+            #logging.debug('=Process uptime: %s' % (processUptime))
+            #logging.debug('=System message: %s' % (systemMessage))
+            #cfg.updateCentralConfigTable()
             
             self.previous_CSV_write_millis = self.current_millis  # reset timer
         else:  # no state change check temp change or and timer csv write interval done
@@ -151,7 +151,7 @@ class Logger(object):
         self.previous_vent_speed_state = self.vent_speed_state
         #self.previous_proc_temp = self.proc_temp
 
-        return
+        return self.state_changed
 
     #routine called when any data has changed state or temp or periodic timer
     def dataHasChanged(self):

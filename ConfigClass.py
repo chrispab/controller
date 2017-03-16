@@ -50,7 +50,7 @@ class Config(object):
             self.setConfigItemInLocalDB( 'tempSPLOff', self.config['tempSPLOff'])
             self.setConfigItemInLocalDB( 'processUptime', self.config['processUptime'])
             self.setConfigItemInLocalDB( 'systemMessage', self.config['systemMessage'])        
-            self.updateCentralConfigTable()
+#            self.updateCentralConfigTable()
         except:
             logging.error("????? bad setConfigItemInDB exception thrown ???")
             e = sys.exc_info()[0]
@@ -60,7 +60,7 @@ class Config(object):
     def updateCentralConfigTable(self):
         try:
             # Open database connection
-            logging.warning("===updatecentralconfigtable ===")
+            logging.warning("=== update central config table ===")
             self.dbCentralConn = self.dbc.getDBConn(
                                     self.getItemValueFromConfig('central_db_hostname'),
                                     self.getItemValueFromConfig('central_db_username'),
@@ -69,23 +69,38 @@ class Config(object):
                                     )
                                     
             if self.dbCentralConn == 0:
-                logging.warning("---Central db conn returned 0 -- exiting")
-                return
+                #logging.warning("^^^^^^^^^^^ update central config table Central db conn returned 0 -- exiting ^^^^^^^^^^")
+                logging.warning("^^^^^^^^^^ update central config table Central db conn returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning( "..........................returning..........................")
+                return 
+                
 
             logging.info("getDBConn done OK")
                                     
             self.central_cursor = self.dbc.getDBCursor(self.dbCentralConn)
-       
+            if (self.central_cursor==0):
+                logging.warning( "^^^^^^^^^^ getdbcursor for update central config tbl tsplonfailed returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning( "..........................returning..........................")
+                return    
+                    
             # Prepare and execute SQL query to update 'tempSPLOn' in the central db settings table.
             sql = "UPDATE  config SET %s = %f" % ('tempSPLOn', self.config['tempSPLOn'])
-            self.dbc.execute(self.central_cursor, sql)        
+            res = self.dbc.execute(self.central_cursor, sql)
+            if (res==0):
+                logging.warning( "^^^^^^^^^^ execute for update central config tbl tsplon failed returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning( "..........................returning..........................")
+                return                    
             logging.info("update central config: %s", sql)
 
     
             # Prepare SQL query to update a single item in the database settings table.
             sql = "UPDATE  config SET %s = %f" % ('tempSPLOff', self.config['tempSPLOff'])
             # Execute the SQL command
-            self.dbc.execute(self.central_cursor, sql)  
+            res = self.dbc.execute(self.central_cursor, sql) 
+            if (res==0):
+                logging.warning( "^^^^^^^^^^ execute query update central config tbl tsploff returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning( "..........................returning..........................")
+                return
             logging.info("update central config: %s", sql)
       
             #dbInfo = self.getDBConnInfoFromConfig('local')
@@ -93,20 +108,32 @@ class Config(object):
             
             sql = "UPDATE  config SET %s = '%s'" % ('processUptime', processUptime)
             # Execute the SQL command
-            self.dbc.execute(self.central_cursor, sql)   
+            res = self.dbc.execute(self.central_cursor, sql)  
+            if (res==0):
+                logging.warning( "^^^^^^^^^^ execute query update central config tbl puptime returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning( "..........................returning..........................")
+                return             
             logging.info("update central config: %s", sql)
 
             systemMessage = self.getConfigItemFromLocalDB('systemMessage')
             
             sql = "UPDATE  config SET %s = '%s'" % ('systemMessage', systemMessage)
             ## Execute the SQL command
-            self.dbc.execute(self.central_cursor, sql)
+            res = self.dbc.execute(self.central_cursor, sql)
+            if (res==0):
+                logging.warning( "^^^^^^^^^^ execute query update central config tbl sysmess returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning( "..........................returning..........................")
+                return             
             logging.info("update central config: %s", sql)
         
             lightState = self.getConfigItemFromLocalDB('lightState')
             sql = "UPDATE  config SET %s = %i" % ('lightState', lightState)
             ## Execute the SQL command
-            self.dbc.execute(self.central_cursor, sql)
+            res = self.dbc.execute(self.central_cursor, sql)
+            if (res==0):
+                logging.warning( "^^^^^^^^^^ execute query update central config tbl lightstae returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning( "..........................returning..........................")
+                return             
             logging.info("update central config: %s", sql)
             
                 
