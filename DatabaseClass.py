@@ -53,21 +53,33 @@ class Database(object):
     def update_central_db(self):
 
         try:
-            logging.warning("=== update_central_db samples ===")
+            logging.warning("=== update_central_db - samples ===")
             # Open database connection
-            #print "?1?"
+            print "?1? pre get cent db conn"
             self.dbConnCentral = self.dbc.getDBConn(cfg.getItemValueFromConfig('central_db_hostname'), 
                                     cfg.getItemValueFromConfig('central_db_username'), 
                                     cfg.getItemValueFromConfig('central_db_password'), 
                                     cfg.getItemValueFromConfig('central_db_dbname'))          
-            
+            if (self.dbConnCentral==0):
+                print "^^^^^^^^^^ dbconncentral returned 0 ^^^^^^^^^^^^^^^^"
+                print "..........................returning.........................."
+                return
             # prepare a cursor object using cursor() method
             
             self.cursorCentral = self.dbc.getDBCursor(self.dbConnCentral)
-            #print "?2?"
+            if (self.cursorCentral==0):
+                print "^^^^^^^^^^ getdbcursor for central db failed returned 0 ^^^^^^^^^^^^^^^^"
+                print "..........................returning.........................."
+                return            
+            
+            print "?2? post get cent db conn"
             # Prepare and execute SQL query to get timestamp of last record in the central database.
             sql = "SELECT sample_dt FROM thdata ORDER BY id DESC LIMIT 1"
-            self.dbc.execute(self.cursorCentral, sql)
+            res = self.dbc.execute(self.cursorCentral, sql)
+            if (res==0):
+                print "^^^^^^^^^^ execute query returned 0 ^^^^^^^^^^^^^^^^"
+                print "..........................returning.........................."
+                return
             
             logging.debug("get last sample time from central sql: %s" % (sql) )
             
@@ -129,8 +141,8 @@ class Database(object):
             # Commit your changes in the database
             self.dbc.commitClose(self.dbConnLocal)
         except:
-            logging.error("????? bad update_central_db exception thrown ???")
+            logging.error("?????=================== bad update_central_db exception thrown ======================???")
             e = sys.exc_info()[0]
-            logging.error( "????? Error: %s ?????" % e )
+            logging.error( "?????================ Error: %s ==========================?????" % e )
             
         return

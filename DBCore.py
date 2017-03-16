@@ -12,19 +12,22 @@ class DBCore(object):
         logging.info("Creating db Core object")
         return
 
-
-    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=1):
+#    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=1):
+    def getDBConn(self, hostName, userName, password, databaseName):
         # Open database connection
         logging.info("* getDBconn *")
         try:
             self.dbConn = pymysql.connect(host = hostName, 
                             user = userName, passwd = password, 
-                            db = databaseName, connect_timeout = conn_timeout)
+                            db = databaseName)
+#                            db = databaseName, connect_timeout = conn_timeout)
+
             logging.info("* connected *")
         except Exception as e:
             logging.error("* error getting DB connection * ")
             logging.error("* DB Error %d: %s * " % (e.args[0], e.args[1]))
             self.dbConn = 0
+            
         
         return self.dbConn
         
@@ -42,13 +45,14 @@ class DBCore(object):
         
         
     def execute(self, cursor, sqlstr):
-        result = 0
+        
         try:
             #print("sql: %s" % sqlstr)
             result = cursor.execute(sqlstr)
         except Exception as e:
             logging.error("*** dberror executing sql query ***")
             logging.error("*** dberror Error %d: %s ***" % (e.args[0], e.args[1]))
+            result = 0
         logging.info("* executing sql *")
         return result
         
@@ -61,6 +65,7 @@ class DBCore(object):
         except Exception as e:
             logging.error("*** dberror executing sql query ***")
             logging.error("*** dberror Error %d: %s ***" % (e.args[0], e.args[1]))
+            result = 0
         logging.info("* executing sql *")
         return result
         
