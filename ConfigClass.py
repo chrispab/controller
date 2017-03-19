@@ -104,8 +104,8 @@ class Config(object):
             logging.info("update central config: %s", sql)
       
             #dbInfo = self.getDBConnInfoFromConfig('local')
-            processUptime = self.getConfigItemFromLocalDB( 'processUptime')
             
+            systemUpTime = self.getConfigItemFromLocalDB( 'systemUpTime')            
             sql = "UPDATE  config SET %s = '%s'" % ('systemUpTime', systemUpTime)
             # Execute the SQL command
             res = self.dbc.execute(self.central_cursor, sql)  
@@ -115,6 +115,7 @@ class Config(object):
                 return             
             logging.info("update central config: %s", sql)
                         
+            processUptime = self.getConfigItemFromLocalDB('processUptime')
             sql = "UPDATE  config SET %s = '%s'" % ('processUptime', processUptime)
             # Execute the SQL command
             res = self.dbc.execute(self.central_cursor, sql)  
@@ -124,8 +125,7 @@ class Config(object):
                 return             
             logging.info("update central config: %s", sql)
 
-            systemMessage = self.getConfigItemFromLocalDB('systemMessage')
-            
+            systemMessage = self.getConfigItemFromLocalDB('systemMessage')            
             sql = "UPDATE  config SET %s = '%s'" % ('systemMessage', systemMessage)
             ## Execute the SQL command
             res = self.dbc.execute(self.central_cursor, sql)

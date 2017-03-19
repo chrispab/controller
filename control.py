@@ -446,6 +446,7 @@ def main():
     start_time = time.time()
     humidity, temperature = ctl1.sensor1.read()
 
+    global systemUpTime
     global processUptime
     global systemMessage
     
