@@ -3,6 +3,7 @@
 #===config params to store in config obj so tunable via web interface====
 
 #Zone 1 - RPi
+zoneName: "Zone 1"
 
 #Hardware specific config items
 # comment out for hardware used as appropriate

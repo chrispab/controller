@@ -440,6 +440,13 @@ def main():
 
     global processUptime
     global systemMessage
+    
+    message = 'Zone '+ cfg.getItemValueFromConfig('zoneName')
+    try:
+        emailMe.sendemail('Process Start', message)
+    except:
+        logging.error("...ERROR SENDING EMAIL - for Process start")
+        
     while 1:
         logging.info("=main=")
         #logging.warning("== process uptime: %s =",processUptime)

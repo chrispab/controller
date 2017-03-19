@@ -5,30 +5,32 @@ import secureFile
 
 
 def sendemail(subject, message):
-    USERNAME = "cn@gmail.com"
-    PASSWORD = "in"
-    MAILTO  = "c@gmail.com"
+    #3 params below held in secureFile.py - not uploaded ti github
+    #USERNAME = "cn@gmail.com"
+    #PASSWORD = "in"
+    #MAILTO  = "c@gmail.com"
     
     msg = MIMEText(message)
     msg['Subject'] = subject
-    msg['From'] = USERNAME
-    msg['To'] = MAILTO
+    msg['From'] = secureFile.USERNAME
+    msg['To'] = secureFile.MAILTO
     
     server = smtplib.SMTP('smtp.gmail.com:587')
     server.ehlo_or_helo_if_needed()
     server.starttls()
     server.ehlo_or_helo_if_needed()
-    server.login(USERNAME,PASSWORD)
-    server.sendmail(USERNAME, MAILTO, msg.as_string())
+    server.login(secureFile.USERNAME,secureFile.PASSWORD)
+    server.sendmail(secureFile.USERNAME, secureFile.MAILTO, msg.as_string())
     server.quit()
 
 if __name__ == "__main__":
    # stuff only to run when not called via 'import' here
+   #test for sending email
    temp=23.3
    humi=45.1
    
    message = 'readings, Temp='+ str(temp) + '  Humi='+ str(humi)
-   sendemail('Spike in Reading', message)
+   sendemail('Test email from Zone', message)
    #sendEmail( 'Pi Subject test', 'this is the test message im sending')
    
    
