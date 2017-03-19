@@ -68,6 +68,7 @@ class Database(object):
             
             self.cursorCentral = self.dbc.getDBCursor(self.dbConnCentral)
             if (self.cursorCentral==0):
+                self.dbc.close(self.dbConnCentral)
                 logging.warning( "^^^^^^^^^^ getdbcursor for central db failed returned 0 ^^^^^^^^^^^^^^^^")
                 logging.warning("..........................returning..........................")
                 return            
@@ -77,6 +78,7 @@ class Database(object):
             sql = "SELECT sample_dt FROM thdata ORDER BY id DESC LIMIT 1"
             res = self.dbc.execute(self.cursorCentral, sql)
             if (res==0):
+                self.dbc.close(self.dbConnCentral)
                 logging.warning("^^^^^^^^^^ execute query returned 0 ^^^^^^^^^^^^^^^^")
                 logging.warning("..........................returning..........................")
                 return
@@ -133,15 +135,17 @@ class Database(object):
                      VALUES (%s, %s, %s, '%s', '%s', '%s' )"
                 res = self.dbc.executemany(self.cursorCentral, sql, rs_to_update_central_db)
                 if (res==0):
+                    self.dbc.close(self.dbConnCentral)
+                    self.dbc.close(self.dbConnLocal)
                     logging.warning( "^^^^^^^^^^ execute many to central db query returned 0 ^^^^^^^^^^^^^^^^")
-                    logging.warning( "..........................returning..........................")
+                    logging.warning( "..........................returning..........................")  
                     return                
                 self.dbc.commitClose(self.dbConnCentral)
                 logging.warning("=== samples synced to central DB: %s ===", self.cursorLocal.rowcount )
             else:
                 logging.warning("-- No samples to sync to central DB --")
 
-    
+            self.dbc.close(self.dbConnCentral)
             # Commit your changes in the database
             self.dbc.commitClose(self.dbConnLocal)
         except:

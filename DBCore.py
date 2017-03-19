@@ -12,23 +12,22 @@ class DBCore(object):
         logging.info("Creating db Core object")
         return
 
-    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=60):
-#    def getDBConn(self, hostName, userName, password, databaseName):
+#    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=60):
+    def getDBConn(self, hostName, userName, password, databaseName):
         # Open database connection
-        logging.info("* getDBconn *: %s, %s" % (hostName, databaseName))
+        #logging.warning("* getDBconn *: %s, %s" % (hostName, databaseName))
         try:
             self.dbConn = pymysql.connect(host = hostName, 
                             user = userName, passwd = password, 
-#                            db = databaseName)
-                            db = databaseName, connect_timeout = conn_timeout)
-
+                            db = databaseName)
+#                            db = databaseName, connect_timeout = conn_timeout)
+            logging.warning("* OPEN getDBconn connected *: %s, %s" % (hostName, databaseName))
             logging.info("* connected *")
         except Exception as e:
             logging.error("* error getting DB connection * ")
             logging.error("* DB Error %d: %s * " % (e.args[0], e.args[1]))
             #print "1!"
             self.dbConn = 0
-            
         
         return self.dbConn
         
@@ -60,7 +59,7 @@ class DBCore(object):
         
     def executemany(self, cursor, sqlstr, rs):
         try:
-            logging.info("* executing sql *")
+            logging.info("* executing many sql *")
             #print("sql: %s" % sqlstr)
             #print("sql: %s" % rs)
             cursor.executemany( sqlstr, rs)
@@ -121,5 +120,7 @@ class DBCore(object):
         except Exception as e:
             logging.error("*** dberror closing conn ***")
             logging.error("*** DB Error %d: %s ***" % (e.args[0], e.args[1]))
+        
+        logging.warning("* CLOSEDS db conn %s: " % dbConn)
         return
         
