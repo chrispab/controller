@@ -106,6 +106,15 @@ class Config(object):
             #dbInfo = self.getDBConnInfoFromConfig('local')
             processUptime = self.getConfigItemFromLocalDB( 'processUptime')
             
+            sql = "UPDATE  config SET %s = '%s'" % ('systemUpTime', systemUpTime)
+            # Execute the SQL command
+            res = self.dbc.execute(self.central_cursor, sql)  
+            if (res==0):
+                logging.warning( "^^^^^^^^^^ execute query update central config tbl systemUpTime returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning( "..........................returning..........................")
+                return             
+            logging.info("update central config: %s", sql)
+                        
             sql = "UPDATE  config SET %s = '%s'" % ('processUptime', processUptime)
             # Execute the SQL command
             res = self.dbc.execute(self.central_cursor, sql)  

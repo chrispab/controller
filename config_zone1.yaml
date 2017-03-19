@@ -62,3 +62,5 @@ central_db_dbname: "zone1_sensordata_db"
 #placeholder items - used for items pushed from system
 processUptime: "00:00:00"
 systemMessage: "system message"
+systemUpTime: "00:00:00"
+

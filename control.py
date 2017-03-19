@@ -289,6 +289,14 @@ class system_timer(object):
         return uptime
 
 
+    def getSystemUpTime(self):
+        # get uptime from the linux terminal command
+        from subprocess import check_output
+        output = check_output(["uptime"])
+        # return only uptime info
+        uptime = output[output.find("up"):output.find("user")-5]
+        
+        return uptime
 
 class Light(object):
     def __init__(self):
@@ -441,9 +449,10 @@ def main():
     global processUptime
     global systemMessage
     
-    message = 'Zone '+ cfg.getItemValueFromConfig('zoneName')
+    zone = 'Zone '+ cfg.getItemValueFromConfig('zoneName')
+    message = zone
     try:
-        emailMe.sendemail('Process Start', message)
+        emailMe.sendemail('Process Start : ' + zone, message)
     except:
         logging.error("...ERROR SENDING EMAIL - for Process start")
         
@@ -486,12 +495,15 @@ def main():
                                     fanState, heaterState, ventSpeedState,
                                     current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
         if stateChanged :
-            logging.warning("======== start state changed main ======")
+            logging.warning("======== start state changed main list ======")
 
             end_time = time.time()
             processUptime = end_time - start_time
             processUptime = str(timedelta(seconds=int(processUptime)))
+            systemUpTime = ctl1.timer1.getSystemUpTime()
             systemMessage = ctl1.timer1.getUpTime().strip()
+            cfg.setConfigItemInLocalDB('systemUpTime', systemUpTime)
+
             cfg.setConfigItemInLocalDB('processUptime', processUptime)
             cfg.setConfigItemInLocalDB('systemMessage', systemMessage )
             cfg.setConfigItemInLocalDB('lightState', int(not(lightState)) )
