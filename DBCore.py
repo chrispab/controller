@@ -12,16 +12,16 @@ class DBCore(object):
         logging.info("Creating db Core object")
         return
 
-#    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=60):
-    def getDBConn(self, hostName, userName, password, databaseName):
+    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=1):
+#    def getDBConn(self, hostName, userName, password, databaseName):
         # Open database connection
         logging.warning("* 1 getDBconn*")
         try:
             logging.warning("* 2 getDBconn*")
             self.dbConn = pymysql.connect(host = hostName, 
                             user = userName, passwd = password, 
-                            db = databaseName)
-#                            db = databaseName, connect_timeout = conn_timeout)
+#                            db = databaseName)
+                            db = databaseName, connect_timeout = conn_timeout)
             logging.warning("* OPEN getDBconn connected *: %s, %s" % (hostName, databaseName))
             logging.info("* connected *")
             logging.warning("* 3 getDBconn*")
