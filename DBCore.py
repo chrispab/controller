@@ -15,20 +15,23 @@ class DBCore(object):
 #    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=60):
     def getDBConn(self, hostName, userName, password, databaseName):
         # Open database connection
-        #logging.warning("* getDBconn *: %s, %s" % (hostName, databaseName))
+        logging.warning("* 1 getDBconn*")
         try:
+            logging.warning("* 2 getDBconn*")
             self.dbConn = pymysql.connect(host = hostName, 
                             user = userName, passwd = password, 
                             db = databaseName)
 #                            db = databaseName, connect_timeout = conn_timeout)
             logging.warning("* OPEN getDBconn connected *: %s, %s" % (hostName, databaseName))
             logging.info("* connected *")
+            logging.warning("* 3 getDBconn*")
         except Exception as e:
+            logging.warning("* 4 getDBconn*")
             logging.error("* error getting DB connection * ")
             logging.error("* DB Error %d: %s * " % (e.args[0], e.args[1]))
             #print "1!"
             self.dbConn = 0
-        
+        logging.warning("* 5 getDBconn*")
         return self.dbConn
         
 

@@ -453,7 +453,7 @@ def main():
     zone = 'Zone '+ cfg.getItemValueFromConfig('zoneName')
     message = zone
     try:
-        emailMe.sendemail('Process Start : ' + zone, message)
+        emailMe.sendemail( zone + ' - Process Started', message)
     except:
         logging.error("...ERROR SENDING EMAIL - for Process start")
         
