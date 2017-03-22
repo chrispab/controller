@@ -450,7 +450,7 @@ def main():
     global processUptime
     global systemMessage
     
-    zone = 'Zone '+ cfg.getItemValueFromConfig('zoneName')
+    zone = cfg.getItemValueFromConfig('zoneName')
     message = zone
     try:
         emailMe.sendemail( zone + ' - Process Started', message)
