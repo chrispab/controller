@@ -294,7 +294,7 @@ class system_timer(object):
         from subprocess import check_output
         output = check_output(["uptime"])
         # return only uptime info
-        uptime = output[output.find("up"):output.find("user")-5]
+        uptime = output[output.find("up")+2:output.find("user")-5]
         
         return uptime
 

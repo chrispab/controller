@@ -25,7 +25,7 @@ lightOffT: "09:00:00"   # time off
 min_CSV_write_interval: 60000 #interval min bet csv writes
 
 ##----L control params----
-heat_off_hours: [ 21,22,23,0,1,2,3,4,5,6,7,8 ]   #hours when heater should NOT operate
+heat_off_hours: [ 22,23,0,1,2,3,4,5,6,7,8,9,10 ]   #hours when heater should NOT operate
 
 RelayOff: 1 #state for relay OFF
 RelayOn: 0  #state for on
