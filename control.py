@@ -15,6 +15,11 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
 # ===================general imports=====================================
+from pympler.tracker import SummaryTracker
+tracker = SummaryTracker()
+
+from mem_top import mem_top
+
 
 import csv
 import datetime
@@ -181,7 +186,9 @@ class Heater(object):
 
         #check for heater OFF hours #todo improve this
         current_hour = datetime.datetime.now().hour
-        if current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
+        #if current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
+        if d_state == ON: #current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
+
             self.state = OFF
             logging.info('..d on, in heat off hours - skipping lon heatctl')
         else:  # d state on or off here also in heat on hrs
@@ -517,6 +524,8 @@ def main():
 
         #call to systemd watchdog to hold off restart
         ctl1.timer1.holdOffWatchdog(current_millis)
+        #tracker.print_diff()
+        #logging.warning(mem_top()) # Or just print().
 
 
 
