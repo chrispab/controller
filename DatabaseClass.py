@@ -51,7 +51,6 @@ class Database(object):
 
 
     def update_central_db(self):
-
         try:
             logging.warning("=== update_central_db - samples ===")
             # Open database connection
@@ -60,13 +59,13 @@ class Database(object):
             centralDBUserName = cfg.getItemValueFromConfig('central_db_username')
             centralDBPassword = cfg.getItemValueFromConfig('central_db_password')
             centralDBDBName = cfg.getItemValueFromConfig('central_db_dbname')
-            logging.warning("222 got db string params")
+            logging.info("222 got db string params")
 
             self.dbConnCentral = self.dbc.getDBConn(centralDBHostName,
                                                     centralDBUserName,
                                                     centralDBPassword,
                                                     centralDBDBName)
-            logging.warning("333 got db connection")
+            logging.info("333 got db connection")
             if (self.dbConnCentral==0):
                 
                 logging.warning("^^^^^^^^^^ dbconncentral error returned 0 ^^^^^^^^^^^^^^^^")

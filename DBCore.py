@@ -23,7 +23,7 @@ class DBCore(object):
                                             user = userName,
                                             passwd = password,
                                             db = databaseName,
-                                            cursorclass=pymysql.cursors.SSCursor,
+                                            cursorclass = pymysql.cursors.SSCursor,
                                             read_timeout = 10)
 #                            db = databaseName, connect_timeout = conn_timeout, cursorclass=pymysql.cursors.SSCursor)
 

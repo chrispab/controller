@@ -21,6 +21,7 @@ tracker = SummaryTracker()
 from mem_top import mem_top
 
 
+
 import csv
 import datetime
 import time
@@ -36,6 +37,8 @@ import RPi.GPIO as GPIO
 
 import subprocess
 import os
+
+import psutil
 
 #my singleton objects
 from DatabaseObject import db # singleton global
@@ -229,12 +232,13 @@ class system_timer(object):
         self.delta = 0
         self.d_state = OFF
         self.prevWDPulseMillis = 0
-        self.WDPeriod = 5000   #watch dog holdoff pulse period
+        self.WDPeriod = 60000   #watch dog holdoff space period
         # get time at start of program execution
         self.start_millis = datetime.datetime.now()
         self.updateClocks()
 
     def holdOffWatchdog(self, current_millis):
+        
         logging.info('==Hold Off Watchdog==')
         logging.info('==current millis: %s' % (current_millis))
         #logging.info('==current fan state: %s' % (self.state))
@@ -518,6 +522,14 @@ def main():
             cfg.updateCentralConfigTable()
             #uptime = cfg.getConfigItemFromLocalDB('processUptime')
             logging.warning("======== process uptime: %s ======", processUptime)
+            mem = psutil.virtual_memory()
+            logging.warning("MMMMMM total memory       : %s MMMMMM",mem.total)
+
+            logging.warning("MMMMMM memory available   : %s MMMMMM",mem.available)
+            logging.warning("MMMMMM memory pc.available: %0.2f MMMMMM",((float(mem.available)/float(mem.total)))*100)
+            #logging.warning("======== % memory available: %s ======",mem.percent)
+
+            
         
         sys.stdout.write(">")
         sys.stdout.flush()

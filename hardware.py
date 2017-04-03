@@ -170,7 +170,7 @@ class sensor(object):
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
         
         #repeat read until valid data or too many errorserror
-        while (self.humidity is None or self.temperature is None) and self.readErrs < 10:
+        while (self.humidity is None or self.temperature is None) and self.readErrs < 5:
             logging.warning("..ERROR TRYING TO READ SENSOR on sensor read")
             self.readErrs += 1
             #if self.platformName == "PCDuino":
@@ -181,15 +181,17 @@ class sensor(object):
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
 
     
-        if self.readErrs == 10:  # powercyle if 10 read errors
+        if self.readErrs == 5:  # powercyle if 10 read errors
             logging.warning("..ten read errors logged")
             self._power_cycle()
             logging.warning("..POWER CYCLE complete during sensor read")
             logging.error("..DODGY TEMP READING USING")
             if cfg.getItemValueFromConfig('emailEnabled') == True:
+                zone = cfg.getItemValueFromConfig('zoneName')
+
                 self.message = 'Power cycling sensor due to too many errors'
                 try:
-                    emailMe.sendemail('PowerCycle', self.message)
+                    emailMe.sendemail(zone + ': bad sensorread - PowerCycle', self.message)
                 except:
                     logging.error("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING")
             self.temperature = self.prevTemp  #restore prev sample readings
@@ -218,7 +220,7 @@ class sensor(object):
                 if cfg.getItemValueFromConfig('emailEnabled') == True:
                     self.message = 'Readings, Temp = '+ str(self.temperature) + ',  Humi = '+ str(self.humidity)
                     try:
-                        emailMe.sendemail('Spike in Reading', self.message)
+                        emailMe.sendemail(zone + 'Spike in Reading', self.message)
                     except:
                         logging.error("ERROR SENDING EMAIL - DODGY READING")
                 self.temperature = self.prevTemp  #restore prev sample readings
