@@ -187,8 +187,6 @@ class Heater(object):
         self.heater_on_delta = ((target_temp - current_temp) * 80 * 1000)  + cfg.getItemValueFromConfig('heater_on_t')
         logging.info('==Heat tdelta on: %s',self.heater_on_delta)
 
-
-
         #check for heater OFF hours #todo improve this
         current_hour = datetime.datetime.now().hour
         #if current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
@@ -234,7 +232,7 @@ class system_timer(object):
         self.delta = 0
         self.d_state = OFF
         self.prevWDPulseMillis = 0
-        self.WDPeriod = 60000   #watch dog holdoff space period
+        self.WDPeriod = 60000   #systend sofware process watchdog holdoff space period
         # get time at start of program execution
         self.start_millis = datetime.datetime.now()
         self.updateClocks()
@@ -317,8 +315,6 @@ class Light(object):
         self.state = OFF
         self.tOn = dt.time()
         self.tOff = dt.time()
-
-
 
     #return true if testTime between timeOn and TimeOff, else false if in off period
     def getLightState(self ):

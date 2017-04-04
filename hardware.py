@@ -181,17 +181,17 @@ class sensor(object):
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
 
     
-        if self.readErrs == 5:  # powercyle if 10 read errors
-            logging.warning("..ten read errors logged")
+        if self.readErrs == 5:  # powercyle if 5 read errors
+            logging.warning("..5 sensor read errors logged")
             self._power_cycle()
             logging.warning("..POWER CYCLE complete during sensor read")
             logging.error("..DODGY TEMP READING USING")
             if cfg.getItemValueFromConfig('emailEnabled') == True:
                 zone = cfg.getItemValueFromConfig('zoneName')
 
-                self.message = 'Power cycling sensor due to too many errors'
+                self.message = 'Power cycling sensor due to too many, 5, errors'
                 try:
-                    emailMe.sendemail(zone + ': bad sensorread - PowerCycle', self.message)
+                    emailMe.sendemail(zone + ': bad sensor read - PowerCycle', self.message)
                 except:
                     logging.error("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING")
             self.temperature = self.prevTemp  #restore prev sample readings

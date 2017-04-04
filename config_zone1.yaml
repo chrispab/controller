@@ -63,4 +63,5 @@ central_db_dbname: "zone1_sensordata_db"
 processUptime: "00:00:00"
 systemMessage: "system message"
 systemUpTime: "00:00:00"
+version: "Version Placeholder"
 
