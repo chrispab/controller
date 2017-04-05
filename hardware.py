@@ -121,7 +121,7 @@ class sensor(object):
             sensor = Adafruit_DHT.DHT22
             logging.info("in RPi2 _read_sensor about to read sensor")
 
-            self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, self.sensorPin)
+            self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, self.sensorPin, 1,0)
             #self.humidity = 51.1
             #self.temperature = 21.3
             #sleep(settings.readDelay)
@@ -167,7 +167,12 @@ class sensor(object):
 
         logging.info("** AQUIring **")
 
+        time1 = datetime.datetime.now()
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
+        time2 = datetime.datetime.now()
+        duration = time2 - time1
+        logging.warning("sensor read duration : %s" % (duration))
+        
         
         #repeat read until valid data or too many errorserror
         while (self.humidity is None or self.temperature is None) and self.readErrs < 5:

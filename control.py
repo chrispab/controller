@@ -14,7 +14,7 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.13"
+VERSION = "0.14"
 
 # ===================general imports=====================================
 from pympler.tracker import SummaryTracker
@@ -521,9 +521,9 @@ def main():
             #uptime = cfg.getConfigItemFromLocalDB('processUptime')
             logging.warning("======== process uptime: %s ======", processUptime)
             mem = psutil.virtual_memory()
-            logging.warning("MMMMMM total memory       : %s MMMMMM",mem.total)
+            #logging.warning("MMMMMM total memory       : %s MMMMMM",mem.total)
 
-            logging.warning("MMMMMM memory available   : %s MMMMMM",mem.available)
+            #logging.warning("MMMMMM memory available   : %s MMMMMM",mem.available)
             logging.warning("MMMMMM memory pc.available: %0.2f MMMMMM",((float(mem.available)/float(mem.total)))*100)
             #logging.warning("======== % memory available: %s ======",mem.percent)
 
