@@ -122,19 +122,14 @@ class sensor(object):
             logging.info("in RPi2 _read_sensor about to read sensor")
 
             self.humidity, self.temperature = Adafruit_DHT.read_retry(sensor, self.sensorPin, 1,0)
-            #self.humidity = 51.1
-            #self.temperature = 21.3
-            #sleep(settings.readDelay)
             
         elif self.platformName == "PCDuino":
             if dht22.getth() == 0:
-                #humidity, temperature = Adafruit_DHT.read_retry(sensor, sensorPin)
                 self.temperature = round(dht22.cvar.temperature, 1)
                 self.humidity = round(dht22.cvar.humidity, 1)
             else:
                 self.temperature = None
                 self.humidity = None
-            #sleep(settings.readDelay)
 
         return self.humidity, self.temperature
         
@@ -178,10 +173,6 @@ class sensor(object):
         while (self.humidity is None or self.temperature is None) and self.readErrs < 5:
             logging.warning("..ERROR TRYING TO READ SENSOR on sensor read")
             self.readErrs += 1
-            #if self.platformName == "PCDuino":
-                #self.delay = 0
-            #if self.platformName == "RPi2":
-            #self.delay = cfg.getItemValueFromConfig('readDelay')
             sleep(self.delay) #wait secs before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
 
@@ -196,7 +187,7 @@ class sensor(object):
 
                 self.message = 'Power cycling sensor due to too many, 5, errors'
                 try:
-                    emailMe.sendemail(zone + ': bad sensor read - PowerCycle', self.message)
+                    emailMe.sendemail(zone + ': bad sensor reads 5  - PowerCycle', self.message)
                 except:
                     logging.error("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING")
             self.temperature = self.prevTemp  #restore prev sample readings

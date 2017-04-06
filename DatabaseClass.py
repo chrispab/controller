@@ -4,6 +4,9 @@ import sys
 from DBCore import *
 import logging
 
+import datetime
+
+
 
 from ConfigObject import cfg # singleton global
 
@@ -51,23 +54,30 @@ class Database(object):
 
 
     def update_central_db(self):
-        try:
-            logging.warning("=== update_central_db - samples ===")
-            # Open database connection
-            logging.info("111 pre get cent db conn")
-            centralDBHostName = cfg.getItemValueFromConfig('central_db_hostname')
-            centralDBUserName = cfg.getItemValueFromConfig('central_db_username')
-            centralDBPassword = cfg.getItemValueFromConfig('central_db_password')
-            centralDBDBName = cfg.getItemValueFromConfig('central_db_dbname')
-            logging.info("222 got db string params")
 
+        logging.warning("=== update_central_db - samples ===")
+        # Open database connection
+        logging.info("111 pre get cent db conn")
+        centralDBHostName = cfg.getItemValueFromConfig('central_db_hostname')
+        centralDBUserName = cfg.getItemValueFromConfig('central_db_username')
+        centralDBPassword = cfg.getItemValueFromConfig('central_db_password')
+        centralDBDBName = cfg.getItemValueFromConfig('central_db_dbname')
+        logging.info("222 got db string params")
+        
+        
+
+
+        
+        try:
+            #time central get last sample time routine
+            time1 = datetime.datetime.now()
+            #cfg.updateCentralConfigTable()
             self.dbConnCentral = self.dbc.getDBConn(centralDBHostName,
                                                     centralDBUserName,
                                                     centralDBPassword,
                                                     centralDBDBName)
             logging.info("333 got db connection")
-            if (self.dbConnCentral==0):
-                
+            if (self.dbConnCentral==0):                
                 logging.warning("^^^^^^^^^^ dbconncentral error returned 0 ^^^^^^^^^^^^^^^^")
                 logging.warning("..........................returning..........................")
                 return
@@ -93,10 +103,9 @@ class Database(object):
             
             #do what with empty set - e.g at start when central table is empty eg last sample time = 0
             result = self.cursorCentral.fetchone()
-            if (result == None): # returns None if no data avail #self.cursorCentral.rowcount == 0: #if central db is empty
+            if (result == None): # returns None if no data avail 
                 last_sample_time = "2017-01-01 00:00:00.000"
-                logging.warning("-- No last sample in central db so set time of last to long ago: %s" % last_sample_time)                
-            
+                logging.warning("-- No last sample in central db so set time of last to long ago: %s" % last_sample_time)                            
             else: #  rowcount != 0
                 logging.debug("--- rowcount  : %s ---" % self.cursorCentral.rowcount)                
                 
@@ -112,12 +121,28 @@ class Database(object):
                     last_sample_time = "2017-01-01 00:00:00.000"
                     logging.warning("-- No datsamples to sync to central DB --")
         
-##WHAT IF central DB is empty????#####
-    
+            ##WHAT IF central DB is empty????#####
+            time2 = datetime.datetime.now()
+            duration = time2 - time1
+            logging.warning("TTTTT - update get last sample time from central DB : %s" % (duration))            
             
-            # get rs from local db now get samples from local db with timestamp > last sample time on central db    
-            self.dbConnLocal = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), cfg.getItemValueFromConfig('db_username'), 
-                    cfg.getItemValueFromConfig('db_password'), cfg.getItemValueFromConfig('db_dbname'))        
+            #####
+            # when prog gets here lastSampleTimeInCentralDB stored in last_sample_time
+            #####
+            
+            # get rs from local db now get samples from local db with timestamp > last sample time on central db
+            time1 = datetime.datetime.now()
+
+            localDBHostName = cfg.getItemValueFromConfig('db_hostname')
+            localDBUserName = cfg.getItemValueFromConfig('db_username')
+            localDBPassword = cfg.getItemValueFromConfig('db_password')
+            localDBDBName = cfg.getItemValueFromConfig('db_dbname')    
+            
+            self.dbConnLocal = self.dbc.getDBConn(localDBHostName,
+                                                    localDBUserName,
+                                                    localDBPassword,
+                                                    localDBDBName)
+                                                            
             # prepare a cursor object using cursor() method
             self.cursorLocal = self.dbc.getDBCursor(self.dbConnLocal)            
             # now get samples from local db with timestamp > last sample time on central db
@@ -145,6 +170,9 @@ class Database(object):
             logging.debug("executing sql to update to remote db to sync with local db=")
             # if rs_to_update_central_db.count > 0: 
             
+            time2 = datetime.datetime.now()
+            duration = time2 - time1
+            logging.warning("TTTTT - update get local samples to update to central DB : %s" % (duration)) 
             
            
            
