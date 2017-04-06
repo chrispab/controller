@@ -162,7 +162,12 @@ class Logger(object):
         data = self._write_to_CSV()
         
         db.writeSampleToLocalDB(data[0], data[1], data[2], data[3], data[4], data[5])
+        
+        time1 = datetime.datetime.now()
         db.update_central_db()
+        time2 = datetime.datetime.now()
+        duration = time2 - time1
+        logging.warning("TTTTT - update central db duration : %s" % (duration))
         
         return
         

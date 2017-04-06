@@ -171,7 +171,7 @@ class sensor(object):
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
         time2 = datetime.datetime.now()
         duration = time2 - time1
-        logging.warning("sensor read duration : %s" % (duration))
+        logging.warning("TTTTTT - sensor read duration : %s" % (duration))
         
         
         #repeat read until valid data or too many errorserror

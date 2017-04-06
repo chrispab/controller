@@ -14,7 +14,7 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.14"
+VERSION = "0.15"
 
 # ===================general imports=====================================
 from pympler.tracker import SummaryTracker
@@ -517,7 +517,15 @@ def main():
             cfg.setConfigItemInLocalDB('processUptime', processUptime)
             cfg.setConfigItemInLocalDB('systemMessage', systemMessage + ". V" + VERSION )
             cfg.setConfigItemInLocalDB('lightState', int(not(lightState)) )
+            
+            
+            
+            time1 = datetime.datetime.now()
             cfg.updateCentralConfigTable()
+            time2 = datetime.datetime.now()
+            duration = time2 - time1
+            logging.warning("TTTTT - update central CONFIG table duration : %s" % (duration))
+            
             #uptime = cfg.getConfigItemFromLocalDB('processUptime')
             logging.warning("======== process uptime: %s ======", processUptime)
             mem = psutil.virtual_memory()
