@@ -14,7 +14,7 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.16"
+VERSION = "0.20 warn"
 
 # ===================general imports=====================================
 from pympler.tracker import SummaryTracker
@@ -308,7 +308,12 @@ class system_timer(object):
         uptime = output[output.find("up")+2:output.find("user")-5]
         
         return uptime
-
+    
+    def seconds_elapsed(self):
+        now = datetime.datetime.now()
+        current_timestamp = time.mktime(now.timetuple())
+        return current_timestamp - psutil.boot_time()
+    
 class Light(object):
     def __init__(self):
         logging.info("creating light object")
@@ -361,25 +366,21 @@ class Light(object):
 
         return self.d_state
 
-# Define function to measure charge time
-def RCtime (PiPin):
-    measurement = 0
+# Function to measure res-cap charge time
+def RCtime (RCPin):
     # Discharge capacitor
-    GPIO.setup(PiPin, GPIO.OUT)
-    GPIO.output(PiPin, GPIO.LOW)
-    time.sleep(0.1)
-
-    GPIO.setup(PiPin, GPIO.IN)
-    # Count loops until voltage across
-    # capacitor reads high on GPIO
-    while (GPIO.input(PiPin) == GPIO.LOW) and (measurement < 9999):
+    GPIO.setup(RCPin, GPIO.OUT)
+    GPIO.output(RCPin, GPIO.LOW)
+    time.sleep(0.1) #give time for C to discharge
+    GPIO.setup(RCPin, GPIO.IN)  #set RC pin to hi impedance
+    # Count loops until voltage across capacitor reads high on GPIO
+    measurement = 0
+    while (GPIO.input(RCPin) == GPIO.LOW) and (measurement < 9999):
         measurement += 1
-
     return measurement
 
 
 init = True
-
 def sd_notify(unset_environment, s_cmd):
 
     """
@@ -461,6 +462,8 @@ def main():
     
     zone = cfg.getItemValueFromConfig('zoneName')
     message = zone
+    if ctl1.timer1.seconds_elapsed() < 120:
+        zone = zone + ' REBOOT '
     try:
         emailMe.sendemail( zone + ' - Process Started', message)
     except:
