@@ -171,16 +171,16 @@ class sensor(object):
         
         #repeat read until valid data or too many errorserror
         while (self.humidity is None or self.temperature is None) and self.readErrs < 5:
-            logging.warning("..ERROR TRYING TO READ SENSOR on sensor read")
+            logging.error("..ERROR TRYING TO READ SENSOR on sensor read")
             self.readErrs += 1
             sleep(self.delay) #wait secs before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
 
     
         if self.readErrs == 5:  # powercyle if 5 read errors
-            logging.warning("..5 sensor read errors logged")
+            logging.error("..5 sensor read errors logged")
             self._power_cycle()
-            logging.warning("..POWER CYCLE complete during sensor read")
+            logging.error("..POWER CYCLE complete during sensor read")
             logging.error("..DODGY TEMP READING USING")
             if cfg.getItemValueFromConfig('emailEnabled') == True:
                 zone = cfg.getItemValueFromConfig('zoneName')
@@ -211,8 +211,8 @@ class sensor(object):
                 logging.warning('Temp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
             else:
                 #bad sample even though good crc
-                logging.warning('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))
-                logging.warning('..DODGY TEMP READING USING - OLD VALS---------------- ')
+                logging.error('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))
+                logging.error('..DODGY TEMP READING USING - OLD VALS---------------- ')
                 if cfg.getItemValueFromConfig('emailEnabled') == True:
                     self.message = 'Readings, Temp = '+ str(self.temperature) + ',  Humi = '+ str(self.humidity)
                     try:

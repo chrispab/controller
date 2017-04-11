@@ -16,8 +16,8 @@ readDelay: 3 #sensor read delay
 tempSPLOn: 21.0   #target 22.5 mp set point max with lon
 tempSPLOff: 15.0 #16.9 #target = 16.9, target loff
 
-tempAlertHi: 26.1  #hi temp alert temp
-tempAlertLo: 15.0  #lo temp alert
+tempAlertHi: 30.0  #hi temp alert temp
+tempAlertLo: 14.5  #lo temp alert
 
 lightOnT: "21:00:00"    # time light on hh:mm:ss
 lightOffT: "09:00:00"   # time off

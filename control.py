@@ -14,15 +14,13 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.20 warn"
+VERSION = "0.21 warn"
 
 # ===================general imports=====================================
 from pympler.tracker import SummaryTracker
 tracker = SummaryTracker()
 
 from mem_top import mem_top
-
-
 
 import csv
 import datetime
@@ -509,7 +507,19 @@ def main():
                                     current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
         if stateChanged :
             logging.warning("======== start state changed main list ======")
-
+            # check for alarm levels etc
+            if temperature > cfg.getItemValueFromConfig('tempAlertHi'):
+                try:
+                    emailMe.sendemail( zone + ' - Hi Temp warning' + temperature, message)
+                except:
+                    logging.error("...ERROR SENDING EMAIL - for Process start")
+                    
+            if temperature < cfg.getItemValueFromConfig('tempAlertLo'):
+                try:
+                    emailMe.sendemail( zone + ' - Lo Temp warning' + temperature, message)
+                except:
+                    logging.error("...ERROR SENDING EMAIL - for Process start")
+                                    
             end_time = time.time()
             processUptime = end_time - start_time
             processUptime = str(timedelta(seconds=int(processUptime)))
@@ -520,8 +530,6 @@ def main():
             cfg.setConfigItemInLocalDB('processUptime', processUptime)
             cfg.setConfigItemInLocalDB('systemMessage', systemMessage + ". V" + VERSION )
             cfg.setConfigItemInLocalDB('lightState', int(not(lightState)) )
-            
-            
             
             time1 = datetime.datetime.now()
             cfg.updateCentralConfigTable()
