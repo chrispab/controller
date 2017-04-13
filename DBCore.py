@@ -23,8 +23,9 @@ class DBCore(object):
                                             user = userName,
                                             passwd = password,
                                             db = databaseName,
+                                            connect_timeout = 1,
                                             cursorclass = pymysql.cursors.SSCursor,
-                                            read_timeout = 10)
+                                            read_timeout = 5)
 #                            db = databaseName, connect_timeout = conn_timeout, cursorclass=pymysql.cursors.SSCursor)
 
             logging.debug("* OPEN getDBconn connected *: %s, %s" % (hostName, databaseName))

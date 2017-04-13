@@ -14,7 +14,7 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.21 warn"
+VERSION = "0.22 warn"
 
 # ===================general imports=====================================
 from pympler.tracker import SummaryTracker
