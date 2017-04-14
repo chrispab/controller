@@ -192,7 +192,7 @@ class Database(object):
                     logging.warning( "..........................returning..........................")  
                     return                
                 self.dbc.commitClose(self.dbConnCentral)
-                logging.warning("---------- samples synced to central DB: %s ===", rsLen )
+                logging.warning("SSSSSS  samples synced to central DB: %s SSSSSS", rsLen )
             else:
                 logging.warning("-- No samples to sync to central DB --")
 
