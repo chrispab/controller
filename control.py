@@ -14,7 +14,7 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.24 warn conn_rd_timeout=1s"
+VERSION = "0.29 my_watchdog full on"
 
 # ===================general imports=====================================
 from pympler.tracker import SummaryTracker
@@ -433,6 +433,14 @@ class Controller(object):
 
     def __init__(self):
         logging.info("init controller")
+        #start the c watchdog
+        logging.warning("WWWWW starting my_watchdog WWWWW")
+#        os.system("sudo ./watchdog/my_watchdog &")
+        os.system("sudo ./watchdog/my_watchdog -r &")
+
+        #subprocess.call(["sudo","./watchdog/my_watchdog"])                
+
+        
         logging.info("---Creating system Objects---")
         self.board1 = hw.platform()
         self.sensor1 = hw.sensor()
@@ -451,6 +459,9 @@ ctl1 = Controller()
 
 #cfg.
 def main():
+
+    
+    
     start_time = time.time()
     humidity, temperature = ctl1.sensor1.read()
 
@@ -466,6 +477,7 @@ def main():
         emailMe.sendemail( zone + ' - Process Started', message)
     except:
         logging.error("...ERROR SENDING EMAIL - for Process start")
+
         
     while 1:
         logging.info("=main=")
