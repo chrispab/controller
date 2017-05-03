@@ -35,13 +35,14 @@ if cfg.getItemValueFromConfig('platform_name') == "RPi2": #rpi platform
     sensor = Adafruit_DHT.DHT22
     #=================hardware dependant pins values etc====================
     #----pin assignments and related hardware defs----
-    powerPin = 2    #pyhs pin 3
-    led2 = 3        #phys pin 5
-    sensorPin = 4   #phys pin 7
-    heaterRelay = 5 #pyhs pin 29
-    ventRelay = 6   #phys pin 31
-    fanRelay = 7    #phys pin 26
-    relay4 = 8      #pyhs pin 24
+    powerPin = cfg.getItemValueFromConfig('powerPin')
+    led2 = cfg.getItemValueFromConfig('led2')    
+    sensorPin = cfg.getItemValueFromConfig('sensorPin')   
+    heaterRelay = cfg.getItemValueFromConfig('heaterRelay') 
+    ventRelay = cfg.getItemValueFromConfig('ventRelay')   
+    fanRelay = cfg.getItemValueFromConfig('fanRelay')    
+    relay4 = cfg.getItemValueFromConfig('relay4')      
+    alivePin = cfg.getItemValueFromConfig('alivePin')
 elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":    # pcduino platform
     import gpio
     import dht22 as dht22
@@ -81,8 +82,8 @@ class sensor(object):
         self.platformName = cfg.getItemValueFromConfig('platform_name')
         self.delay= cfg.getItemValueFromConfig('readDelay')
         self.prevReadTime = datetime.datetime.now()
-        self.powerPin = 2
-        self.sensorPin = 4
+        self.powerPin = cfg.getItemValueFromConfig('powerPin')
+        self.sensorPin = cfg.getItemValueFromConfig('sensorPin')
 
         self._power_cycle()
         self._prime_read_sensor()    # get temp, humi
@@ -261,13 +262,17 @@ class platform(object):
         logging.info('initialising io pins')
         if cfg.getItemValueFromConfig('platform_name') == "RPi2":
             GPIO.setup(heaterRelay, GPIO.OUT)   #set pin as OP
-            GPIO.output(heaterRelay, 1)         #heat off
+            GPIO.output(heaterRelay, 0)         #heat off
             GPIO.setup(ventRelay, GPIO.OUT)     #set pin as OP
-            GPIO.output(ventRelay, 0)           #vent on
+            GPIO.output(ventRelay, 1)           #vent on
             GPIO.setup(fanRelay, GPIO.OUT)      #set pin as OP
-            GPIO.output(fanRelay, 0)            #fan on
+            GPIO.output(fanRelay, 1)            #fan on
             GPIO.setup(relay4, GPIO.OUT)        #set pin as OP
-            GPIO.output(relay4, 1)              #speed low
+            GPIO.output(relay4, 0)              #speed low
+            
+            GPIO.setup(alivePin, GPIO.OUT)        #set pin as OP
+            GPIO.output(alivePin, 1)              #signal alive to io board
+            
         elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
             for portpin in relaypins:
                 gpio.pinMode(portpin, gpio.OUTPUT)    #

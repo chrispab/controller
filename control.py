@@ -14,13 +14,13 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.29 my_watchdog full on"
+VERSION = "0.30 hw watchdog 1"
 
 # ===================general imports=====================================
-from pympler.tracker import SummaryTracker
-tracker = SummaryTracker()
+#from pympler.tracker import SummaryTracker
+#tracker = SummaryTracker()
 
-from mem_top import mem_top
+#from mem_top import mem_top
 
 import csv
 import datetime
@@ -341,7 +341,7 @@ class Light(object):
 
         #new ldr based routine test
         #print("hi")
-        count = RCtime(10) # Measure timing using GPIO4
+        count = RCtime(cfg.getItemValueFromConfig('RCPin')) # Measure timing using GPIO4
         #print count
 
         if ( count > 2000):
@@ -434,9 +434,9 @@ class Controller(object):
     def __init__(self):
         logging.info("init controller")
         #start the c watchdog
-        logging.warning("WWWWW starting my_watchdog WWWWW")
+        #logging.warning("WWWWW starting my_watchdog WWWWW")
 #        os.system("sudo ./watchdog/my_watchdog &")
-        os.system("sudo ./watchdog/my_watchdog -r &")
+        #os.system("sudo ./watchdog/my_watchdog -r &")
 
         #subprocess.call(["sudo","./watchdog/my_watchdog"])                
 

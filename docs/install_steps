@@ -1,0 +1,16 @@
+sudo apt-get update
+
+sudo apt-get install build-essential python-dev
+
+sudo apt-get install mariadb-server
+
+sudo pip install pyyaml
+sudo apt-get install python-pip python-dev libmysqlclient-dev
+pip install MySQL-python
+
+
+sudo pip install psutil
+
+
+
+

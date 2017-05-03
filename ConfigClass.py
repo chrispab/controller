@@ -37,8 +37,8 @@ class Config(object):
         f = open(fileStr)
         # use safe_load instead load
         config = yaml.safe_load(f)
-        logging.info("==Reading config settings from yaml file==")
-        logging.info(yaml.dump(config))
+        logging.warning("==Reading config settings from yaml file==")
+        logging.warning(yaml.dump(config))
         f.close()
 
         return config
