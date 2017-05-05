@@ -14,7 +14,7 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.30 hw watchdog 1"
+VERSION = "0.31 hw watchdog on"
 
 # ===================general imports=====================================
 #from pympler.tracker import SummaryTracker
@@ -230,26 +230,50 @@ class system_timer(object):
         self.delta = 0
         self.d_state = OFF
         self.prevWDPulseMillis = 0
-        self.WDPeriod = 60000   #systend sofware process watchdog holdoff space period
+        self.WDPeriod = 10000   #systend sofware process watchdog holdoff space period
+
+        self.watchDogPin = cfg.getItemValueFromConfig('watchDogPin')  # 
+        
         # get time at start of program execution
         self.start_millis = datetime.datetime.now()
         self.updateClocks()
 
-    def holdOffWatchdog(self, current_millis):
+    def holdOffWatchdog(self, current_millis, forceWatchdogToggle=False):
         
         logging.info('==Hold Off Watchdog==')
         logging.info('==current millis: %s' % (current_millis))
         #logging.info('==current fan state: %s' % (self.state))
         #if self.state == OFF:
             # if time is up, so change the state to ON
-        if current_millis - self.prevWDPulseMillis >= self.WDPeriod:
+        if (current_millis - self.prevWDPulseMillis) >= self.WDPeriod:
             #uptime = cfg.getConfigItemFromLocalDB('processUptime')
             #logging.warning("== process uptime: %s =", uptime)
 
-            logging.info("- Pat the DOG - WOOF -")
+            logging.info("- Pat the DOG -")
             #print('==WOOF==')
             #reset timer
             self.prevWDPulseMillis = current_millis
+
+            # toggle watchdog pin
+            GPIO.output(self.watchDogPin, not GPIO.input(self.watchDogPin))
+
+            logging.warning("DDDDDDDDDD Patted the DOG  DDDDDDDDDD")
+#return
+        elif  (forceWatchdogToggle == True):
+            logging.info("- FORCE Pat the DOG -")
+            #print('==WOOF==')
+            #reset timer
+            self.prevWDPulseMillis = current_millis
+
+            # toggle watchdog pin
+            GPIO.output(self.watchDogPin, not GPIO.input(self.watchDogPin))
+
+            logging.warning("DDDDDDDDDD    FORCE   Patted the DOG  DDDDDDDDDD")
+#return
+
+        return
+            
+            
             # else if fanState is ON
             
             
@@ -267,15 +291,20 @@ class system_timer(object):
                 #exit(1)
     
             # after the init, ping the watchdog and check for errors
-            retval = sd_notify(0, "WATCHDOG=1")
-            logging.warning("+++++ Patted the DOG - WOOF +++++")
-            if retval <> 0:
-                sys.stderr.write("terminating : fatal sd_notify() error for watchdog ping\n")
-                #exit(1)
+            
+
+            
+            #retval = sd_notify(0, "WATCHDOG=1")
+            #if retval <> 0:
+                #sys.stderr.write("terminating : fatal sd_notify() error for watchdog ping\n")
+                ##exit(1)
 
         #sys.stdout.write("WF")
         #sys.stdout.flush()
-        return
+			
+		#force watchdog toggle	
+
+			
         
 
     
@@ -460,7 +489,8 @@ ctl1 = Controller()
 #cfg.
 def main():
 
-    
+    #call to systemd watchdog to hold off restart
+    ctl1.timer1.holdOffWatchdog(0, True)
     
     start_time = time.time()
     humidity, temperature = ctl1.sensor1.read()
@@ -480,6 +510,7 @@ def main():
 
         
     while 1:
+
         logging.info("=main=")
         #logging.warning("== process uptime: %s =",processUptime)
 
@@ -487,8 +518,13 @@ def main():
         logging.info("current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.updateClocks()
         current_millis = ctl1.timer1.current_millis
+        
+        #call to systemd watchdog to hold off restart
+        ctl1.timer1.holdOffWatchdog(current_millis)
 
         startT = time.time()
+        
+        #read sensor
         humidity, temperature = ctl1.sensor1.read()
         endT= time.time()
         duration = endT-startT
@@ -541,7 +577,7 @@ def main():
 
             cfg.setConfigItemInLocalDB('processUptime', processUptime)
             cfg.setConfigItemInLocalDB('systemMessage', systemMessage + ". V" + VERSION )
-            cfg.setConfigItemInLocalDB('lightState', int(not(lightState)) )
+            cfg.setConfigItemInLocalDB('lightState', int(lightState) )
             
             time1 = datetime.datetime.now()
             cfg.updateCentralConfigTable()
@@ -563,8 +599,7 @@ def main():
         sys.stdout.write(">")
         sys.stdout.flush()
 
-        #call to systemd watchdog to hold off restart
-        ctl1.timer1.holdOffWatchdog(current_millis)
+
         #tracker.print_diff()
         #logging.warning(mem_top()) # Or just print().
 
