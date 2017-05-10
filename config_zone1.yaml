@@ -65,3 +65,16 @@ systemMessage: "system message"
 systemUpTime: "00:00:00"
 version: "Version Placeholder"
 
+quietMode: True
+#=================hardware dependant pins values etc====================
+#----pin assignments and related hardware defs----
+powerPin: 2    #pyhs pin 3
+led2: 4        #phys pin 5
+sensorPin: 3   #phys pin 5
+heaterRelay: 5 #pyhs pin 29
+ventRelay: 26   #phys pin 37
+fanRelay: 11    #phys pin 23
+relay4: 6      #pyhs pin 31
+RCPin: 27 #phypin13
+alivePin: 22 #phy pin 15
+watchDogPin: 17
