@@ -27,8 +27,8 @@ min_CSV_write_interval: 60000 #interval min bet csv writes
 ##----L control params----
 heat_off_hours: [ 22,23,0,1,2,3,4,5,6,7,8,9,10 ]   #hours when heater should NOT operate
 
-RelayOff: 1 #state for relay OFF
-RelayOn: 0  #state for on
+RelayOff: 0 #state for relay OFF
+RelayOn: 1  #state for on
 
 heater_on_t: 10000  #min time heater is on or off for
 heater_off_t: 30000  #min time heater is on or off for
@@ -46,13 +46,13 @@ fan_off_t: 1000 #vent off time
 dataPath: "data/thdata.csv"
 #extraPath: "data/extradata.csv"
 
-emailEnabled: True
+emailEnabled: False
 
 #db params
 db_hostname: "127.0.0.1"
-db_username: "controller"
-db_password: "password"
-db_dbname: "sensordata_db"
+db_username: "zone1"
+db_password: "zone1"
+db_dbname: "zone1db"
 
 central_db_hostname: "192.168.0.201"
 central_db_username: "myiot"

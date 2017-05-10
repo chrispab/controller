@@ -142,6 +142,8 @@ class sensor(object):
 		#TODO safe mode should also put fan on full speed
         self.temperature = 30
         self.humidity = 1
+        GPIO.setup(heaterRelay, GPIO.OUT)   #set pin as OP
+        GPIO.output(heaterRelay, 0)         #heat off        
         print self.temperature
         print ("FFFFFFFF Posssible faulty sensor detected - SAFE MODE ENABLED")        
         return        
@@ -296,7 +298,7 @@ class sensor(object):
                 #GPIO.output(self.powerPin, GPIO.HIGH)        #hi to power on sensor
                 #logging.warning("power cycle - Power back ON")
 
-                sleep(1)   
+                sleep(2)   
                              
             elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
                 gpio.pinMode(self.powerPin, gpio.OUTPUT)

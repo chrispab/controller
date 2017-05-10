@@ -4,7 +4,7 @@ import yaml
 #from DatabaseObject import db # singleton
 import os
 import socket # to get hostname 
-import MySQLdb
+#import MySQLdb
 import pymysql.cursors
 import sys
 from DBCore import *

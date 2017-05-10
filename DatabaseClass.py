@@ -1,4 +1,4 @@
-import MySQLdb
+#import MySQLdb
 import pymysql.cursors
 import sys
 from DBCore import *
