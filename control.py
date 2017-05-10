@@ -14,7 +14,7 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.31 hw watchdog on"
+VERSION = "0.33 hw watchdog on in field 2"
 
 # ===================general imports=====================================
 #from pympler.tracker import SummaryTracker
@@ -336,7 +336,7 @@ class system_timer(object):
         
         return uptime
     
-    def seconds_elapsed(self):
+    def secsSinceBoot(self):
         now = datetime.datetime.now()
         current_timestamp = time.mktime(now.timetuple())
         return current_timestamp - psutil.boot_time()
@@ -499,12 +499,16 @@ def main():
     global processUptime
     global systemMessage
     
+    
+    #TODO ENABLE EMAIL ENABLED OBEY
     zone = cfg.getItemValueFromConfig('zoneName')
     message = zone
-    if ctl1.timer1.seconds_elapsed() < 120:
+    #if just booted
+    if ctl1.timer1.secsSinceBoot() < 120:
         zone = zone + ' REBOOT '
     try:
-        emailMe.sendemail( zone + ' - Process Started', message)
+        #emailMe.sendemail( zone + ' - Process Started', message)
+        pass
     except:
         logging.error("...ERROR SENDING EMAIL - for Process start")
 

@@ -97,6 +97,8 @@ class sensor(object):
         self._prime_read_sensor()    # get temp, humi
         #self.sensorPin = 4
         
+        self.safeModeTemp = 30
+        
         
     def _prime_read_sensor(self):
         self.readErrs = 0
@@ -137,7 +139,8 @@ class sensor(object):
         logging.info("_rs humi: %s" % self.humidity)
             
     def _enableSafeMode(self):
-        self.temperature = 99
+		#TODO safe mode should also put fan on full speed
+        self.temperature = 30
         self.humidity = 1
         print self.temperature
         print ("FFFFFFFF Posssible faulty sensor detected - SAFE MODE ENABLED")        
@@ -203,7 +206,7 @@ class sensor(object):
         
         
         #repeat read until valid data or too many errorserror
-        maxSensorReadErrors = 3
+        maxSensorReadErrors = 5
         while (self.humidity is None or self.temperature is None) and self.readErrs < maxSensorReadErrors:
             logging.error("..ERROR TRYING TO READ SENSOR on sensor read")
             self.readErrs += 1
@@ -218,10 +221,11 @@ class sensor(object):
             logging.error("..DODGY TEMP READING")
             if cfg.getItemValueFromConfig('emailEnabled') == True:
                 zone = cfg.getItemValueFromConfig('zoneName')
-
+				#TODO limit emails sent 
                 self.message = 'Power cycling sensor due to too many,' + str(maxSensorReadErrors) + ', errors'
                 try:
-                    emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)
+                    #emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)
+                    pass
                 except:
                     logging.error("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING - too many errors %d" % maxSensorReadErrors)
                     
@@ -233,11 +237,11 @@ class sensor(object):
             self._enableSafeMode()
 
         else:#good read CRC if here
-            if self.temperature == 99:
-                print("GOOD CRC BUT TEMP IS SAFE MODE 99")
+            if self.temperature == 30:
+                print("GOOD CRC BUT TEMP IS SAFE MODE value")
             #check for whacky readings compared to last - i.e reading glitch
             elif ( abs(self.temperature - self.prevTemp) < 10) and ( (self.humidity >= 10)
-                and (self.humidity <= 100)) or (self.prevTemp == 99): #if temp diff smallish, assume good sample
+                and (self.humidity <= 100)) or (self.prevTemp == 30): #if temp diff smallish, assume good sample
                 #print( "..read sensor SUCCESS" )
                 logging.info("..read sensor success at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
                 
@@ -257,6 +261,9 @@ class sensor(object):
                 #bad sample even though good crc
                 logging.error('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))
                 logging.error('..DODGY TEMP READING USING - OLD VALS---------------- ')
+                
+                				#TODO limit emails sent 
+
                 if cfg.getItemValueFromConfig('emailEnabled') == True:
                     self.message = 'Readings, Temp = '+ str(self.temperature) + ',  Humi = '+ str(self.humidity)
                     try:
@@ -274,14 +281,22 @@ class sensor(object):
             if cfg.getItemValueFromConfig('platform_name') == "RPi2":
                 GPIO.setup(self.powerPin, GPIO.OUT)  #set pin as OP
                 GPIO.output(self.powerPin, GPIO.LOW)        #set low to power off sensor
-                logging.warning("power cycle off 1st sleep")
+                logging.warning("sensor power cycle - power off")
 
-                sleep(3)
+                sleep(5)
                 GPIO.output(self.powerPin, GPIO.HIGH)        #hi to power on sensor
-                logging.warning("power cycle Power back ON")
+                logging.warning("sensor ower cycle - Power back ON")
 
-                #sleep(1)
-                
+                #sleep(2)
+                #GPIO.output(self.powerPin, GPIO.LOW)        #set low to power off sensor
+                #logging.warning("power cycle - power off")
+                                
+                #sleep(5)
+                #GPIO.output(self.powerPin, GPIO.HIGH)        #hi to power on sensor
+                #logging.warning("power cycle - Power back ON")
+
+                sleep(1)   
+                             
             elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
                 gpio.pinMode(self.powerPin, gpio.OUTPUT)
                 gpio.digitalWrite(self.powerPin, gpio.LOW)   #power off
