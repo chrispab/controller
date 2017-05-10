@@ -286,7 +286,7 @@ class sensor(object):
 
                 sleep(5)
                 GPIO.output(self.powerPin, GPIO.HIGH)        #hi to power on sensor
-                logging.warning("sensor ower cycle - Power back ON")
+                logging.warning("sensor power cycle - Power back ON")
 
                 #sleep(2)
                 #GPIO.output(self.powerPin, GPIO.LOW)        #set low to power off sensor
