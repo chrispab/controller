@@ -258,6 +258,19 @@ class system_timer(object):
             GPIO.output(self.watchDogPin, not GPIO.input(self.watchDogPin))
 
             logging.warning("DDDDDDDDDD Patted the DOG  DDDDDDDDDD")
+            
+            sys.stderr.write("starting : python daemon watchdog and fail test script started\n")
+            #notify systemd that we've started
+            retval = sd_notify(0, "READY=1")
+            if retval <> 0:
+                sys.stderr.write("terminating : fatal sd_notify() error for script start\n")
+                #exit(1)
+    
+             #after the init, ping the watchdog and check for errors
+            
+            retval = sd_notify(0, "WATCHDOG=1")
+            if retval <> 0:
+                sys.stderr.write("terminating : fatal sd_notify() error for watchdog ping\n")
 #return
         elif  (forceWatchdogToggle == True):
             logging.info("- FORCE Pat the DOG -")
@@ -271,7 +284,7 @@ class system_timer(object):
             logging.warning("DDDDDDDDDD    FORCE   Patted the DOG  DDDDDDDDDD")
 #return
 
-        return
+        #return
             
             
             # else if fanState is ON
@@ -283,28 +296,15 @@ class system_timer(object):
             #subprocess.call(["/bin/systemd-notify","--pid=" + str(os.getpid()),"WATCHDOG=1"] shell=True)
             #subprocess.call(['/bin/systemd-notify','--pid=' + str(os.getpid()),'WATCHDOG=1'], shell=True)
             
-            #sys.stderr.write("starting : python daemon watchdog and fail test script started\n")
-            # notify systemd that we've started
-            #retval = sd_notify(0, "READY=1")
-            #if retval <> 0:
-                #sys.stderr.write("terminating : fatal sd_notify() error for script start\n")
-                #exit(1)
-    
-            # after the init, ping the watchdog and check for errors
-            
 
-            
-            #retval = sd_notify(0, "WATCHDOG=1")
-            #if retval <> 0:
-                #sys.stderr.write("terminating : fatal sd_notify() error for watchdog ping\n")
-                ##exit(1)
+                #exit(1)
 
         #sys.stdout.write("WF")
         #sys.stdout.flush()
 			
 		#force watchdog toggle	
 
-			
+        return
         
 
     
