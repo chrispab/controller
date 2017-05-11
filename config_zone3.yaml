@@ -80,3 +80,4 @@ RCPin: 27 #phypin13
 alivePin: 22 #phy pin 15
 watchDogPin: 17
 
+location: "SHD"

@@ -14,7 +14,7 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.35 ioboard tweaks"
+VERSION = "0.37 : ioboard"
 
 # ===================general imports=====================================
 #from pympler.tracker import SummaryTracker
@@ -577,10 +577,15 @@ def main():
             processUptime = str(timedelta(seconds=int(processUptime)))
             systemUpTime = ctl1.timer1.getSystemUpTime()
             systemMessage = ctl1.timer1.getUpTime().strip()
-            cfg.setConfigItemInLocalDB('systemUpTime', " Ver: " + VERSION + " : " + systemUpTime)
+            location = cfg.getItemValueFromConfig('location')
+            logging.warning("LLLLLLLLLL - loc : %s" % (location))
+            
+            cfg.setConfigItemInLocalDB('systemUpTime', "LOC: " + location + " Ver: " + VERSION + " : " + systemUpTime)
 
             cfg.setConfigItemInLocalDB('processUptime', processUptime)
-            cfg.setConfigItemInLocalDB('systemMessage', systemMessage + ". V" + VERSION )
+            cfg.setConfigItemInLocalDB('systemMessage', systemMessage + ". V" + VERSION  )
+#            cfg.setConfigItemInLocalDB('systemMessage', systemMessage + ". V" + VERSION )
+            
             cfg.setConfigItemInLocalDB('lightState', int(lightState) )
             
             time1 = datetime.datetime.now()
