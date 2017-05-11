@@ -97,7 +97,8 @@ class sensor(object):
         self._prime_read_sensor()    # get temp, humi
         #self.sensorPin = 4
         
-        self.safeModeTemp = 30
+        self.safeModeTemp = 25	#temp to represent safe mode
+        self.safeMode = True
         
         
     def _prime_read_sensor(self):
@@ -140,10 +141,11 @@ class sensor(object):
             
     def _enableSafeMode(self):
 		#TODO safe mode should also put fan on full speed
-        self.temperature = 30
-        self.humidity = 1
-        GPIO.setup(heaterRelay, GPIO.OUT)   #set pin as OP
-        GPIO.output(heaterRelay, 0)         #heat off        
+        self.temperature = self.safeModeTemp
+        self.safeMode = True	#enable safe mode
+        self.humidity = 70
+        #GPIO.setup(heaterRelay, GPIO.OUT)   #set pin as OP
+        #GPIO.output(heaterRelay, 0)         #heat off        
         print self.temperature
         print ("FFFFFFFF Posssible faulty sensor detected - SAFE MODE ENABLED")        
         return        
@@ -240,8 +242,9 @@ class sensor(object):
             self._enableSafeMode()
 
         else:#good read CRC if here
-            if self.temperature == 30:
-                print("GOOD CRC BUT TEMP IS SAFE MODE value")
+            if self.temperature == self.safeModeTemp:
+            #if self.safeMode == True	#enable safe op mode
+                print("GOOD CRC BUT enable SAFE MODE")
             #check for whacky readings compared to last - i.e reading glitch
             elif ( abs(self.temperature - self.prevTemp) < 30) and ( (self.humidity >= 10)
                 and (self.humidity <= 100)) or (self.prevTemp == 30): #if temp diff smallish, assume good sample
@@ -256,8 +259,8 @@ class sensor(object):
                 self.humidity = round(self.humidity, 1)
                 
                 #filter temp function
-                self.proc_temp = self.proc_temp + ( 0.333 * (self.temperature - self.proc_temp))
-                self.proc_temp = round(self.proc_temp, 3)
+                #self.proc_temp = self.proc_temp + ( 0.333 * (self.temperature - self.proc_temp))
+                #self.proc_temp = round(self.proc_temp, 3)
                 logging.warning('Temp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
 
             else:
@@ -286,19 +289,11 @@ class sensor(object):
                 GPIO.output(self.powerPin, GPIO.LOW)        #set low to power off sensor
                 logging.warning("sensor power cycle - power off")
 
-                sleep(5)
+                sleep(3)
                 GPIO.output(self.powerPin, GPIO.HIGH)        #hi to power on sensor
                 logging.warning("sensor power cycle - Power back ON")
 
-                #sleep(2)
-                #GPIO.output(self.powerPin, GPIO.LOW)        #set low to power off sensor
-                #logging.warning("power cycle - power off")
-                                
-                #sleep(5)
-                #GPIO.output(self.powerPin, GPIO.HIGH)        #hi to power on sensor
-                #logging.warning("power cycle - Power back ON")
-
-                sleep(2)   
+                sleep(1)   
                              
             elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
                 gpio.pinMode(self.powerPin, gpio.OUTPUT)
@@ -306,6 +301,7 @@ class sensor(object):
                 sleep(1.0 * 3000 / 1000)
                 gpio.digitalWrite(self.powerPin, gpio.HIGH)  #power on
                 sleep(1.0 * 3000 / 1000)
+        
         
 class platform(object):
     def __init__(self):
@@ -345,6 +341,8 @@ class platform(object):
                 gpio.digitalWrite(portpin, gpio.HIGH)    #turn off all relays        
         
     def switch_relays(self, heaterState, ventState, fanState, ventSpeedState):
+		#check if in safe mode
+		#if sensor.getSafeMode() 
         #print('....fan switch state', fanState)
         if cfg.getItemValueFromConfig('platform_name') == "RPi2":
             GPIO.output(heaterRelay, heaterState)

@@ -27,8 +27,8 @@ min_CSV_write_interval: 60000 #interval min bet csv writes
 ##----L control params----
 heat_off_hours: [ 20,21,22,23,0,1,2,3,4,5,6,7,8,9,10,11,12,13 ]   #hours when heater should NOT operate
 
-RelayOff: 1 #state for relay OFF
-RelayOn: 0  #state for on
+RelayOff: 0 #state for relay OFF
+RelayOn: 1  #state for on
 
 heater_on_t: 5000  #min time heater is on or off for
 heater_off_t: 30000  #min time heater is on or off for
@@ -64,3 +64,19 @@ processUptime: "00:00:00"
 systemMessage: "system message"
 systemUpTime: "00:00:00"
 version: "Version Placeholder"
+
+quietMode: True
+#=================hardware dependant pins values etc====================
+#----pin assignments and related hardware defs----
+powerPin: 2    #pyhs pin 3
+led2: 4        #phys pin 5
+sensorPin: 3   #phys pin 5
+heaterRelay: 5 #pyhs pin 29
+ventRelay: 26   #phys pin 37
+fanRelay: 11    #phys pin 23
+relay4: 6      #pyhs pin 31
+RCPin: 27 #phypin13
+alivePin: 22 #phy pin 15
+watchDogPin: 17
+
+location: "CTY"
