@@ -46,7 +46,7 @@ fan_off_t: 45000 #vent off time
 
 dataPath: "data/thdata.csv"
 
-emailEnabled: False
+emailEnabled: True
 
 #db params
 db_hostname: "127.0.0.1"
