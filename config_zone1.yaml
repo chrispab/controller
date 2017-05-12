@@ -1,9 +1,11 @@
 # YAML
 
-#===config params to store in config obj so tunable via web interface====
+#===config params to store in config obj so tunable via web interface etc====
 
 #Zone 1 - RPi
 zoneName: "Zone 1"
+location: "GRG"
+
 
 #Hardware specific config items
 # comment out for hardware used as appropriate
@@ -79,4 +81,3 @@ RCPin: 27 #phypin13
 alivePin: 22 #phy pin 15
 watchDogPin: 17
 
-location: "GRG"

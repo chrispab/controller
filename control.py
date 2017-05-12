@@ -14,7 +14,7 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.37 : ioboard"
+VERSION = "0.41 : z1 reboot probv2"
 
 # ===================general imports=====================================
 #from pympler.tracker import SummaryTracker
@@ -507,8 +507,8 @@ def main():
     if ctl1.timer1.secsSinceBoot() < 120:
         zone = zone + ' REBOOT '
     try:
-        #emailMe.sendemail( zone + ' - Process Started', message)
-        pass
+        emailMe.sendemail( zone + ' - Process Started', message)
+        #pass
     except:
         logging.error("...ERROR SENDING EMAIL - for Process start")
 

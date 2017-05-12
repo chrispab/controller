@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # hardware.py
 # hardware specific for rpi platform
-#for control.py for enviro controller
+#for control.py for HVAC controller
 #
 
 # general im ports
@@ -10,15 +10,6 @@ import datetime
 from datetime import timedelta, time
 import sendemail as emailMe
 import logging
-
-##import settings
-#import socket # to get hostname 
-##note: hostName expected zone1 or zone2
-#hostName = socket.gethostname()
-#settingsFileName = 'settings_' + hostName
-#print(settingsFileName)
-##import as settings
-#settings = __import__(settingsFileName)
 
 
 from support import round_time as round_time
@@ -141,7 +132,8 @@ class sensor(object):
             
     def _enableSafeMode(self):
 		#TODO safe mode should also put fan on full speed
-        self.temperature = self.safeModeTemp
+        #self.temperature = 25 #self.safeModeTemp
+        self.temperature = 25 #self.safeModeTemp
         self.safeMode = True	#enable safe mode
         self.humidity = 70
         #GPIO.setup(heaterRelay, GPIO.OUT)   #set pin as OP
@@ -216,7 +208,7 @@ class sensor(object):
             self.readErrs += 1
             sleep(self.delay) #wait secs before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
-            logging.warning("readings %s, %s" % (self.humidity, self.temperature))
+            logging.warning("readings %s, %s" % (self.temperature, self.humidity))
 
         #when here, means readings have vALS OR ARE null
         if self.readErrs == maxSensorReadErrors:  # powercyle if maxSensorReadErrors read errors, null READINGS
@@ -229,8 +221,8 @@ class sensor(object):
 				#TODO limit emails sent 
                 self.message = 'Power cycling sensor due to too many,' + str(maxSensorReadErrors) + ', errors'
                 try:
-                    #emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)
-                    pass
+                    emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)
+                    #pass
                 except:
                     logging.error("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING - too many errors %d" % maxSensorReadErrors)
                     
@@ -288,11 +280,9 @@ class sensor(object):
                 GPIO.setup(self.powerPin, GPIO.OUT)  #set pin as OP
                 GPIO.output(self.powerPin, GPIO.LOW)        #set low to power off sensor
                 logging.warning("sensor power cycle - power off")
-
                 sleep(3)
                 GPIO.output(self.powerPin, GPIO.HIGH)        #hi to power on sensor
                 logging.warning("sensor power cycle - Power back ON")
-
                 sleep(1)   
                              
             elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
