@@ -135,6 +135,28 @@ class Config(object):
                 return             
             logging.info("update central config: %s", sql)
         
+
+            controllerMessage = self.getConfigItemFromLocalDB('controllerMessage')            
+            sql = "UPDATE  config SET %s = '%s'" % ('controllerMessage', controllerMessage)
+            ## Execute the SQL command
+            res = self.dbc.execute(self.central_cursor, sql)
+            if (res==0):
+                logging.warning( "^^^^^^^^^^ execute query update central config tbl sysmess returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning( "..........................returning..........................")
+                return             
+            logging.info("update central config: %s", sql)
+
+
+            miscMessage = self.getConfigItemFromLocalDB('miscMessage')            
+            sql = "UPDATE  config SET %s = '%s'" % ('miscMessage', miscMessage)
+            ## Execute the SQL command
+            res = self.dbc.execute(self.central_cursor, sql)
+            if (res==0):
+                logging.warning( "^^^^^^^^^^ execute query update central config tbl sysmess returned 0 ^^^^^^^^^^^^^^^^")
+                logging.warning( "..........................returning..........................")
+                return             
+            logging.info("update central config: %s", sql)
+                        
             lightState = self.getConfigItemFromLocalDB('lightState')
             sql = "UPDATE  config SET %s = %i" % ('lightState', lightState)
             ## Execute the SQL command

@@ -14,7 +14,7 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.41 : z1 reboot probv2"
+VERSION = "0.42 : footer messages1"
 
 # ===================general imports=====================================
 #from pympler.tracker import SummaryTracker
@@ -458,6 +458,12 @@ def sd_notify(unset_environment, s_cmd):
                 del os.environ['NOTIFY_SOCKET']
     return(0) # OK
 
+def get_ip_address():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    return s.getsockname()[0]
+
+
 class Controller(object):
 
     def __init__(self):
@@ -583,8 +589,16 @@ def main():
             cfg.setConfigItemInLocalDB('systemUpTime', "LOC: " + location + " Ver: " + VERSION + " : " + systemUpTime)
 
             cfg.setConfigItemInLocalDB('processUptime', processUptime)
+            
+            cfg.setConfigItemInLocalDB('miscMessage', location)
+
             cfg.setConfigItemInLocalDB('systemMessage', systemMessage + ". V" + VERSION  )
 #            cfg.setConfigItemInLocalDB('systemMessage', systemMessage + ". V" + VERSION )
+
+            ipAddress = get_ip_address()
+            cfg.setConfigItemInLocalDB('controllerMessage', ipAddress)
+
+            # = cfg.getItemValueFromConfig('location')
             
             cfg.setConfigItemInLocalDB('lightState', int(lightState) )
             
