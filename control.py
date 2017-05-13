@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # control.py
-# control for enviro controller
+# control for HVAC controller
 
 import logging
 #logger options
@@ -14,8 +14,7 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.44 : footer messages 3"
-
+from version import VERSION
 # ===================general imports=====================================
 
 import csv
@@ -325,7 +324,7 @@ class system_timer(object):
         #uptime = output
         return uptime
 
-
+    # return sys up time in HH:MM:SS format if poss
     def getSystemUpTime(self):
         # get uptime from the linux terminal command
         from subprocess import check_output
@@ -334,6 +333,17 @@ class system_timer(object):
         uptime = output[output.find("up")+2:output.find("user")-5]
         
         return uptime
+        
+        
+    def getSystemUpTimeFromProc(self):
+        from datetime import timedelta
+
+        with open('/proc/uptime', 'r') as f:
+            uptime_seconds = int(float(f.readline().split()[0]) // 1)
+            uptime_string = str(timedelta(seconds = uptime_seconds))
+
+        return(uptime_string)
+
     
     def secsSinceBoot(self):
         now = datetime.datetime.now()
@@ -503,6 +513,8 @@ def main():
     global systemUpTime
     global processUptime
     global systemMessage
+    global controllerMessage
+    global miscMessage
     
     
     #TODO ENABLE EMAIL ENABLED OBEY
@@ -577,27 +589,30 @@ def main():
                 except:
                     logging.error("...ERROR SENDING EMAIL - for Process start")
                                     
-            end_time = time.time()
-            processUptime = end_time - start_time
-            processUptime = str(timedelta(seconds=int(processUptime)))
-            systemUpTime = ctl1.timer1.getSystemUpTime()
-            systemMessage = ctl1.timer1.getUpTime().strip()
+
+            
+            
             location = cfg.getItemValueFromConfig('location')
             logging.warning("LLLLLLLLLL - loc : %s" % (location))
             
-            cfg.setConfigItemInLocalDB('systemUpTime', " Ver: " + VERSION + " : " + systemUpTime)
 
-            cfg.setConfigItemInLocalDB('processUptime', processUptime)
+
+            end_time = time.time()
+            processUptime = end_time - start_time
+            processUptime = str(timedelta(seconds=int(processUptime)))
+            cfg.setConfigItemInLocalDB('processUptime', "Process Up Time: " +processUptime)
+
+            systemUpTime = ctl1.timer1.getSystemUpTimeFromProc()
+            cfg.setConfigItemInLocalDB('systemUpTime',  "System Up Time: " + systemUpTime)
             
             cfg.setConfigItemInLocalDB('miscMessage', location)
-
-            cfg.setConfigItemInLocalDB('systemMessage', systemMessage + ". V" + VERSION  )
-#            cfg.setConfigItemInLocalDB('systemMessage', systemMessage + ". V" + VERSION )
+            
+            systemMessage = ctl1.timer1.getUpTime().strip()
+            cfg.setConfigItemInLocalDB('systemMessage', systemMessage  )
 
             ipAddress = get_ip_address()
-            cfg.setConfigItemInLocalDB('controllerMessage', ipAddress)
+            cfg.setConfigItemInLocalDB('controllerMessage', "V: " +  VERSION + ", IP: " + ipAddress)
 
-            # = cfg.getItemValueFromConfig('location')
             
             cfg.setConfigItemInLocalDB('lightState', int(lightState) )
             
