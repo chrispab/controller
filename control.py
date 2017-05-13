@@ -14,13 +14,9 @@ logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=loggin
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
-VERSION = "0.43 : footer messages2"
+VERSION = "0.44 : footer messages 3"
 
 # ===================general imports=====================================
-#from pympler.tracker import SummaryTracker
-#tracker = SummaryTracker()
-
-#from mem_top import mem_top
 
 import csv
 import datetime
@@ -54,6 +50,8 @@ path = cfg.getItemValueFromConfig('dataPath')
 
 processUptime = 0
 systemMessage = 0
+
+from componentClasses import *   #components of controller board
 
 # ============================common code start==========================
 
@@ -167,6 +165,7 @@ class Fan(object):
                 self.prev_fan_millis = current_millis
         #self.state = ON
         return
+
 
 
 class Heater(object):
@@ -586,7 +585,7 @@ def main():
             location = cfg.getItemValueFromConfig('location')
             logging.warning("LLLLLLLLLL - loc : %s" % (location))
             
-            cfg.setConfigItemInLocalDB('systemUpTime', "LOC: " + location + " Ver: " + VERSION + " : " + systemUpTime)
+            cfg.setConfigItemInLocalDB('systemUpTime', " Ver: " + VERSION + " : " + systemUpTime)
 
             cfg.setConfigItemInLocalDB('processUptime', processUptime)
             
