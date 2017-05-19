@@ -472,6 +472,14 @@ def get_ip_address():
     s.connect(("8.8.8.8", 80))
     return s.getsockname()[0]
 
+def execAndTimeFunc(func):
+    time1 = datetime.datetime.now()
+    func()
+    time2 = datetime.datetime.now()
+    duration = time2 - time1
+    logging.warning("TTTTTTTTTTTT - update central CONFIG table duration called BY FUNC: %s" % (duration))	
+	
+	
 
 class Controller(object):
 
@@ -616,11 +624,13 @@ def main():
             
             cfg.setConfigItemInLocalDB('lightState', int(lightState) )
             
-            time1 = datetime.datetime.now()
-            cfg.updateCentralConfigTable()
-            time2 = datetime.datetime.now()
-            duration = time2 - time1
-            logging.warning("TTTTT - update central CONFIG table duration : %s" % (duration))
+            #time1 = datetime.datetime.now()
+            #cfg.updateCentralConfigTable()
+            #time2 = datetime.datetime.now()
+            #duration = time2 - time1
+            #logging.warning("TTTTT - update central CONFIG table duration : %s" % (duration))
+            
+            execAndTimeFunc(cfg.updateCentralConfigTable)
             
             #uptime = cfg.getConfigItemFromLocalDB('processUptime')
             logging.warning("======== process uptime: %s ======", processUptime)

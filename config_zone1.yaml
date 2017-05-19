@@ -4,7 +4,7 @@
 
 #Zone 1 - RPi
 zoneName: "Zone 1"
-location: "GRG"
+location: "cty"
 
 
 #Hardware specific config items
@@ -57,9 +57,9 @@ db_password: "zone1"
 db_dbname: "zone1db"
 
 central_db_hostname: "192.168.0.201"
-central_db_username: "myiot"
-central_db_password: "myiot"
-central_db_dbname: "zone1_sensordata_db"
+central_db_username: "zone1"
+central_db_password: "zone1"
+central_db_dbname: "zone1centraldb"
 
 #placeholder items - used for items pushed from system
 processUptime: "00:00:00"
@@ -68,6 +68,7 @@ systemUpTime: "00:00:00"
 version: "Version Placeholder"
 
 quietMode: True
+
 #=================hardware dependant pins values etc====================
 #----pin assignments and related hardware defs----
 powerPin: 2    #pyhs pin 3
