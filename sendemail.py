@@ -14,22 +14,22 @@ def sendemail(subject, message):
     
     emailEnabled = cfg.getItemValueFromConfig('emailEnabled')  # email Enabled T orF
     if emailEnabled:
-	    msg = MIMEText(message)
-	    msg['Subject'] = subject
-	    msg['From'] = secureFile.USERNAME
-	    msg['To'] = secureFile.MAILTO
-	    try:
-		    server = smtplib.SMTP('smtp.gmail.com:587')
-		    server.ehlo_or_helo_if_needed()
-		    server.starttls()
-		    server.ehlo_or_helo_if_needed()
-		    server.login(secureFile.USERNAME,secureFile.PASSWORD)
-		    server.sendmail(secureFile.USERNAME, secureFile.MAILTO, msg.as_string())
-		    server.quit()
-	    except:
-			logging.error("????? Error sending email ???")
-			e = sys.exc_info()[0]
-			logging.error( "????? Error: %s ?????" % e )
+        msg = MIMEText(message)
+        msg['Subject'] = subject
+        msg['From'] = secureFile.USERNAME
+        msg['To'] = secureFile.MAILTO
+        try:
+            server = smtplib.SMTP('smtp.gmail.com:587')
+            server.ehlo_or_helo_if_needed()
+            server.starttls()
+            server.ehlo_or_helo_if_needed()
+            server.login(secureFile.USERNAME,secureFile.PASSWORD)
+            server.sendmail(secureFile.USERNAME, secureFile.MAILTO, msg.as_string())
+            server.quit()
+        except:
+            logging.error("????? Error sending email ???")
+            e = sys.exc_info()[0]
+            logging.error( "????? Error: %s ?????" % e )
     return
     
 
