@@ -468,8 +468,14 @@ def sd_notify(unset_environment, s_cmd):
     return(0) # OK
 
 def get_ip_address():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
+	try:
+		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		s.connect(("8.8.8.8", 80))
+    except:
+        logging.error("????? cant get a network socket ?????")
+        e = sys.exc_info()[0]
+        logging.error( "????? Error: %s ?????" % e )
+        return "cant get socket"
     return s.getsockname()[0]
 
 def execAndTimeFunc(func):
