@@ -527,12 +527,13 @@ def main():
     
     #TODO ENABLE EMAIL ENABLED OBEY
     zone = cfg.getItemValueFromConfig('zoneName')
+    location = cfg.getItemValueFromConfig('location')
     message = zone
     #if just booted
     if ctl1.timer1.secsSinceBoot() < 120:
         zone = zone + ' REBOOT '
     try:
-        emailMe.sendemail( zone + ' - Process Started', message)
+        emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
         #pass
     except:
         logging.error("...ERROR SENDING EMAIL - for Process start")
