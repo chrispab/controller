@@ -12,7 +12,7 @@ venv
 /chartx
 /C_Python_sensor_driver
 
-/Adafruit_Python_DHT-master
+/Adafruit_Python_DHT
 /build
 secureFile.py
 myenvctl.log

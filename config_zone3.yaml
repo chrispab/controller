@@ -4,6 +4,8 @@
 
 #Zone 3 - RPi
 zoneName: "Zone 3"
+location: "CTY"
+
 
 
 #Hardware specific config items
@@ -80,4 +82,3 @@ RCPin: 27 #phypin13
 alivePin: 22 #phy pin 15
 watchDogPin: 17
 
-location: "SHD"
