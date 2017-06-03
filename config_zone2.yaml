@@ -4,7 +4,7 @@
 
 #Zone 2 - RPi
 zoneName: "Zone 2"
-location: "GRG"
+location: "CTY"
 
 #Hardware specific config items
 # comment out for hardware used as appropriate
