@@ -42,7 +42,7 @@ ventPulseOnDelta: 10000 #60 secs cooling on delta
 vent_lon_sp_offset: -0.1 #offset
 vent_loff_sp_offset: 1.0 #
 
-fan_on_t: 14000  #vent on time
+fan_on_t: 140000  #vent on time
 fan_off_t: 5000 #vent off time
 
 dataPath: "data/thdata.csv"
