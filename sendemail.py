@@ -2,12 +2,15 @@
 import smtplib
 from email.mime.text import MIMEText
 import secureFile
+import logging
+import sys    # for stdout print
+
 
 from ConfigObject import cfg # singleton global
 
 
 def sendemail(subject, message):
-    #3 params below held in secureFile.py - not uploaded ti github
+    #3 params below held in secureFile.py - not uploaded to github
     #USERNAME = "cn@gmail.com"
     #PASSWORD = "in"
     #MAILTO  = "c@gmail.com"
