@@ -202,7 +202,12 @@ def main():
             cfg.setConfigItemInLocalDB('systemMessage', systemMessage  )
 
             ipAddress = get_ip_address()
-            cfg.setConfigItemInLocalDB('controllerMessage', "V: " +  VERSION + ", IP: " + ipAddress)
+            cfg.setConfigItemInLocalDB('controllerMessage', "V: " +  VERSION + ", IP: " + "<a href=" + "https://" + ipAddress + ":10000" + ' target="_blank"' + ">"+ ipAddress + "</a>")
+            #https://192.168.0.110:10000
+            #<a href="https://www.w3schools.com/" target="_blank">Visit W3Schools!</a>
+			#<a href="https://www.w3schools.com/html/default.asp">HTML tutorial</a>
+
+
 
             cfg.setConfigItemInLocalDB('lightState', int(lightState) )
             
