@@ -4,9 +4,7 @@
 
 #Zone 3 - RPi
 zoneName: "Zone 3"
-location: "GRG"
-
-
+location: "SHED"
 
 #Hardware specific config items
 # comment out for hardware used as appropriate
@@ -17,7 +15,7 @@ hardware: "RaspberryPi2"
 readDelay: 3 #sensor read delay
 ##
 tempSPLOn: 21.0   #target 24.o veg mp set point max with lon
-tempSPLOff: 15.0 #target = 21.0 veg, target loff
+tempSPLOff: 16.0 #target = 21.0 veg, target loff
 
 tempAlertHi: 26.1  #hi temp alert temp
 tempAlertLo: 15.0  #lo temp alert
@@ -43,8 +41,8 @@ ventPulseOnDelta: 10000 #60 secs cooling on delta
 vent_lon_sp_offset: 0.0 #offset
 vent_loff_sp_offset: 2.0 #
 
-fan_on_t: 30000  #vent on time
-fan_off_t: 50000 #vent off time
+fan_on_t: 9000000  #vent on time
+fan_off_t: 5000 #vent off time
 
 dataPath: "data/thdata.csv"
 

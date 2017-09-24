@@ -240,6 +240,8 @@ class Light(object):
 
 
         return self.d_state
+        
+        
 # Function to measure res-cap charge time
 def RCtime (RCPin):
     # Discharge capacitor
