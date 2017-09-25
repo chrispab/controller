@@ -90,6 +90,9 @@ class sensor(object):
         
         self.safeModeTemp = 25	#temp to represent safe mode
         self.safeMode = True
+        self.message = ""
+        self.sensorMessage = ""
+        
         
         
     def _prime_read_sensor(self):
@@ -171,6 +174,8 @@ class sensor(object):
 
         logging.info("...try to read sensor at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
         self.readErrs = 0    #reset err count
+        self.message = ""   #reset err message
+        
         
         #save previous values if reqd later
         self.prevTemp = self.temperature
@@ -190,7 +195,7 @@ class sensor(object):
             #restore prev sample readings
             #self.temperature = self.prevTemp  
             #self.humidity = self.prevHumi
-            return self.humidity, self.temperature
+            return self.humidity, self.temperature, self.sensorMessage
 
         logging.info("** AQUIring **")
 
@@ -221,7 +226,8 @@ class sensor(object):
 				#TODO limit emails sent 
                 self.message = 'Power cycling sensor due to too many,' + str(maxSensorReadErrors) + ', errors'
                 try:
-                    emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)
+                    #emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)
+                    self.sensorMessage = self.message
                     #pass
                 except:
                     logging.error("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING - too many errors %d" % maxSensorReadErrors)
@@ -265,13 +271,15 @@ class sensor(object):
                 if cfg.getItemValueFromConfig('emailEnabled') == True:
                     self.message = 'Readings, Temp = '+ str(self.temperature) + ',  Humi = '+ str(self.humidity)
                     try:
-                        emailMe.sendemail(zone + 'Spike in Reading', self.message)
+                        #emailMe.sendemail(zone + 'Spike in Reading', self.message)
+                        self.sensorMessage = self.message
+
                     except:
                         logging.error("ERROR SENDING EMAIL - DODGY READING")
                 self.temperature = self.prevTemp  #restore prev sample readings
                 self.humidity = self.prevHumi
         
-        return self.humidity, self.temperature
+        return self.humidity, self.temperature, self.message
            
          
     def _power_cycle(self):

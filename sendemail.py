@@ -32,7 +32,7 @@ def sendemail(subject, message):
         except:
             logging.error("????? Error sending email ???")
             e = sys.exc_info()[0]
-            logging.error( "????? Error: %s ?????" % e )
+            logging.error( "????? Error: %s   OLD EMAIL ROUTINE   ?????" % e )
     return
     
 

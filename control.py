@@ -26,6 +26,9 @@ import datetime as dt
 import sys    # for stdout print
 import socket # to get hostname
 import sendemail as emailMe
+
+from myemail import MyEmail
+
 from Logger import Logger
 
 import RPi.GPIO as GPIO
@@ -99,6 +102,7 @@ class Controller(object):
 #############
 logging.info("--- Creating the controller---")
 ctl1 = Controller()
+emailObj = MyEmail()
 
 #cfg.
 def main():
@@ -107,7 +111,7 @@ def main():
     ctl1.timer1.holdOffWatchdog(0, True)
     
     start_time = time.time()
-    humidity, temperature = ctl1.sensor1.read()
+    humidity, temperature, sensorMessage = ctl1.sensor1.read()
 
     global systemUpTime
     global processUptime
@@ -124,7 +128,8 @@ def main():
     if ctl1.timer1.secsSinceBoot() < 120:
         zone = zone + ' REBOOT '
     
-    emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
+    #emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
+    emailObj.send( zone + ' emailObj ' + location + ' - Process Started', message)
                 
     while 1:
 
@@ -142,7 +147,12 @@ def main():
         startT = time.time()
         
         #read sensor
-        humidity, temperature = ctl1.sensor1.read()
+        humidity, temperature,sensorMessage = ctl1.sensor1.read()
+        if sensorMessage :
+			#emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)	
+			emailObj.send(zone + ': bad sensor reads  - PowerCycle', self.message)	
+			
+					
         endT= time.time()
         duration = endT-startT
         logging.debug("+++ Aquisition sampletime: %s +++",duration)
