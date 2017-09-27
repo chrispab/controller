@@ -279,7 +279,7 @@ class sensor(object):
                 self.temperature = self.prevTemp  #restore prev sample readings
                 self.humidity = self.prevHumi
         
-        return self.humidity, self.temperature, self.message
+        return self.humidity, self.temperature, self.sensorMessage
            
          
     def _power_cycle(self):
