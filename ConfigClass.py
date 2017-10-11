@@ -10,6 +10,9 @@ import sys
 from DBCore import *
 import logging
 
+import location
+
+
 
 class Config(object):
     
@@ -30,6 +33,31 @@ class Config(object):
         return
 
     def readConfigFromFile(self):
+        # get config db info for this zone
+        cfgZonesFilename = "config_zones.yaml"
+        #read in zones yaml data
+        fileStr = os.path.abspath( cfgZonesFilename )
+        f = open(fileStr)
+        configZones = yaml.safe_load(f)
+        logging.warning("== Reading config Zone settings from yaml file ==")
+        logging.warning(yaml.dump(configZones))
+        f.close()        
+
+        # now get common data and specific data for locations
+        cfgLocationsFilename = "config_locations.yaml"
+        fileStr = os.path.abspath( cfgLocationsFilename )
+        f = open(fileStr)
+        configLocations = yaml.safe_load(f)
+        logging.warning("== Reading config Location settings from yaml file ==")
+        logging.warning(yaml.dump(configLocations))
+        f.close()  
+        
+        for section in configLocations:
+            print(section)
+        #print(configLocations['location1'])
+        #print(configLocations['location2'])                
+        
+        #get old config style data
         cfgFilename = "config_" + socket.gethostname() + ".yaml"
         logging.info(cfgFilename)
         fileStr = os.path.abspath( cfgFilename )
@@ -41,7 +69,47 @@ class Config(object):
         logging.warning(yaml.dump(config))
         f.close()
 
-        return config
+        ################################################################
+        # now we have the 3 config structs configLocations and configZones
+        # and the old  config
+        #lets build a new replacement config struct
+        # use location.code to id the section to load
+        
+        newCfg = {}
+        #add common section items to new config obj
+        for item in configLocations['common']:
+            print(item)
+            print(configLocations['common'][item])
+            newCfg[item] = configLocations['common'][item] # put in new dict
+            
+        #add location items to new config obj use location.code
+        locSection = 'location' + location.code
+        for item in configLocations[locSection]:
+            print(item)
+            print(configLocations[locSection][item])
+            newCfg[item] = configLocations[locSection][item] # put in new dict
+                        
+        #add zone items to new config obj use location.zone
+        locSection = location.zoneName
+        for item in configZones[locSection]:
+            print(item)
+            print(configZones[locSection][item])
+            newCfg[item] = configZones[locSection][item] # put in new dict
+                        
+        
+        for item in newCfg:
+            print(item)
+            print(newCfg[item])
+            #newCfg[item] = configZones[locSection][item] # put in new dict                
+        
+        
+        print(newCfg)
+
+        
+        
+        #return config
+        return newCfg
+        
         
     def writeConfigToLocalDB(self):
         logging.info("== WriteConfigToLocalDB ==")

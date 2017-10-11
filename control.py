@@ -122,7 +122,7 @@ def main():
     
     #TODO ENABLE EMAIL ENABLED OBEY
     zone = cfg.getItemValueFromConfig('zoneName')
-    location = cfg.getItemValueFromConfig('location')
+    location = cfg.getItemValueFromConfig('locationDisplayName')
     message = zone
     #if just booted
     if ctl1.timer1.secsSinceBoot() < 120:
@@ -149,10 +149,9 @@ def main():
         #read sensor
         humidity, temperature,sensorMessage = ctl1.sensor1.read()
         if sensorMessage :
-			#emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)	
-			emailObj.send(zone + ': bad sensor reads  - PowerCycle', self.message)	
-			
-					
+            #emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)	
+            emailObj.send(zone + ': bad sensor reads  - PowerCycle', sensorMessage)
+
         endT= time.time()
         duration = endT-startT
         logging.debug("+++ Aquisition sampletime: %s +++",duration)
@@ -195,7 +194,7 @@ def main():
                 except:
                     logging.error("...ERROR SENDING EMAIL - for Process start")
                                     
-            location = cfg.getItemValueFromConfig('location')
+            location = cfg.getItemValueFromConfig('locationDisplayName')
             logging.warning("LLLLLLLLLL - loc : %s" % (location))
             
             end_time = time.time()
