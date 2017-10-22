@@ -158,13 +158,13 @@ class Heater(object):
         logging.info('==Heat tdelta on: %s',self.heater_on_delta)
 
         #check for heater OFF hours #todo improve this
-        current_hour = datetime.datetime.now().hour
+        #current_hour = datetime.datetime.now().hour
         #if current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
         if d_state == ON: #current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
 
             self.state = OFF
             logging.info('..d on, in heat off hours - skipping lon heatctl')
-        else:  # d state on or off here also in heat on hrs
+        else:  # d off here
             logging.info('..do heatctl')
             if current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
                 self.state = OFF

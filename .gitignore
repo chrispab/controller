@@ -16,3 +16,4 @@ venv
 /build
 secureFile.py
 myenvctl.log
+location.py

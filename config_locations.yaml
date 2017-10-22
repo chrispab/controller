@@ -34,7 +34,7 @@ common:
   
 locations:
   id: "s"
-  locationDisplayName: "S"
+  locationDisplayName: "SHD"
 
   tempSPLOn: 21.0   #target 24.o veg mp set point max with lon
   tempSPLOff: 16.0 #target = 21.0 veg, target loff
@@ -48,29 +48,29 @@ locations:
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
 ##----L control params----
-  heat_off_hours: [ 20,21,22,23,0,1,2,3,4,5,6,7,8,9,10,11,12,13 ]   #hours when heater should NOT operate
+  #heat_off_hours: [ 20,21,22,23,0,1,2,3,4,5,6,7,8,9,10,11,12,13 ]   #hours when heater should NOT operate
 
-  heater_on_t: 5000  #min time heater is on or off for
-  heater_off_t: 30000  #min time heater is on or off for
+  heater_on_t: 30000  #min time heater is on when below lo sp
+  heater_off_t: 60000  #min time heater is off for
   heater_sp_offset: 0
 
-  ventOnDelta: 20000 #duration vent is on in millis - minimum mark
-  ventOffDelta: 97000 #vent off duration in miili sec
+  ventOnDelta: 27000 #duration vent is on in millis - minimum mark
+  ventOffDelta: 119000 #vent off duration in miili sec
   ventPulseOnDelta: 10000 #60 secs cooling on delta
   vent_lon_sp_offset: -0.1 #offset
   vent_loff_sp_offset: 1.0 #
 
-  fan_on_t: 1740000  #vent on time ms
-  fan_off_t: 60000 #vent off time ms
+  fan_on_t: 17400000  #vent on time ms
+  fan_off_t: 10000 #vent off time ms
 
 
   emailEnabled: True
   quietMode: True
 
 locationc:
-  locationDisplayName: "CONsv"
-
   id: "c"
+  locationDisplayName: "CSV"
+
   tempSPLOn: 20.5   #target 24.o veg mp set point max with lon
   tempSPLOff: 15.0 #target = 21.0 veg, target loff
 
@@ -84,7 +84,7 @@ locationc:
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
 ##----L control params----
-  heat_off_hours: [ 20,21,22,23,0,1,2,3,4,5,6,7,8,9,10,11,12,13 ]   #hours when heater should NOT operate
+  #heat_off_hours: [ 20,21,22,23,0,1,2,3,4,5,6,7,8,9,10,11,12,13 ]   #hours when heater should NOT operate
 
   heater_on_t: 5000  #min time heater is on or off for in ms
   heater_off_t: 30000  #min time heater is on or off for
@@ -105,9 +105,8 @@ locationc:
 
 
 locationg:
-  locationDisplayName: "G"
-
   id: "g"
+  locationDisplayName: "GRG"
 
   tempSPLOn: 21.0   #target 24.o veg mp set point max with lon
   tempSPLOff: 16.0 #target = 21.0 veg, target loff
@@ -121,7 +120,7 @@ locationg:
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
 ##----L control params----
-  heat_off_hours: [0,1,2,3,4,5,6,7,8,9,16,17,18,19,20,21,22,23]   #hours when heater should NOT operate
+  #heat_off_hours: [0,1,2,3,4,5,6,7,8,9,16,17,18,19,20,21,22,23]   #hours when heater should NOT operate
 
 
   heater_on_t: 4000  #min time heater is on or off for
