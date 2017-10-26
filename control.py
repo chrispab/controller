@@ -184,15 +184,15 @@ def main():
             # check for alarm levels etc
             if temperature > cfg.getItemValueFromConfig('tempAlertHi'):
                 try:
-                    emailMe.sendemail( zone + ' - Hi Temp warning' + temperature, message)
+                    emailObj.send( zone + ' - Hi Temp warning' + temperature, message)
                 except:
-                    logging.error("...ERROR SENDING EMAIL - for Process start")
+                    logging.error("...ERROR SENDING EMAIL - for hi temp alert")
                     
             if temperature < cfg.getItemValueFromConfig('tempAlertLo'):
                 try:
-                    emailMe.sendemail( zone + ' - Lo Temp warning' + temperature, message)
+                    emailObj.send( zone + ' - Lo Temp warning' + temperature, message)
                 except:
-                    logging.error("...ERROR SENDING EMAIL - for Process start")
+                    logging.error("...ERROR SENDING EMAIL - low temp alert")
                                     
             location = cfg.getItemValueFromConfig('locationDisplayName')
             logging.warning("LLLLLLLLLL - loc : %s" % (location))
@@ -212,10 +212,6 @@ def main():
 
             ipAddress = get_ip_address()
             cfg.setConfigItemInLocalDB('controllerMessage', "V: " +  VERSION + ", IP: " + "<a href=" + "https://" + ipAddress + ":10000" + ' target="_blank"' + ">"+ ipAddress + "</a>")
-            #https://192.168.0.110:10000
-            #<a href="https://www.w3schools.com/" target="_blank">Visit W3Schools!</a>
-			#<a href="https://www.w3schools.com/html/default.asp">HTML tutorial</a>
-
 
 
             cfg.setConfigItemInLocalDB('lightState', int(lightState) )
