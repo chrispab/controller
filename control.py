@@ -200,10 +200,12 @@ def main():
             end_time = time.time()
             processUptime = end_time - start_time
             processUptime = str(timedelta(seconds=int(processUptime)))
-            cfg.setConfigItemInLocalDB('processUptime', "Process Up Time: " +processUptime)
+            #cfg.setConfigItemInLocalDB('processUptime', "Process Up Time: " +processUptime)
+            cfg.setConfigItemInLocalDB('processUptime', processUptime)
 
             systemUpTime = ctl1.timer1.getSystemUpTimeFromProc()
-            cfg.setConfigItemInLocalDB('systemUpTime',  "System Up Time: " + systemUpTime)
+            #cfg.setConfigItemInLocalDB('systemUpTime',  "System Up Time: " + systemUpTime)
+            cfg.setConfigItemInLocalDB('systemUpTime', systemUpTime)
             
             cfg.setConfigItemInLocalDB('miscMessage', location)
             

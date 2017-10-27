@@ -102,7 +102,7 @@ locationg:
   id: "g"
   locationDisplayName: "GRG"
 
-  tempSPLOn: 25.2   #target 24.o veg mp set point max with lon
+  tempSPLOn: 23.8   # 25.2 max, target 24.o veg mp set point max with lon
   tempSPLOff: 16.0 #target = 21.0 veg, target loff
 
   tempAlertHi: 26.1  #hi temp alert temp
