@@ -36,8 +36,8 @@ locations:
   id: "s"
   locationDisplayName: "SHD"
 
-  tempSPLOn: 22.5   #target 24.o veg mp set point max with lon
-  tempSPLOff: 16.0 #target = 21.0 veg, target loff
+  tempSPLOn: 22.5   #
+  tempSPLOff: 16.0 #
 
   tempAlertHi: 30.0  #hi temp alert temp
   tempAlertLo: 14.5  #lo temp alert
@@ -51,8 +51,8 @@ locations:
   heater_off_t: 60000  #min time heater is off for
   heater_sp_offset: 0
 
-  ventOnDelta: 27000 #duration vent is on in millis - minimum mark
-  ventOffDelta: 119000 #vent off duration in miili sec
+  ventOnDelta: 20000 #duration vent is on in millis - minimum mark
+  ventOffDelta: 40000 #vent off duration in miili sec
   ventPulseOnDelta: 10000 #60 secs cooling on delta
   vent_lon_sp_offset: -0.1 #offset
   vent_loff_sp_offset: 1.0 #
@@ -84,8 +84,8 @@ locationc:
   heater_off_t: 30000  #min time heater is on or off for
   heater_sp_offset: 0
 
-  ventOnDelta: 20000 #duration vent is on in millis - minimum mark
-  ventOffDelta: 97000 #vent off duration in miili sec
+  ventOnDelta: 30000 #duration vent is on in millis - minimum mark
+  ventOffDelta: 30000 #vent off duration in miili sec
   ventPulseOnDelta: 10000 #60 secs cooling on delta
   vent_lon_sp_offset: 0.0 #offset
   vent_loff_sp_offset: 0.0 #
@@ -102,8 +102,8 @@ locationg:
   id: "g"
   locationDisplayName: "GRG"
 
-  tempSPLOn: 23.8   # 25.2 max, target 24.o veg mp set point max with lon
-  tempSPLOff: 16.0 #target = 21.0 veg, target loff
+  tempSPLOn: 23.8   # 25.2 max calced
+  tempSPLOff: 16.0 #
 
   tempAlertHi: 26.1  #hi temp alert temp
   tempAlertLo: 15.0  #lo temp alert
@@ -117,8 +117,8 @@ locationg:
   heater_off_t: 30000  #min time heater is on or off for
   heater_sp_offset: 0
 
-  ventOnDelta: 15000 #duration vent is on in millis
-  ventOffDelta: 127000 #vent off duration in miili sec
+  ventOnDelta: 20000 #duration vent is on in millis
+  ventOffDelta: 40000 #vent off duration in miili sec
   ventPulseOnDelta: 10000 #60 secs cooling on delta
   vent_lon_sp_offset: 0.0 #offset
   vent_loff_sp_offset: 2.0 #
