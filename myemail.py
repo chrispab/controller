@@ -21,7 +21,7 @@ class MyEmail(object):
         self.elapsedMillis = 0
         self.deltaDateTime = 0
         self.prevEmailSendMillis = 0
-        self.emailSendTimeGap = 60 * 15 * 1000 #time in milli secs, 60 secs each 1000 ms
+        self.emailSendTimeGap = cfg.getItemValueFromConfig('emailSendTimeGap') #time in milli secs, 60 secs each 1000 ms
         self.emailEnabled = cfg.getItemValueFromConfig('emailEnabled')  # email Enabled T orF
         # get date and time at start of program execution
         self.startDateTime = datetime.datetime.now()
