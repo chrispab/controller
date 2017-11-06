@@ -1,12 +1,13 @@
 #import MySQLdb
 #import pymysql
 import pymysql.cursors
+import sqlite3 as lite
 import sys
 import logging
 
 class DBCore(object):
         
-    dbConn = 0
+    dbConn = None
     cursor = 0
         
     def __init__(self):
@@ -17,37 +18,74 @@ class DBCore(object):
     def getDBConn(self, hostName, userName, password, databaseName):
         # Open database connection
         logging.debug("* 1 getDBconn*")
-        try:
-            logging.debug("* 2 getDBconn*")
-            self.dbConn = pymysql.connect(host = hostName,
-                                            user = userName,
-                                            passwd = password,
-                                            db = databaseName,
-                                            connect_timeout = 1,
-                                            cursorclass = pymysql.cursors.SSCursor,
-                                            read_timeout = 1)
-#                            db = databaseName, connect_timeout = conn_timeout, cursorclass=pymysql.cursors.SSCursor)
+        
+        # check if connecting to local sqlite3 db and get its con obj otherwise get a mysql conn object
+        if (hostName == '127.0.0.1'):
+            
+            #con = None
+            
+            try:
+                #con = lite.connect(databaseName)
+                logging.warning("******* ATTEMPTING SQLITE CONN  *******")
 
-            logging.debug("* OPEN getDBconn connected *: %s, %s" % (hostName, databaseName))
-            logging.info("* connected *")
-            logging.debug("* 3 getDBconn*")
-        except Exception as e:
-            logging.debug("* 4 getDBconn*")
-            logging.error("* error getting DB connection * ")
-            logging.error("* DB Error %d: %s * " % (e.args[0], e.args[1]))
-            #print "1!"
-            self.dbConn = 0
+                self.dbConn = lite.connect(databaseName)
+                
+                #cur = self.dbConn.cursor()    
+                #cur.execute('SELECT SQLITE_VERSION()')
+                
+                #data = cur.fetchone()
+                
+                #print "SQLite version: %s" % data      
+                logging.warning("***** SQLITE3  OPEN getDBconn connected *: %s, %s SQLITE3 *****" % (hostName, databaseName))
+          
+                
+                
+            except lite.Error, e:
+                
+                print "Error %s:" % e.args[0]
+                #sys.exit(1)
+                
+            finally:
+                
+                if self.dbConn :
+                    self.dbConn .close()
+                        
+        else:
+            
+            try:
+                logging.debug("* 2 getDBconn*")
+                self.dbConn = pymysql.connect(host = hostName,
+                                                user = userName,
+                                                passwd = password,
+                                                db = databaseName,
+                                                connect_timeout = 1,
+                                                cursorclass = pymysql.cursors.SSCursor,
+                                                read_timeout = 1)
+    #                            db = databaseName, connect_timeout = conn_timeout, cursorclass=pymysql.cursors.SSCursor)
+    
+                logging.debug("* OPEN getDBconn connected *: %s, %s" % (hostName, databaseName))
+                logging.info("* connected *")
+                logging.debug("* 3 getDBconn*")
+            except Exception as e:
+                logging.debug("* 4 getDBconn*")
+                logging.error("* error getting DB connection * ")
+                logging.error("* DB Error %d: %s * " % (e.args[0], e.args[1]))
+                #print "1!"
+                self.dbConn = 0
+                
         logging.debug("* 5 getDBconn*")
         return self.dbConn
         
 
     def getDBCursor (self, dbConn):
         logging.info("* getDBCursor *")
+        logging.warning("???????????? GETDBCURSOR dbconn = %s" % dbConn)
+
         try:
             self.cursor = dbConn.cursor()
             logging.info("* got db cursor *")
         except Exception as e:
-            logging.error("*** dberror getting cursor ***")
+            logging.error("*** dberror getting cursor test ***")
             logging.error("*** DB Error %d: %s ***" % (e.args[0], e.args[1]))
             self.cursor = 0
         return self.cursor

@@ -1,0 +1,14 @@
+
+sudo systemctl status zone_controller.service
+
+to follow
+sudo journalctl --follow -u zone_controller.service
+
+to stop service:
+sudo systemctl stop zone_controller.service
+
+to restart service:
+sudo systemctl restart zone_controller.service
+
+=done setup autorun
+

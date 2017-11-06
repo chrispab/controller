@@ -288,9 +288,10 @@ class Config(object):
 
 
     def setConfigItemInLocalDB(self, name, value):
+        logging.warning("name : %s, value " % name)
         try:
             # Open database connection
-            logging.info("===setconfigitemIndb===")
+            logging.warning("===setconfigitemIndb===")
             
             self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
                             self.getItemValueFromConfig('db_username'),
@@ -298,8 +299,12 @@ class Config(object):
                             self.getItemValueFromConfig('db_dbname'))
             
             #get db cursor
+            logging.warning("???????????? pre get cursor")
+            logging.warning("???????????? dbconn = %s" % self.dbConn)
+
             self.cursor = self.dbc.getDBCursor(self.dbConn)
-    
+            logging.warning("???????????? post get cursor")
+
             #print("type", type(value))
             if (type(value) is str):
                 #value = value
@@ -307,13 +312,13 @@ class Config(object):
             else:
                 value=str(value)
             sqlstr = "UPDATE  config SET %s = '%s'" % (name, value)            
-            #print("???????????? ", sqlstr)
+            logging.warning("???????????? %s " % sqlstr)
     
             self.dbc.execute(self.cursor, sqlstr)
             
             self.dbc.commitClose(self.dbConn)
         except:
-            logging.error("????? bad setConfigItemInDB exception thrown ???")
+            logging.error("????? bad setConfigItemInLocalDB exception thrown ???")
             e = sys.exc_info()[0]
             logging.error( "????? Error: %s ?????" % e )
 
