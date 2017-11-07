@@ -1,14 +1,10 @@
-sudo apt-get update
+to create new db ready
 
-sudo apt-get install build-essential python-dev
+cd controller
 
-sudo apt-get install mariadb-server
+rm zone2db.db
 
-sudo pip install pyyaml
-sudo apt-get install python-pip python-dev libmysqlclient-dev
-
-
-sudo pip install psutil
+python createZoneDb.py
 
 
 

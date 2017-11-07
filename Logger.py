@@ -182,7 +182,7 @@ class Logger(object):
         
         
         sample_dt = datetime.datetime.now() # gives time with 6 dp
-        #trim off last 3 digits
+        #convert to string and trim off last 3 digits
         sample_txt = sample_dt.strftime('%Y-%m-%d %H:%M:%S.%f')
         sample_txt = sample_txt[:-3]
         data[0] = sample_txt

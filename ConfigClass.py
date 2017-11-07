@@ -288,11 +288,11 @@ class Config(object):
 
 
     def setConfigItemInLocalDB(self, name, value):
-        logging.warning("name : %s" % (name))
-        logging.warning("value : %s" % (value))
+        #logging.warning("name : %s" % (name))
+        #logging.warning("value : %s" % (value))
         try:
             # Open database connection
-            logging.warning("===setconfigitemInLocaldb===")
+            #logging.warning("===setconfigitemInLocaldb===")
             
             self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
                             self.getItemValueFromConfig('db_username'),
@@ -300,11 +300,11 @@ class Config(object):
                             self.getItemValueFromConfig('db_dbname'))
             
             #get db cursor
-            logging.warning("???????????? pre get cursor")
-            logging.warning("???????????? dbconn = %s" % self.dbConn)
+            #logging.warning("???????????? pre get cursor")
+            #logging.warning("???????????? dbconn = %s" % self.dbConn)
 
             self.cursor = self.dbc.getDBCursor(self.dbConn)
-            logging.warning("???????????? post get cursor")
+            #logging.warning("???????????? post get cursor")
 
             #print("type", type(value))
             if (type(value) is str):
@@ -313,7 +313,7 @@ class Config(object):
             else:
                 value=str(value)
             sqlstr = "UPDATE  config SET %s = '%s'" % (name, value)            
-            logging.warning("???????????? %s " % sqlstr)
+            #logging.warning("???????????? %s " % sqlstr)
     
             self.dbc.execute(self.cursor, sqlstr)
             

@@ -22,9 +22,9 @@ class DBCore(object):
         # check if connecting to local sqlite3 db and get its con obj otherwise get a mysql conn object
         if (hostName == '127.0.0.1'):
             try:
-                logging.warning("******* ATTEMPTING SQLITE CONN  *******")
+                #logging.warning("******* ATTEMPTING SQLITE CONN  *******")
                 self.dbConn = lite.connect(databaseName)
-                logging.warning("***** SQLITE3  OPEN getDBconn connected *: %s, %s SQLITE3 *****" % (hostName, databaseName))
+                #logging.warning("***** SQLITE3  OPEN getDBconn connected *: %s, %s SQLITE3 *****" % (hostName, databaseName))
             #except lite.Error, e:
             except Exception as e:
                 print "Error %s:" % e.args[0]
@@ -65,7 +65,7 @@ class DBCore(object):
 
     def getDBCursor (self, dbConn):
         logging.info("* getDBCursor *")
-        logging.warning("???????????? GETDBCURSOR dbconn = %s" % dbConn)
+        #logging.warning("???????????? GETDBCURSOR dbconn = %s" % dbConn)
 
         try:
             self.cursor = dbConn.cursor()
@@ -80,9 +80,9 @@ class DBCore(object):
     def execute(self, cursor, sqlstr):
         
         try:
-            logging.warning("sql: %s" % sqlstr)
+            #logging.warning("sql: %s" % sqlstr)
             cursor.execute(sqlstr)
-            logging.warning("* executed sql *")
+            #logging.warning("* executed sql *")
             result = 1
         except Exception as e:
             logging.warning("*** dberror executing sql query mmmmmm***")
