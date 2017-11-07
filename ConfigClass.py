@@ -120,7 +120,7 @@ class Config(object):
             self.setConfigItemInLocalDB( 'systemMessage', self.config['systemMessage'])        
 #            self.updateCentralConfigTable()
         except:
-            logging.error("????? bad setConfigItemInDB exception thrown ???")
+            logging.error("????? bad writeConfigToLocalDB exception thrown ???")
             e = sys.exc_info()[0]
             logging.error( "????? Error: %s ?????" % e )
         return
@@ -288,10 +288,11 @@ class Config(object):
 
 
     def setConfigItemInLocalDB(self, name, value):
-        logging.warning("name : %s, value " % name)
+        logging.warning("name : %s" % (name))
+        logging.warning("value : %s" % (value))
         try:
             # Open database connection
-            logging.warning("===setconfigitemIndb===")
+            logging.warning("===setconfigitemInLocaldb===")
             
             self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
                             self.getItemValueFromConfig('db_username'),

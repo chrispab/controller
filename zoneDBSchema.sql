@@ -5,23 +5,21 @@ create table thdata (
     id          integer primary key autoincrement not null,
     sample_dt   TEXT key,
     temperature REAL,
-    humidity REAL,
+    humidity    REAL,
     heaterstate INT,
-    ventstate INT,
-    fanstate INT
-    name        text primary key,
-    description text,
-    deadline    date
+    ventstate   INT,
+    fanstate    INT
 );
 
 -- Tasks are steps that can be taken to complete a project
-create table task (
-id INT, tempSPLOn REAL, tempSPLOff REAL, systemUpTime TEXT, processUptime TEXT, systemMessage TEXT, lightState INT
-    id           integer primary key autoincrement not null,
-    priority     integer default 1,
-    details      text,
-    status       text,
-    deadline     date,
-    completed_on date,
-    project      text not null references project(name)
+create table config (
+    id           integer primary key  not null,
+    tempSPLOn    REAL not null,
+    tempSPLOff   REAL not null,
+    systemUpTime TEXT not null,
+    processUptime TEXT not null,
+    systemMessage TEXT not null,
+    controllerMessage TEXT not null,
+    miscMessage    text not null,
+    lightState   integer not null
 );

@@ -22,6 +22,7 @@ class Database(object):
         
         
     def writeSampleToLocalDB(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
+
         # Open database connection
         try:
             logging.warning("=== write Sample To Local DB ===")

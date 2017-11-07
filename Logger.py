@@ -179,7 +179,14 @@ class Logger(object):
                 'ventstate', 'fanstate']
         # round timestamp to nearest second
 #        data[0] = self.current_time
-        data[0] = datetime.datetime.now() 
+        
+        
+        sample_dt = datetime.datetime.now() # gives time with 6 dp
+        #trim off last 3 digits
+        sample_txt = sample_dt.strftime('%Y-%m-%d %H:%M:%S.%f')
+        sample_txt = sample_txt[:-3]
+        data[0] = sample_txt
+
 
         data[1] = self.temperature
         data[2] = self.humidity

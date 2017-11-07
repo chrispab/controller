@@ -6,6 +6,7 @@ import logging
 #logger options
 ###############
 #logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
+#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 #
 logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 #logging.basicConfig(format='[%(filename)s:%(lineno)s - %(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
