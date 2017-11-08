@@ -6,7 +6,7 @@ import logging
 
 import datetime
 
-
+logger = logging.getLogger("DBClass")
 
 from ConfigObject import cfg # singleton global
 
@@ -25,7 +25,7 @@ class Database(object):
 
         # Open database connection
         try:
-            logging.warning("=== write Sample To Local DB ===")
+            logger.warning("=== write Sample To Local DB ===")
             self.dbConn = self.dbc.getDBConn(cfg.getItemValueFromConfig('db_hostname'), 
                             cfg.getItemValueFromConfig('db_username'), 
                             cfg.getItemValueFromConfig('db_password'),
@@ -34,10 +34,7 @@ class Database(object):
             self.cursor = self.dbc.getDBCursor(self.dbConn)
     
             # Prepare SQL query to INSERT a record into the database.
-            sql = "INSERT INTO thdata(sample_dt, \
-                temperature, humidity, heaterstate, ventstate, fanstate) \
-                VALUES ('%s', '%s', '%s', '%s', '%s', '%s' )" % \
-                (sample_dt, temperature, humidity, heaterstate, ventstate, fanstate)
+            sql = "INSERT INTO thdata(sample_dt, temperature, humidity, heaterstate, ventstate, fanstate) VALUES ('%s', '%s', '%s', '%s', '%s', '%s' )" % (sample_dt, temperature, humidity, heaterstate, ventstate, fanstate)
             # Execute the SQL command
             self.dbc.execute(self.cursor, sql)
     
@@ -56,7 +53,7 @@ class Database(object):
 
     def update_central_db(self):
 
-        logging.warning("=== update_central_db - samples ===")
+        logger.warning("=== update_central_db - samples ===")
         # Open database connection
         logging.info("111 pre get cent db conn")
         centralDBHostName = cfg.getItemValueFromConfig('central_db_hostname')
@@ -90,7 +87,12 @@ class Database(object):
             logging.info("222 post get cent db conn")
             
             # Prepare and execute SQL query to get timestamp of last record in the central database.
-            sql = "SELECT sample_dt FROM thdata ORDER BY id DESC LIMIT 1"
+            #ensure returned value includes the fracyional millisecs part .000 etc
+            # using date format here ensures if fractional is .000 this is retrieved correctly
+            # previously time with .000 was truncated
+            sql = "SELECT DATE_FORMAT(sample_dt, '%Y-%m-%d %H:%i:%S.%f') FROM thdata ORDER BY id DESC LIMIT 1"
+            
+            
             res = self.dbc.execute(self.cursorCentral, sql)
             if (res==0):
                 self.dbc.close(self.dbConnCentral)
@@ -205,8 +207,8 @@ class Database(object):
             else:
                 logging.warning("-- No samples to sync to central DB --")
 
-            if self.dbc: # does this do anything?
-                self.dbc.close(self.dbConnCentral)
+            #if self.dbc: # does this do anything?
+                #self.dbc.close(self.dbConnCentral)
             # Commit your changes in the database
             self.dbc.commitClose(self.dbConnLocal)
         except:

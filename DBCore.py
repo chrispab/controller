@@ -5,26 +5,29 @@ import sqlite3 as lite
 import sys
 import logging
 
+logger = logging.getLogger("DBCore")
+
+
 class DBCore(object):
         
     dbConn = 0
     cursor = 0
         
     def __init__(self):
-        logging.info("Creating db Core object")
+        logger.info("Creating db Core object")
         return
 
 #    def getDBConn(self, hostName, userName, password, databaseName, conn_timeout=1):
     def getDBConn(self, hostName, userName, password, databaseName):
         # Open database connection
-        logging.debug("* 1 getDBconn*")
+        logger.debug("* 1 getDBconn*")
         
         # check if connecting to local sqlite3 db and get its con obj otherwise get a mysql conn object
         if (hostName == '127.0.0.1'):
             try:
-                #logging.warning("******* ATTEMPTING SQLITE CONN  *******")
+                #logger.warning("******* ATTEMPTING SQLITE CONN  *******")
                 self.dbConn = lite.connect(databaseName)
-                #logging.warning("***** SQLITE3  OPEN getDBconn connected *: %s, %s SQLITE3 *****" % (hostName, databaseName))
+                #logger.warning("***** SQLITE3  OPEN getDBconn connected *: %s, %s SQLITE3 *****" % (hostName, databaseName))
             #except lite.Error, e:
             except Exception as e:
                 print "Error %s:" % e.args[0]
@@ -39,7 +42,7 @@ class DBCore(object):
         else:
             
             try:
-                logging.debug("* 2 getDBconn*")
+                logger.debug("* 2 getDBconn*")
                 self.dbConn = pymysql.connect(host = hostName,
                                                 user = userName,
                                                 passwd = password,
@@ -49,30 +52,30 @@ class DBCore(object):
                                                 read_timeout = 1)
     #                            db = databaseName, connect_timeout = conn_timeout, cursorclass=pymysql.cursors.SSCursor)
     
-                logging.debug("* OPEN getDBconn connected *: %s, %s" % (hostName, databaseName))
-                logging.info("* connected *")
-                logging.debug("* 3 getDBconn*")
+                logger.debug("* OPEN getDBconn connected *: %s, %s" % (hostName, databaseName))
+                logger.info("* connected *")
+                logger.debug("* 3 getDBconn*")
             except Exception as e:
-                logging.debug("* 4 getDBconn*")
-                logging.error("* error getting DB connection * ")
-                logging.error("* DB Error %d: %s * " % (e.args[0], e.args[1]))
+                logger.debug("* 4 getDBconn*")
+                logger.error("* error getting DB connection * ")
+                logger.error("* DB Error %d: %s * " % (e.args[0], e.args[1]))
                 #print "1!"
                 self.dbConn = 0
                 
-        logging.debug("* 5 getDBconn*")
+        logger.debug("* 5 getDBconn*")
         return self.dbConn
         
 
     def getDBCursor (self, dbConn):
-        logging.info("* getDBCursor *")
-        #logging.warning("???????????? GETDBCURSOR dbconn = %s" % dbConn)
+        logger.info("* getDBCursor *")
+        #logger.warning("???????????? GETDBCURSOR dbconn = %s" % dbConn)
 
         try:
             self.cursor = dbConn.cursor()
-            logging.info("* got db cursor *")
+            logger.info("* got db cursor *")
         except Exception as e:
-            logging.error("*** dberror getting cursor test ***")
-            #logging.error("*** DB Error %d: %s ***" % (e.args[0], e.args[1]))
+            logger.error("*** dberror getting cursor test ***")
+            #logger.error("*** DB Error %d: %s ***" % (e.args[0], e.args[1]))
             self.cursor = 0
         return self.cursor
         
@@ -80,29 +83,29 @@ class DBCore(object):
     def execute(self, cursor, sqlstr):
         
         try:
-            #logging.warning("sql: %s" % sqlstr)
+            #logger.warning("sql: %s" % sqlstr)
             cursor.execute(sqlstr)
-            #logging.warning("* executed sql *")
+            #logger.warning("* executed sql *")
             result = 1
         except Exception as e:
-            logging.warning("*** dberror executing sql query mmmmmm***")
-            #logging.exception("*** db execute Error %d: %s ***" % (e.args[0], e.args[1]))
-            logging.exception("*** db execute Error ***")
+            logger.error("*** dberror executing sql query mmmmmm***")
+            #logger.exception("*** db execute Error %d: %s ***" % (e.args[0], e.args[1]))
+            logger.exception("*** db execute Error ***")
             result = 0
         return result
         
     def executemany(self, cursor, sqlstr, rs):
         try:
-            logging.info("* executing many sql *")
-            logging.warning("sqlstr: %s" % sqlstr)
-            logging.warning("rs: %s" % rs)
+            logger.info("* executing many sql *")
+            logger.debug("sqlstr: %s" % sqlstr)
+            logger.debug("rs: %s" % rs)
             cursor.executemany( sqlstr, rs)
             result = 1
         except Exception as e:
-            #logging.exception("*** dberror executing sql query zzz***")
-            logging.error("*** dberror Error %d: %s ***" % (e.args[0], e.args[1]))
+            #logger.exception("*** dberror executing sql query zzz***")
+            logger.error("*** dberror Error %d: %s ***" % (e.args[0], e.args[1]))
             result = 0
-        logging.info("* executing sql *")
+        logger.info("* executing sql *")
         return result
         
 
@@ -110,39 +113,39 @@ class DBCore(object):
         # Commit your changes in the database
         try:
             dbConn.commit()
-            logging.info("* committed *")
+            logger.info("* committed *")
             # disconnect from server
-            logging.info("* ready to close *")
+            logger.info("* ready to close *")
         except Exception as e:
             try:
                 dbConn.rollback()
             except:
-                logging.error("*** db rollback failed dberror ***")
-                logging.error("*** DB Error %d: %s ***" % (e.args[0], e.args[1]))
-            logging.error("*** DB WRITE PROBLEM ***")
+                logger.error("*** db rollback failed dberror ***")
+                logger.error("*** DB Error %d: %s ***" % (e.args[0], e.args[1]))
+            logger.error("*** DB WRITE PROBLEM ***")
         finally:
             self.close(dbConn)
-            logging.info("* commitClose *")
+            logger.info("* commitClose *")
         return
 
     def commit(self, dbConn):
         # Commit your changes in the database
         try:
             dbConn.commit()
-            logging.info("* committed *")
+            logger.info("* committed *")
 
             # disconnect from server
-            logging.info("* ready to close *")
+            logger.info("* ready to close *")
         except Exception as e:
             try:
                 dbConn.rollback()
             except:
-                logging.error("*** db rollback failed dberror ***")
-                #logging.error("*** DB Error %d: %s ***" % (e.args[0], e.args[1]))
-            logging.error("*** DB WRITE PROBLEM so rolled back***")
+                logger.error("*** db rollback failed dberror ***")
+                #logger.error("*** DB Error %d: %s ***" % (e.args[0], e.args[1]))
+            logger.error("*** DB WRITE PROBLEM so rolled back***")
         finally:
             self.close(dbConn)
-            logging.info("* commit - final close*")
+            logger.info("* commit - final close*")
         return
                 
     def close(self, dbConn):
@@ -150,11 +153,11 @@ class DBCore(object):
         try:            
             if  dbConn:
                 dbConn.close()
-                logging.info("* close *")
+                logger.info("* close *")
         except Exception as e:
-            logging.exception("*** dberror closing conn ***")
-            #logging.error("*** DB Error %d: %s ***" % (e.args[0], e.args[1]))
+            logger.exception("*** dberror closing conn ***")
+            #logger.error("*** DB Error %d: %s ***" % (e.args[0], e.args[1]))
         
-        logging.debug("* CLOSED db conn %s: " % dbConn)
+        logger.debug("* CLOSED db conn %s: " % dbConn)
         return
         
