@@ -9,6 +9,7 @@ import pymysql.cursors
 import sys
 from DBCore import *
 import logging
+logger = logging.getLogger(__name__)
 
 import location
 
@@ -21,7 +22,7 @@ class Config(object):
     dbConn =0
 
     def __init__(self):
-        logging.info("creating config object")
+        logger.info("creating config object")
         self.dbc = DBCore()
         #write init config from file to db
         self.config = self.readConfigFromFile()
@@ -29,7 +30,7 @@ class Config(object):
 
         self.writeConfigToLocalDB()
 
-        logging.info("__written temp lon sp to db config__");
+        logger.info("__written temp lon sp to db config__");
         return
 
     def readConfigFromFile(self):
@@ -39,8 +40,8 @@ class Config(object):
         fileStr = os.path.abspath( cfgZonesFilename )
         f = open(fileStr)
         configZones = yaml.safe_load(f)
-        logging.warning("== Reading config Zone settings from yaml file ==")
-        logging.warning(yaml.dump(configZones))
+        logger.warning("== Reading config Zone settings from yaml file ==")
+        logger.warning(yaml.dump(configZones))
         f.close()        
 
         # now get common data and specific data for locations
@@ -48,8 +49,8 @@ class Config(object):
         fileStr = os.path.abspath( cfgLocationsFilename )
         f = open(fileStr)
         configLocations = yaml.safe_load(f)
-        logging.warning("== Reading config Location settings from yaml file ==")
-        logging.warning(yaml.dump(configLocations))
+        logger.warning("== Reading config Location settings from yaml file ==")
+        logger.warning(yaml.dump(configLocations))
         f.close()  
         
         for section in configLocations:
@@ -59,14 +60,14 @@ class Config(object):
         
         #get old config style data
         cfgFilename = "config_" + socket.gethostname() + ".yaml"
-        logging.info(cfgFilename)
+        logger.info(cfgFilename)
         fileStr = os.path.abspath( cfgFilename )
         #f = open('/home/pi/controlleroo/config.yaml')
         f = open(fileStr)
         # use safe_load instead load
         config = yaml.safe_load(f)
-        logging.warning("==Reading config settings from yaml file==")
-        logging.warning(yaml.dump(config))
+        logger.warning("==Reading config settings from yaml file==")
+        logger.warning(yaml.dump(config))
         f.close()
 
         ################################################################
@@ -112,7 +113,7 @@ class Config(object):
         
         
     def writeConfigToLocalDB(self):
-        logging.info("== WriteConfigToLocalDB ==")
+        logger.info("== WriteConfigToLocalDB ==")
         try:
             self.setConfigItemInLocalDB( 'tempSPLOn', self.config['tempSPLOn'])
             self.setConfigItemInLocalDB( 'tempSPLOff', self.config['tempSPLOff'])
@@ -120,15 +121,15 @@ class Config(object):
             self.setConfigItemInLocalDB( 'systemMessage', self.config['systemMessage'])        
 #            self.updateCentralConfigTable()
         except:
-            logging.error("????? bad writeConfigToLocalDB exception thrown ???")
+            logger.error("????? bad writeConfigToLocalDB exception thrown ???")
             e = sys.exc_info()[0]
-            logging.error( "????? Error: %s ?????" % e )
+            logger.error( "????? Error: %s ?????" % e )
         return
 
     def updateCentralConfigTable(self):
         try:
             # Open database connection
-            logging.warning("=== update central config table ===")
+            logger.warning("=== update central config table ===")
             self.dbCentralConn = self.dbc.getDBConn(
                                     self.getItemValueFromConfig('central_db_hostname'),
                                     self.getItemValueFromConfig('central_db_username'),
@@ -137,28 +138,28 @@ class Config(object):
                                     )
                                     
             if self.dbCentralConn == 0:
-                #logging.warning("^^^^^^^^^^^ update central config table Central db conn returned 0 -- exiting ^^^^^^^^^^")
-                logging.warning("^^^^^^^^^^ update central config table Central db conn returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning( "..........................returning..........................")
+                #logger.warning("^^^^^^^^^^^ update central config table Central db conn returned 0 -- exiting ^^^^^^^^^^")
+                logger.warning("^^^^^^^^^^ update central config table Central db conn returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning( "..........................returning..........................")
                 return 
                 
 
-            logging.info("getDBConn done OK")
+            logger.info("getDBConn done OK")
                                     
             self.central_cursor = self.dbc.getDBCursor(self.dbCentralConn)
             if (self.central_cursor==0):
-                logging.warning( "^^^^^^^^^^ getdbcursor for update central config tbl tsplonfailed returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning( "..........................returning..........................")
+                logger.warning( "^^^^^^^^^^ getdbcursor for update central config tbl tsplonfailed returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning( "..........................returning..........................")
                 return    
                     
             # Prepare and execute SQL query to update 'tempSPLOn' in the central db settings table.
             sql = "UPDATE  config SET %s = %f" % ('tempSPLOn', self.config['tempSPLOn'])
             res = self.dbc.execute(self.central_cursor, sql)
             if (res==0):
-                logging.warning( "^^^^^^^^^^ execute for update central config tbl tsplon failed returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning( "..........................returning..........................")
+                logger.warning( "^^^^^^^^^^ execute for update central config tbl tsplon failed returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning( "..........................returning..........................")
                 return                    
-            logging.info("update central config: %s", sql)
+            logger.info("update central config: %s", sql)
 
     
             # Prepare SQL query to update a single item in the database settings table.
@@ -166,10 +167,10 @@ class Config(object):
             # Execute the SQL command
             res = self.dbc.execute(self.central_cursor, sql) 
             if (res==0):
-                logging.warning( "^^^^^^^^^^ execute query update central config tbl tsploff returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning( "..........................returning..........................")
+                logger.warning( "^^^^^^^^^^ execute query update central config tbl tsploff returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning( "..........................returning..........................")
                 return
-            logging.info("update central config: %s", sql)
+            logger.info("update central config: %s", sql)
       
             #dbInfo = self.getDBConnInfoFromConfig('local')
             
@@ -178,30 +179,30 @@ class Config(object):
             # Execute the SQL command
             res = self.dbc.execute(self.central_cursor, sql)  
             if (res==0):
-                logging.warning( "^^^^^^^^^^ execute query update central config tbl systemUpTime returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning( "..........................returning..........................")
+                logger.warning( "^^^^^^^^^^ execute query update central config tbl systemUpTime returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning( "..........................returning..........................")
                 return             
-            logging.info("update central config: %s", sql)
+            logger.info("update central config: %s", sql)
                         
             processUptime = self.getConfigItemFromLocalDB('processUptime')
             sql = "UPDATE  config SET %s = '%s'" % ('processUptime', processUptime)
             # Execute the SQL command
             res = self.dbc.execute(self.central_cursor, sql)  
             if (res==0):
-                logging.warning( "^^^^^^^^^^ execute query update central config tbl puptime returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning( "..........................returning..........................")
+                logger.warning( "^^^^^^^^^^ execute query update central config tbl puptime returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning( "..........................returning..........................")
                 return             
-            logging.info("update central config: %s", sql)
+            logger.info("update central config: %s", sql)
 
             systemMessage = self.getConfigItemFromLocalDB('systemMessage')            
             sql = "UPDATE  config SET %s = '%s'" % ('systemMessage', systemMessage)
             ## Execute the SQL command
             res = self.dbc.execute(self.central_cursor, sql)
             if (res==0):
-                logging.warning( "^^^^^^^^^^ execute query update central config tbl sysmess returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning( "..........................returning..........................")
+                logger.warning( "^^^^^^^^^^ execute query update central config tbl sysmess returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning( "..........................returning..........................")
                 return             
-            logging.info("update central config: %s", sql)
+            logger.info("update central config: %s", sql)
         
 
             controllerMessage = self.getConfigItemFromLocalDB('controllerMessage')            
@@ -209,10 +210,10 @@ class Config(object):
             ## Execute the SQL command
             res = self.dbc.execute(self.central_cursor, sql)
             if (res==0):
-                logging.warning( "^^^^^^^^^^ execute query update central config tbl sysmess returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning( "..........................returning..........................")
+                logger.warning( "^^^^^^^^^^ execute query update central config tbl sysmess returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning( "..........................returning..........................")
                 return             
-            logging.info("update central config: %s", sql)
+            logger.info("update central config: %s", sql)
 
 
             miscMessage = self.getConfigItemFromLocalDB('miscMessage')            
@@ -220,29 +221,29 @@ class Config(object):
             ## Execute the SQL command
             res = self.dbc.execute(self.central_cursor, sql)
             if (res==0):
-                logging.warning( "^^^^^^^^^^ execute query update central config tbl sysmess returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning( "..........................returning..........................")
+                logger.warning( "^^^^^^^^^^ execute query update central config tbl sysmess returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning( "..........................returning..........................")
                 return             
-            logging.info("update central config: %s", sql)
+            logger.info("update central config: %s", sql)
                         
             lightState = self.getConfigItemFromLocalDB('lightState')
             sql = "UPDATE  config SET %s = %i" % ('lightState', lightState)
             ## Execute the SQL command
             res = self.dbc.execute(self.central_cursor, sql)
             if (res==0):
-                logging.warning( "^^^^^^^^^^ execute query update central config tbl lightstae returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning( "..........................returning..........................")
+                logger.warning( "^^^^^^^^^^ execute query update central config tbl lightstae returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning( "..........................returning..........................")
                 return             
-            logging.info("update central config: %s", sql)
+            logger.info("update central config: %s", sql)
             
                 
             # Commit changes in the database
             self.dbc.commitClose(self.dbCentralConn)
             
         except:
-            logging.error("????? bad update_central_db exception thrown ???")
+            logger.error("????? bad update_central_db exception thrown ???")
             e = sys.exc_info()[0]
-            logging.error( "????? Error: %s ?????" % e )
+            logger.error( "????? Error: %s ?????" % e )
 
         return
 
@@ -254,7 +255,7 @@ class Config(object):
     def writeConfigToFile(self, config):
         fileStr = os.path.abspath("config_new.yaml")
         f = open(fileStr, "w")
-        logging.info("==Writing config settings to new yaml file config_new.yaml==")
+        logger.info("==Writing config settings to new yaml file config_new.yaml==")
         yaml.dump(config, f)
         f.close()
         return
@@ -272,7 +273,7 @@ class Config(object):
         ###############################################################################
         
     def getDBConnInfoFromConfig(self, dbName):
-        logging.warning("Get DB Conn Info for : %s", dbName)
+        logger.warning("Get DB Conn Info for : %s", dbName)
         if (dbName == 'local'):
             dbInfo['db_hostname'] = cfg.getItemValueFromConfig('db_hostname')
             dbInfo['db_username'] = cfg.getItemValueFromConfig('db_username')
@@ -288,11 +289,11 @@ class Config(object):
 
 
     def setConfigItemInLocalDB(self, name, value):
-        #logging.warning("name : %s" % (name))
-        #logging.warning("value : %s" % (value))
+        #logger.warning("name : %s" % (name))
+        #logger.warning("value : %s" % (value))
         try:
             # Open database connection
-            #logging.warning("===setconfigitemInLocaldb===")
+            #logger.warning("===setconfigitemInLocaldb===")
             
             self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
                             self.getItemValueFromConfig('db_username'),
@@ -300,28 +301,28 @@ class Config(object):
                             self.getItemValueFromConfig('db_dbname'))
             
             #get db cursor
-            #logging.warning("???????????? pre get cursor")
-            #logging.warning("???????????? dbconn = %s" % self.dbConn)
+            #logger.warning("???????????? pre get cursor")
+            #logger.warning("???????????? dbconn = %s" % self.dbConn)
 
             self.cursor = self.dbc.getDBCursor(self.dbConn)
-            #logging.warning("???????????? post get cursor")
+            #logger.warning("???????????? post get cursor")
 
             #print("type", type(value))
             if (type(value) is str):
                 #value = value
-                logging.info("$string detected$")
+                logger.info("$string detected$")
             else:
                 value=str(value)
             sqlstr = "UPDATE  config SET %s = '%s'" % (name, value)            
-            #logging.warning("???????????? %s " % sqlstr)
+            #logger.warning("???????????? %s " % sqlstr)
     
             self.dbc.execute(self.cursor, sqlstr)
             
             self.dbc.commitClose(self.dbConn)
         except:
-            logging.error("????? bad setConfigItemInLocalDB exception thrown ???")
+            logger.error("????? bad setConfigItemInLocalDB exception thrown ???")
             e = sys.exc_info()[0]
-            logging.error( "????? Error: %s ?????" % e )
+            logger.error( "????? Error: %s ?????" % e )
 
         return
 
@@ -330,7 +331,7 @@ class Config(object):
     def getConfigItemFromDB(self, db, itemNname):
         try:
             # Open database connection
-            logging.info("===getConfigItemFromDB===")
+            logger.info("===getConfigItemFromDB===")
             self.dbConn = self.dbc.getDBConn(db['db_hostname'], 
                             db['db_username'], db['db_password'],
                             db['db_dbname'])
@@ -345,9 +346,9 @@ class Config(object):
             value=self.cursor.fetchone()
             self.dbc.commitClose(self.dbConn)
         except:
-            logging.error("????? bad getConfigItemFromDB ???")
+            logger.error("????? bad getConfigItemFromDB ???")
             e = sys.exc_info()[0]
-            logging.error( "????? Error: %s ?????" % e )
+            logger.error( "????? Error: %s ?????" % e )
             
         return value[0]
         
@@ -357,7 +358,7 @@ class Config(object):
         value[0]=1
         try:
             # Open database connection
-            logging.info("===getConfigItemFromLocalDB===")
+            logger.info("===getConfigItemFromLocalDB===")
             self.dbConn = self.dbc.getDBConn(self.getItemValueFromConfig('db_hostname'), 
             self.getItemValueFromConfig('db_username'),self.getItemValueFromConfig('db_password'),
             self.getItemValueFromConfig('db_dbname'))
@@ -372,9 +373,9 @@ class Config(object):
             value=self.cursor.fetchone()
             self.dbc.commitClose(self.dbConn)
         except:
-            logging.error("????? bad update_central_db exception thrown ???")
+            logger.error("????? bad update_central_db exception thrown ???")
             e = sys.exc_info()[0]
-            logging.error( "????? Error: %s ?????" % e )
+            logger.error( "????? Error: %s ?????" % e )
             #value[0]=1
             
         return value[0]

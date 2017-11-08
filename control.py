@@ -33,6 +33,9 @@ from myemail import MyEmail
 
 from Logger import Logger
 
+
+logger = logging.getLogger(__name__)
+
 import RPi.GPIO as GPIO
 
 import subprocess
@@ -63,9 +66,9 @@ def get_ip_address():
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
     except:
-        logging.error("????? cant get a network socket ?????")
+        logger.error("????? cant get a network socket ?????")
         e = sys.exc_info()[0]
-        logging.error( "????? Error: %s ?????" % e )
+        logger.error( "????? Error: %s ?????" % e )
         return "cant get socket"
     return s.getsockname()[0]
 
@@ -74,22 +77,22 @@ def execAndTimeFunc(func):
     func()
     time2 = datetime.datetime.now()
     duration = time2 - time1
-    logging.warning("TTTTTTTTTTTT - update central CONFIG table duration called BY FUNC: %s" % (duration))	
+    logger.warning("TTTTTTTTTTTT - update central CONFIG table duration called BY FUNC: %s" % (duration))	
 
 
 class Controller(object):
 
     def __init__(self):
-        logging.info("init controller")
+        logger.info("init controller")
         #start the c watchdog
-        #logging.warning("WWWWW starting my_watchdog WWWWW")
+        #logger.warning("WWWWW starting my_watchdog WWWWW")
 #        os.system("sudo ./watchdog/my_watchdog &")
         #os.system("sudo ./watchdog/my_watchdog -r &")
 
         #subprocess.call(["sudo","./watchdog/my_watchdog"])                
 
         
-        logging.info("---Creating system Objects---")
+        logger.info("---Creating system Objects---")
         self.board1 = hw.platform()
         self.sensor1 = hw.sensor()
         self.vent1 = Vent()
@@ -102,7 +105,7 @@ class Controller(object):
 
 #main routine
 #############
-logging.info("--- Creating the controller---")
+logger.info("--- Creating the controller---")
 ctl1 = Controller()
 emailObj = MyEmail()
 
@@ -135,11 +138,11 @@ def main():
                 
     while 1:
 
-        logging.info("=main=")
-        #logging.warning("== process uptime: %s =",processUptime)
+        logger.info("=main while loop=")
+        #logger.warning("== process uptime: %s =",processUptime)
 
-        logging.debug(socket.gethostname())
-        logging.info("current time: %s" % (ctl1.timer1.current_time))
+        logger.debug(socket.gethostname())
+        logger.info("current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.updateClocks()
         current_millis = ctl1.timer1.current_millis
         
@@ -156,7 +159,7 @@ def main():
 
         endT= time.time()
         duration = endT-startT
-        logging.debug("+++ Aquisition sampletime: %s +++",duration)
+        logger.debug("+++ Aquisition sampletime: %s +++",duration)
 
         #get all states
         lightState = ctl1.light.getLightState()
@@ -166,12 +169,12 @@ def main():
         ventSpeedState = ctl1.vent1.speed_state
 
         if lightState == ON:
-            logging.info('=LOn=')
+            logger.info('=LOn=')
             target_temp = cfg.getItemValueFromConfig('tempSPLOn')
         else:  # off
-            logging.info('=LOff=')
+            logger.info('=LOff=')
             target_temp = cfg.getItemValueFromConfig('tempSPLOff')
-        logging.info(target_temp)
+        logger.debug(target_temp)
 
         ctl1.fan1.control(current_millis)
         ctl1.vent1.control(temperature, target_temp, lightState, current_millis)
@@ -182,22 +185,23 @@ def main():
                                     fanState, heaterState, ventSpeedState,
                                     current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
         if stateChanged :
-            logging.warning("======== start state changed main list ======")
+            print("->")
+            logger.debug("======== start state changed main list ======")
             # check for alarm levels etc
             if temperature > cfg.getItemValueFromConfig('tempAlertHi'):
                 try:
                     emailObj.send( zone + ' - Hi Temp warning' + temperature, message)
                 except:
-                    logging.error("...ERROR SENDING EMAIL - for hi temp alert")
+                    logger.error("...ERROR SENDING EMAIL - for hi temp alert")
                     
             if temperature < cfg.getItemValueFromConfig('tempAlertLo'):
                 try:
                     emailObj.send( zone + ' - Lo Temp warning' + temperature, message)
                 except:
-                    logging.error("...ERROR SENDING EMAIL - low temp alert")
+                    logger.error("...ERROR SENDING EMAIL - low temp alert")
                                     
             location = cfg.getItemValueFromConfig('locationDisplayName')
-            logging.warning("LLLLLLLLLL - loc : %s" % (location))
+            logger.debug("LLLLLLLLLL - loc : %s" % (location))
             
             end_time = time.time()
             processUptime = end_time - start_time
@@ -224,23 +228,25 @@ def main():
             #cfg.updateCentralConfigTable()
             #time2 = datetime.datetime.now()
             #duration = time2 - time1
-            #logging.warning("TTTTT - update central CONFIG table duration : %s" % (duration))
+            #logger.warning("TTTTT - update central CONFIG table duration : %s" % (duration))
             
             execAndTimeFunc(cfg.updateCentralConfigTable)
             
             #uptime = cfg.getConfigItemFromLocalDB('processUptime')
-            logging.warning("======== process uptime: %s ======", processUptime)
+            logger.info("======== process uptime: %s ======", processUptime)
             mem = psutil.virtual_memory()
-            #logging.warning("MMMMMM total memory       : %s MMMMMM",mem.total)
+            #logger.warning("MMMMMM total memory       : %s MMMMMM",mem.total)
 
-            #logging.warning("MMMMMM memory available   : %s MMMMMM",mem.available)
-            logging.warning("MMMMMM memory pc.available: %0.2f MMMMMM",((float(mem.available)/float(mem.total)))*100)
-            #logging.warning("======== % memory available: %s ======",mem.percent)
+            #logger.warning("MMMMMM memory available   : %s MMMMMM",mem.available)
+            logger.debug("MMMMMM memory pc.available: %0.2f MMMMMM",((float(mem.available)/float(mem.total)))*100)
+            #logger.warning("======== % memory available: %s ======",mem.percent)
 
-        sys.stdout.write(">")
-        sys.stdout.flush()
+        
+        else:
+            sys.stdout.write(">")
+            sys.stdout.flush()
         #tracker.print_diff()
-        #logging.warning(mem_top()) # Or just print().
+        #logger.warning(mem_top()) # Or just print().
 
 
 

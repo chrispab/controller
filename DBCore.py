@@ -5,7 +5,7 @@ import sqlite3 as lite
 import sys
 import logging
 
-logger = logging.getLogger("DBCore")
+logger = logging.getLogger(__name__)
 
 
 class DBCore(object):

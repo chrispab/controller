@@ -3,6 +3,7 @@ import csv
 import datetime
 import sys
 
+logger = logging.getLogger(__name__)
 
 from ConfigObject import cfg # singleton global
 from DatabaseObject import db # singleton global
@@ -21,7 +22,7 @@ class Logger(object):
     # roundT = roundTime
 
     def __init__(self):
-        logging.info("creating logger object")
+        logger.info("creating logger object")
         self.temperature = 0
         self.humidity = 0
         self.heater_state = OFF
@@ -59,54 +60,54 @@ class Logger(object):
         #sys.stdout.write(".")
         #sys.stdout.flush()
         self.state_changed = False
-        logging.info('== Checking for changes ==')
+        logger.info('== Checking for changes ==')
 
         # check each for state change and set new prewrite states
         if self.vent_state != self.previous_vent_state:  # any change in vent
             if self.previous_vent_state == OFF:  # must be going OFF to ON
                 # write a low record immediately before hi record
-                logging.info("--new prevvent low row appended to CSV -----")
+                logger.info("--new prevvent low row appended to CSV -----")
                 self.vent_state = OFF
                 self.state_changed = True
             else:  # if self.previous_vent_state == ON:  # must be going ON TO OFF
                 # write a on record immediately before hi record
-                logging.info("-- new prevvent hi row appended to CSV -----")
+                logger.info("-- new prevvent hi row appended to CSV -----")
                 self.vent_state = ON
                 self.state_changed = True
 
         if self.vent_speed_state != self.previous_vent_speed_state:  # any change in vent speed
             if self.previous_vent_speed_state == OFF:  # was lo speed
                 # write a low record immediately before hi record
-                logging.info("-- new prevvspeed low row appended to CSV -----")
+                logger.info("-- new prevvspeed low row appended to CSV -----")
                 self.vent_speed_state = OFF
                 self.state_changed = True
             else:  # was hi speed going low
                 # write a on record immediately before hi record
-                logging.info("-- new prevvspeed hi row appended to CSV -----")
+                logger.info("-- new prevvspeed hi row appended to CSV -----")
                 self.vent_speed_state = ON
                 self.state_changed = True
 
         if self.fan_state != self.previous_fan_state:  # any change in vent
             if self.previous_fan_state == OFF:  # must be going OFF to ON
                 # write a low record immediately before hi record
-                logging.info("-- new prevfanstate low row appended to CSV -----")
+                logger.info("-- new prevfanstate low row appended to CSV -----")
                 self.fan_state = OFF
                 self.state_changed = True
             else:  # must be going ON TO OFF
                 # write a on record immediately before hi record
-                logging.info("-- new  prevfanstate hi row appended to CSV -----")
+                logger.info("-- new  prevfanstate hi row appended to CSV -----")
                 self.fan_state = ON
                 self.state_changed = True
 
         if self.heater_state != self.previous_heater_state:  # any change in vent
             if self.previous_heater_state == OFF:  # must be going OFF to ON
                 # write a low record immediately before hi record
-                logging.info("-- new heaterstate low row appended to CSV -----")
+                logger.info("-- new heaterstate low row appended to CSV -----")
                 self.heater_state = OFF
                 self.state_changed = True
             else:  # must be going ON TO OFF
                 # write a on record immediately before hi record
-                logging.info("-- new  heaterstate hi row appended to CSV -----")
+                logger.info("-- new  heaterstate hi row appended to CSV -----")
                 self.heater_state = ON
                 self.state_changed = True
 
@@ -114,22 +115,22 @@ class Logger(object):
             #self.state_changed = True
 
         if self.state_changed == True:
-            logging.warning("-- O/P State Change - OLD state --")
+            logger.warning("-- O/P State Change - OLD state --")
             self.dataHasChanged()  # write modded old change state(s)
             #restore new vals 
             self.vent_state = vent_state
             self.vent_speed_state = vent_speed_state
             self.heater_state = heater_state
             self.fan_state = fan_state
-            logging.warning("-- O/P State Change - NEW state --")
+            logger.warning("-- O/P State Change - NEW state --")
             #write new states
             self.dataHasChanged()  # write modded post change state(s)
             
 
             #processUptime = cfg.getConfigItemFromLocalDB('processUptime')
             #systemMessage = cfg.getConfigItemFromLocalDB('systemMessage')
-            #logging.debug('=Process uptime: %s' % (processUptime))
-            #logging.debug('=System message: %s' % (systemMessage))
+            #logger.debug('=Process uptime: %s' % (processUptime))
+            #logger.debug('=System message: %s' % (systemMessage))
             #cfg.updateCentralConfigTable()
             
             self.previous_CSV_write_millis = self.current_millis  # reset timer
@@ -137,9 +138,9 @@ class Logger(object):
             if ((self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval))
                     or (self.temperature != self.previous_temperature)):  # any change
                 if self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval):
-                    logging.warning("..interval passed ..time for new CSV write")
+                    logger.warning("..interval passed ..time for new CSV write")
                 else:
-                    logging.warning("..new data row generated.. new temp")
+                    logger.warning("..new data row generated.. new temp")
                 self.dataHasChanged()
                 self.previous_CSV_write_millis = self.current_millis  # reset timer
 
@@ -156,9 +157,9 @@ class Logger(object):
     #routine called when any data has changed state or temp or periodic timer
     def dataHasChanged(self):
         
-        logging.warning("*** Data Has Changed- updating csv, dbs ***")
-        #logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
-        #logging.warning("DataChanged Time: %s", str(datetime.datetime.now()))
+        logger.warning("*** Data Has Changed- updating csv, dbs ***")
+        #logger.warning("DataChanged Time: %s", str(datetime.datetime.now()))
+        #logger.warning("DataChanged Time: %s", str(datetime.datetime.now()))
         data = self._write_to_CSV()
         
         db.writeSampleToLocalDB(data[0], data[1], data[2], data[3], data[4], data[5])
@@ -167,14 +168,14 @@ class Logger(object):
         db.update_central_db()
         time2 = datetime.datetime.now()
         duration = time2 - time1
-        logging.warning("TTTTT - update central db duration : %s" % (duration))
+        logger.warning("TTTTT - update central db duration : %s" % (duration))
         
         return
         
 
     def _write_to_CSV(self):
 
-        logging.warning('=== _write_to_CSV data record ===')
+        logger.warning('=== _write_to_CSV data record ===')
         data = ['time', 'temp', 'humi', 'heaterstate',
                 'ventstate', 'fanstate']
         # round timestamp to nearest second

@@ -6,20 +6,17 @@ import logging
 
 import datetime
 
-logger = logging.getLogger("DBClass")
+logger = logging.getLogger(__name__)
 
 from ConfigObject import cfg # singleton global
 
 class Database(object):
 
     def __init__(self):
-        logging.info("Creating db object")
+        logger.info("Creating db object")
         self.dbc = DBCore()
         return
 
-
-
-        
         
     def writeSampleToLocalDB(self, sample_dt, temperature, humidity, heaterstate, ventstate, fanstate):
 
@@ -44,9 +41,9 @@ class Database(object):
             #self.update_central_db()    # sync local recs update to central db
         
         except:
-            logging.error("????? bad writeSampleToLocalDB exception thrown ???")
+            logger.error("????? bad writeSampleToLocalDB exception thrown ???")
             e = sys.exc_info()[0]
-            logging.error( "????? Error: %s ?????" % e )
+            logger.error( "????? Error: %s ?????" % e )
             
         return
 
@@ -55,12 +52,12 @@ class Database(object):
 
         logger.warning("=== update_central_db - samples ===")
         # Open database connection
-        logging.info("111 pre get cent db conn")
+        logger.info("111 pre get cent db conn")
         centralDBHostName = cfg.getItemValueFromConfig('central_db_hostname')
         centralDBUserName = cfg.getItemValueFromConfig('central_db_username')
         centralDBPassword = cfg.getItemValueFromConfig('central_db_password')
         centralDBDBName = cfg.getItemValueFromConfig('central_db_dbname')
-        logging.info("222 got db string params")
+        logger.info("222 got db string params")
         
         
         try:
@@ -71,20 +68,20 @@ class Database(object):
                                                     centralDBUserName,
                                                     centralDBPassword,
                                                     centralDBDBName)
-            logging.info("333 got db connection")
+            logger.info("333 got db connection")
             if (self.dbConnCentral==0):                
-                logging.warning("^^^^^^^^^^ dbconncentral error returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning("..........................returning..........................")
+                logger.warning("^^^^^^^^^^ dbconncentral error returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning("..........................returning..........................")
                 return
             
             self.cursorCentral = self.dbc.getDBCursor(self.dbConnCentral)
             if (self.cursorCentral==0):
                 self.dbc.close(self.dbConnCentral)
-                logging.warning( "^^^^^^^^^^ getdbcursor for central db failed returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning("..........................returning..........................")
+                logger.warning( "^^^^^^^^^^ getdbcursor for central db failed returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning("..........................returning..........................")
                 return            
             
-            logging.info("222 post get cent db conn")
+            logger.info("222 post get cent db conn")
             
             # Prepare and execute SQL query to get timestamp of last record in the central database.
             #ensure returned value includes the fracyional millisecs part .000 etc
@@ -96,29 +93,32 @@ class Database(object):
             res = self.dbc.execute(self.cursorCentral, sql)
             if (res==0):
                 self.dbc.close(self.dbConnCentral)
-                logging.warning("^^^^^^^^^^ execute query error returned 0 ^^^^^^^^^^^^^^^^")
-                logging.warning("..........................returning..........................")
+                logger.warning("^^^^^^^^^^ execute query error returned 0 ^^^^^^^^^^^^^^^^")
+                logger.warning("..........................returning..........................")
                 return
             
-            logging.warning("get last sample time from central sql: %s" % (sql) )
+            logger.warning("get last sample time from central sql: %s" % (sql) )
             
             #do what with empty set - e.g at start when central table is empty eg last sample time = 0
             #get the actual record containing the dattime 
+            # logger.warning("--- rowcount 1 : %s ---" % self.cursorCentral.rowcount)
+            
+            # just get the one record which should be the datre time 
             result = self.cursorCentral.fetchone()
             if (result == None): # returns None if no data avail 
                 last_sample_time = "2017-01-01 00:00:00.000"
-                logging.warning("-- No last sample in central db so set time of last to long ago: %s" % last_sample_time)                            
+                logger.warning("-- No last sample in central db so set time of last to long ago: %s" % last_sample_time)                            
             else: #  rowcount != 0
-                logging.warning("--- rowcount  : %s ---" % self.cursorCentral.rowcount)                
+                # logger.warning("--- rowcount 2 : %s ---" % self.cursorCentral.rowcount)                
                 
                 #row = self.cursorCentral.fetchone()    # get row of data
                 row = result
-                logging.warning("--- row !=0  : %s ---" % row)
-                logging.warning("--- row data value for last time  : %s ---" % row[0])
+                logger.warning("--- row    : %s ---" % row)
+                logger.warning("--- row[0] : %s ---" % row[0])
                 #print(row[0])                
                 
-                #logging.warning("row[0] :%s " % (row[0]))
-                #logging.warning("last sample time: %s - " % (row[0]) )
+                #logger.warning("row[0] :%s " % (row[0]))
+                #logger.warning("last sample time: %s - " % (row[0]) )
                 
                 
                 #last_sample_time = strftime("%Y-%m-%d %H:%M:%S.%f", row[0])
@@ -126,12 +126,12 @@ class Database(object):
                 
                 if row[0] == None: #REDUNDANT CODE ????????
                     last_sample_time = "2017-01-01 00:00:00.000"
-                    logging.warning("-- No datsamples to sync to central DB --")
+                    logger.warning("-- No datsamples to sync to central DB --")
         
             ##WHAT IF central DB is empty????#####
             time2 = datetime.datetime.now()
             duration = time2 - time1
-            logging.warning("TTTTT - update get last sample time from central DB execution time: %s" % (duration))            
+            logger.warning("TTTTT - update get last sample time from central DB execution time: %s" % (duration))            
             
             #####
             # when prog gets here lastSampleTimeInCentralDB stored in last_sample_time
@@ -158,10 +158,10 @@ class Database(object):
             # e.g WHERE sample_dt > '2017-11-07 09:24:00' - this really should '2017-11-07 09:24:00.000'
             # appears to be truncated when retrieved from db as entry in db does have 3 dp '.000' using sqlite3
             sql = "SELECT sample_dt, temperature, humidity, heaterstate, ventstate,fanstate FROM thdata WHERE sample_dt > '%s'" % last_sample_time
-            logging.warning("sql to get last sample time: %s" % sql)            
+            logger.warning("sql to get last sample time: %s" % sql)            
             #
             self.dbc.execute(self.cursorLocal, sql)
-            logging.warning("statement after get rs of samples from local db")
+            logger.warning("statement after get rs of samples from local db")
             rs_to_update_central_db = list(self.cursorLocal.fetchall())
              ######using sscursor must iterate over to get row count - cos cant use rowcount with ssCursor
             ##using sscursor to see if solves memory leak
@@ -173,17 +173,17 @@ class Database(object):
                 #print(result)
             ######################################################            
             
-            logging.debug("--Records to update central db: %s" % (rs_to_update_central_db))
-            logging.debug("data got from local server - in list ready to upload-")
+            logger.debug("--Records to update central db: %s" % (rs_to_update_central_db))
+            logger.debug("data got from local server - in list ready to upload-")
     
     
     
-            logging.debug("executing sql to update to remote db to sync with local db=")
+            logger.debug("executing sql to update to remote db to sync with local db=")
             # if rs_to_update_central_db.count > 0: 
             
             time2 = datetime.datetime.now()
             duration = time2 - time1
-            logging.warning("TTTTT - update get local samples to update to central DB : %s" % (duration)) 
+            logger.warning("TTTTT - update get local samples to update to central DB : %s" % (duration)) 
             
            
            
@@ -199,22 +199,22 @@ class Database(object):
                 if (res==0):
                     self.dbc.close(self.dbConnCentral)
                     self.dbc.close(self.dbConnLocal)
-                    logging.warning( "^^^^^^^^^^ execute many to central db query returned 0 ^^^^^^^^^^^^^^^^")
-                    logging.warning( "..........................returning..........................")  
+                    logger.warning( "^^^^^^^^^^ execute many to central db query returned 0 ^^^^^^^^^^^^^^^^")
+                    logger.warning( "..........................returning..........................")  
                     return                
                 self.dbc.commitClose(self.dbConnCentral)
-                logging.warning("SSSSSS  samples synced to central DB: %s SSSSSS", rsLen )
+                logger.warning("SSSSSS  samples synced to central DB: %s SSSSSS", rsLen )
             else:
-                logging.warning("-- No samples to sync to central DB --")
+                logger.warning("-- No samples to sync to central DB --")
 
             #if self.dbc: # does this do anything?
                 #self.dbc.close(self.dbConnCentral)
             # Commit your changes in the database
             self.dbc.commitClose(self.dbConnLocal)
         except:
-            logging.error("????????? bad update_central_db exception thrown ??????")
-            logging.exception("update samples in central db")
+            logger.error("????????? bad update_central_db exception thrown ??????")
+            logger.exception("update samples in central db")
             e = sys.exc_info()[0]
-            logging.error( "????????? Error: %s ????????" % e )
+            logger.error( "????????? Error: %s ????????" % e )
             
         return

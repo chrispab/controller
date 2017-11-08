@@ -21,6 +21,9 @@ import socket # to get hostname
 import sendemail as emailMe
 from Logger import Logger
 
+logger = logging.getLogger(__name__)
+
+
 import RPi.GPIO as GPIO
 
 import subprocess
@@ -28,12 +31,12 @@ import os
 class Relay(object):
 
     def __init__(self):
-        logging.info("creating relay - dummy so far")
+        logger.info("creating relay - dummy so far")
 
 class Vent(object):
 
     def __init__(self):
-        logging.info("creating vent")
+        logger.info("creating vent")
         self.state = OFF
         self.speed_state = OFF
         self.speed_state_count = 0
@@ -51,7 +54,7 @@ class Vent(object):
         self.vent_override = OFF  # settings.ventOverride
 
     def control(self, current_temp, target_temp, d_state, current_millis):
-        logging.info('==Vent ctl==')
+        logger.info('==Vent ctl==')
         self.speed_state = OFF  # lo speed
         if (self.platformName == 'RaspberryPi2'):
             if d_state == ON:
@@ -66,21 +69,21 @@ class Vent(object):
             self.vent_override = ON
             self.state = ON
             self.prev_vent_millis = current_millis  # retrigeer time period
-            logging.info("..VENT ON Loff - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
+            logger.info("..VENT ON Loff - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
 
         if ((d_state == ON) and (current_temp > target_temp + self.vent_lon_sp_offset)):
             self.vent_override = ON
             self.state = ON
             self.prev_vent_millis = current_millis  # retrigeer time period
-            logging.info("..VENT ON - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
+            logger.info("..VENT ON - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
         # temp below target, change state to OFF after pulse delay
         elif (self.vent_override == ON) and ((current_millis - self.prev_vent_millis) >= self.vent_pulse_on_delta):
             self.state = OFF
             self.vent_override = OFF
             self.prev_vent_millis = current_millis
-            logging.info("..VENT OFF - temp ok, OVERRIDE - OFF")
+            logger.info("..VENT OFF - temp ok, OVERRIDE - OFF")
         elif self.vent_override == ON:
-            logging.info('..Vent on - override in progress')
+            logger.info('..Vent on - override in progress')
 
         # periodic vent control - only execute if vent ovveride not active
         if self.vent_override == OFF:  # process periodic vent activity
@@ -88,20 +91,20 @@ class Vent(object):
                 # iftime is up, so change the state to ON
                 if current_millis - self.prev_vent_millis >= self.vent_off_delta:
                     self.state = ON
-                    logging.info("..VENT ON cycle period start")
+                    logger.info("..VENT ON cycle period start")
                     self.prev_vent_millis = current_millis
                 else:
-                    logging.info('..Vent off - during cycle OFF period')
+                    logger.info('..Vent off - during cycle OFF period')
             else:
                 # vent is on, we must wait for the duration to expire before
                 # turning it off
                 # time up, change state to OFF
                 if (current_millis - self.prev_vent_millis) >= self.vent_on_delta:
                     self.state = OFF
-                    logging.info("..VENT OFF cycle period start")
+                    logger.info("..VENT OFF cycle period start")
                     self.prev_vent_millis = current_millis
                 else:
-                    logging.info('..Vent on - during cycle ON period')
+                    logger.info('..Vent on - during cycle ON period')
         return
 
 
@@ -110,29 +113,29 @@ class Vent(object):
 class Fan(object):
 
     def __init__(self):
-        logging.info("Creating fan")
+        logger.info("Creating fan")
         self.state = OFF
         self.prev_fan_millis = 0  # last time vent state updated
         self.fan_on_delta = cfg.getItemValueFromConfig('fan_on_t')  # vent on time
         self.fan_off_delta = cfg.getItemValueFromConfig('fan_off_t')  # vent off time
 
     def control(self, current_millis):
-        logging.info('==fan ctl==')
+        logger.info('==fan ctl==')
         # if fan off, we must wait for the interval to expire before turning it on
-        logging.info('==current millis: %s' % (current_millis))
-        logging.info('==current fan state: %s' % (self.state))
+        logger.info('==current millis: %s' % (current_millis))
+        logger.info('==current fan state: %s' % (self.state))
         if self.state == OFF:
             # if time is up, so change the state to ON
             if current_millis - self.prev_fan_millis >= self.fan_off_delta:
                 self.state = ON
-                logging.info("..FAN ON")
+                logger.info("..FAN ON")
                 self.prev_fan_millis = current_millis
         # else if fanState is ON
         else:
             # time is up, so change the state to LOW
             if (current_millis - self.prev_fan_millis) >= self.fan_on_delta:
                 self.state = OFF
-                logging.info("..FAN OFF")
+                logger.info("..FAN OFF")
                 self.prev_fan_millis = current_millis
         #self.state = ON
         return
@@ -144,7 +147,7 @@ class Fan(object):
 class Heater(object):
 
     def __init__(self):
-        logging.info("creating heater")
+        logger.info("creating heater")
         self.state = OFF
         self.heater_off_delta = cfg.getItemValueFromConfig('heater_off_t')  # min time heater is on or off for
         self.heater_on_delta = cfg.getItemValueFromConfig('heater_on_t')  # min time heater is on or off for
@@ -152,10 +155,10 @@ class Heater(object):
         self.heater_sp_offset = cfg.getItemValueFromConfig('heater_sp_offset')
 
     def control(self, current_temp, target_temp, d_state, current_millis):
-        logging.info('==Heat ctl==')
+        logger.info('==Heat ctl==')
         #calc new heater on t based on t gap
         self.heater_on_delta = ((target_temp - current_temp) * 80 * 1000)  + cfg.getItemValueFromConfig('heater_on_t')
-        logging.info('==Heat tdelta on: %s',self.heater_on_delta)
+        logger.info('==Heat tdelta on: %s',self.heater_on_delta)
 
         #check for heater OFF hours #todo improve this
         #current_hour = datetime.datetime.now().hour
@@ -163,42 +166,42 @@ class Heater(object):
         if d_state == ON: #current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
 
             self.state = OFF
-            logging.info('..d on, in heat off hours - skipping lon heatctl')
+            logger.info('..d on, in heat off hours - skipping lon heatctl')
         else:  # d off here
-            logging.info('..do heatctl')
+            logger.info('..do heatctl')
             if current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
                 self.state = OFF
-                logging.info("...temp over sp - HEATER OFF")
+                logger.info("...temp over sp - HEATER OFF")
                 self.prev_heater_millis = current_millis
             elif self.state == ON:  # t below tsp if time is up, so check if change the state to OFF
                 if current_millis - self.prev_heater_millis >= self.heater_on_delta:
                     self.state = OFF
-                    logging.info("...in heat auto cycle - switch HEATER OFF after pulse on")
+                    logger.info("...in heat auto cycle - switch HEATER OFF after pulse on")
                     self.prev_heater_millis = current_millis
                 else:
-                   logging.info('in heat auto cycle - Heater still on - during low temp heat pulse')
+                   logger.info('in heat auto cycle - Heater still on - during low temp heat pulse')
             elif current_millis - self.prev_heater_millis >= self.heater_off_delta:  # heater is off, turn on after delta
                 self.state = ON
-                logging.info("...in heat auto cycle - switch HEATER ON")
+                logger.info("...in heat auto cycle - switch HEATER ON")
                 self.prev_heater_millis = current_millis
             else:
-                logging.info("...in heat auto cycle - during heat OFF period")
+                logger.info("...in heat auto cycle - during heat OFF period")
         # else:
             #print("..in d-off, no heat ctl")
-        logging.info('Heater state: %s' , ('OFF' if self.state else 'ON') )
+        logger.info('Heater state: %s' , ('OFF' if self.state else 'ON') )
         return
 
 
 class Light(object):
     def __init__(self):
-        logging.info("creating light object")
+        logger.info("creating light object")
         self.state = OFF
         self.tOn = dt.time()
         self.tOff = dt.time()
 
     #return true if testTime between timeOn and TimeOff, else false if in off period
     def getLightState(self ):
-        logging.info('==light - get light state==')
+        logger.info('==light - get light state==')
 
         tOff = cfg.getTOff()
         tOn = cfg.getTOn()
@@ -213,7 +216,7 @@ class Light(object):
         if (((currT > tOn) or (currT < tOff)) and ( X )):
             lightState = ON
 
-        logging.debug("==light state check. ON: %s, OFF: %s, NOW: %s, state: %d" % (tOn.strftime("%H:%M:%S"), tOff.strftime("%H:%M:%S"), currT.strftime("%H:%M:%S"), lightState))
+        logger.debug("==light state check. ON: %s, OFF: %s, NOW: %s, state: %d" % (tOn.strftime("%H:%M:%S"), tOff.strftime("%H:%M:%S"), currT.strftime("%H:%M:%S"), lightState))
 
 
         #new ldr based routine test
@@ -258,7 +261,7 @@ def RCtime (RCPin):
 class system_timer(object):
 
     def __init__(self):
-        logging.info("creating system timer")
+        logger.info("creating system timer")
         self.current_hour = datetime.datetime.now().hour
         self.current_time = 0
         self.start_millis = 0
@@ -276,16 +279,16 @@ class system_timer(object):
 
     def holdOffWatchdog(self, current_millis, forceWatchdogToggle=False):
         
-        logging.info('==Hold Off Watchdog==')
-        logging.info('==current millis: %s' % (current_millis))
-        #logging.info('==current fan state: %s' % (self.state))
+        logger.info('==Hold Off Watchdog==')
+        logger.debug('==current millis: %s' % (current_millis))
+        #logger.info('==current fan state: %s' % (self.state))
         #if self.state == OFF:
             # if time is up, so change the state to ON
         if (current_millis - self.prevWDPulseMillis) >= self.WDPeriod:
             #uptime = cfg.getConfigItemFromLocalDB('processUptime')
-            #logging.warning("== process uptime: %s =", uptime)
+            #logger.warning("== process uptime: %s =", uptime)
 
-            logging.info("- Pat the DOG -")
+            logger.info("- Pat the DOG -")
             #print('==WOOF==')
             #reset timer
             self.prevWDPulseMillis = current_millis
@@ -293,23 +296,23 @@ class system_timer(object):
             # toggle watchdog pin
             GPIO.output(self.watchDogPin, not GPIO.input(self.watchDogPin))
 
-            logging.warning("DDDDDDDDDD Patted the DOG  DDDDDDDDDD")
+            logger.debug("DDDDDDDDDD Patted the DOG  DDDDDDDDDD")
             
-            sys.stderr.write("starting : python daemon watchdog and fail test script started\n")
+            logger.debug("starting : python daemon watchdog and fail test script started\n")
             #notify systemd that we've started
             retval = sd_notify(0, "READY=1")
             if retval <> 0:
-                sys.stderr.write("terminating : fatal sd_notify() error for script start\n")
+                logger.debug("terminating : fatal sd_notify() error for script start\n")
                 #exit(1)
     
              #after the init, ping the watchdog and check for errors
             
             retval = sd_notify(0, "WATCHDOG=1")
             if retval <> 0:
-                sys.stderr.write("terminating : fatal sd_notify() error for watchdog ping\n")
+                logger.error("terminating : fatal sd_notify() error for watchdog ping\n")
 #return
         elif  (forceWatchdogToggle == True):
-            logging.info("- FORCE Pat the DOG -")
+            logger.info("- FORCE Pat the DOG -")
             #print('==WOOF==')
             #reset timer
             self.prevWDPulseMillis = current_millis
@@ -317,7 +320,7 @@ class system_timer(object):
             # toggle watchdog pin
             GPIO.output(self.watchDogPin, not GPIO.input(self.watchDogPin))
 
-            logging.warning("DDDDDDDDDD    FORCE   Patted the DOG  DDDDDDDDDD")
+            logger.warning("DDDDDDDDDD    FORCE   Patted the DOG  DDDDDDDDDD")
 #return
 
         #return
@@ -429,9 +432,9 @@ def sd_notify(unset_environment, s_cmd):
             sys.stderr.write("error : incorrect sock.sendto  return value\n")
             return(1)
     except :
-            logging.error("????? sd_notify error ???")
+            logger.error("????? sd_notify error ???")
             e = sys.exc_info()[0]
-            logging.error( "????? Error: %s ?????" % e )
+            logger.error( "????? Error: %s ?????" % e )
     finally:
         # terminate the socket connection
         if sock:

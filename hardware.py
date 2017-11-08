@@ -12,6 +12,12 @@ import sendemail as emailMe
 import logging
 
 
+
+
+logger = logging.getLogger(__name__)
+#logger.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
+
 from support import round_time as round_time
 from support import delay as delay
 
@@ -62,7 +68,7 @@ elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":    # pcduino plat
 class sensor(object):
 
     def __init__(self):
-        logging.info("create sensor object")
+        logger.info("create sensor object")
         if cfg.getItemValueFromConfig('platform_name') == "RPi2":
             
             self.sensorType = Adafruit_DHT.DHT22
@@ -102,7 +108,7 @@ class sensor(object):
     
         #repeat read until valid data or too many errorserror
         while (self.humidity is None or self.temperature is None) and self.readErrs < 5:
-            logging.warning("..ERROR TRYING TO READ SENSOR on PRIME sensor read")
+            logger.error("..ERROR TRYING TO READ SENSOR on PRIME sensor read")
             self.readErrs += 1
 
             sleep(self.delay) #wait before re-read
@@ -111,8 +117,8 @@ class sensor(object):
             ##self.prevTempHumiMillis = self.currentMillis
             #self.temperature = round(self.temperature, 1)
             #self.humidity = round(self.humidity, 1)
-            #logging.info("_rs temp: %s" % self.temperature)
-            #logging.info("_rs humi: %s" % self.humidity)
+            #logger.info("_rs temp: %s" % self.temperature)
+            #logger.info("_rs humi: %s" % self.humidity)
             
         #self.prevTempHumiMillis = self.currentMillis
         
@@ -130,8 +136,8 @@ class sensor(object):
         
         self.temperature = round(self.temperature, 1)
         self.humidity = round(self.humidity, 1)
-        logging.info("_rs temp: %s" % self.temperature)
-        logging.info("_rs humi: %s" % self.humidity)
+        logger.info("_rs temp: %s" % self.temperature)
+        logger.info("_rs humi: %s" % self.humidity)
             
     def _enableSafeMode(self):
 		#TODO safe mode should also put fan on full speed
@@ -142,7 +148,7 @@ class sensor(object):
         #GPIO.setup(heaterRelay, GPIO.OUT)   #set pin as OP
         #GPIO.output(heaterRelay, 0)         #heat off        
         print self.temperature
-        print ("FFFFFFFF Posssible faulty sensor detected - SAFE MODE ENABLED")        
+        logger.error("FFFFFFFF Posssible faulty sensor detected - SAFE MODE ENABLED")        
         return        
                     
     
@@ -150,7 +156,7 @@ class sensor(object):
     def _read_sensor(self):
         if self.platformName == "RPi2":
             #sensor = Adafruit_DHT.DHT22
-            logging.info("in RPi2 _read_sensor about to read sensor")
+            logger.info("in RPi2 _read_sensor about to read sensor")
 
             self.humidity, self.temperature = Adafruit_DHT.read_retry(self.sensorType, self.sensorPin, 1,0)
             
@@ -172,7 +178,7 @@ class sensor(object):
         #read till ret 0-ok. timeout if no valid data after timeout
         #global currentMillis        #current time
 
-        logging.info("...try to read sensor at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
+        logger.debug("...try to read sensor at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
         self.readErrs = 0    #reset err count
         self.message = ""   #reset err message
         
@@ -190,37 +196,38 @@ class sensor(object):
         if (timeGap < timedelta(seconds=3)):
             #sleep(self.delay)
             #print("Time Gap to go : %s" %timeGap)
-            logging.info("** JUMPING OUT OF AQUISITION **")
+            logger.info("** JUMPING OUT OF AQUISITION **")
             
             #restore prev sample readings
             #self.temperature = self.prevTemp  
             #self.humidity = self.prevHumi
             return self.humidity, self.temperature, self.sensorMessage
 
-        logging.info("** AQUIring **")
+        logger.info("** AQUIring **")
 
         time1 = datetime.datetime.now()
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
         time2 = datetime.datetime.now()
         duration = time2 - time1
-        logging.warning("TTTTTT - sensor read duration : %s" % (duration))
+        print("->-")
+        logger.debug("TTTTTT - sensor read duration : %s" % (duration))
         
         
         #repeat read until valid data or too many errorserror
         maxSensorReadErrors = 5
         while (self.humidity is None or self.temperature is None) and self.readErrs < maxSensorReadErrors:
-            logging.error("..ERROR TRYING TO READ SENSOR on sensor read test")
+            logger.error("..ERROR TRYING TO READ SENSOR on sensor read test")
             self.readErrs += 1
             sleep(self.delay) #wait secs before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
-            logging.warning("readings %s, %s" % (self.temperature, self.humidity))
+            logger.debug("readings %s, %s" % (self.temperature, self.humidity))
 
         #when here, means readings have vALS OR ARE null
         if self.readErrs == maxSensorReadErrors:  # powercyle if maxSensorReadErrors read errors, null READINGS
-            logging.error("..%d sensor Max read errors logged" % maxSensorReadErrors)
+            logger.error("..%d sensor Max read errors logged" % maxSensorReadErrors)
             self._power_cycle()
-            logging.error("..POWER CYCLE complete during sensor read")
-            logging.error("..DODGY TEMP READING")
+            logger.error("..POWER CYCLE complete during sensor read")
+            logger.error("..DODGY TEMP READING")
             if cfg.getItemValueFromConfig('emailEnabled') == True:
                 zone = cfg.getItemValueFromConfig('zoneName')
 				#TODO limit emails sent 
@@ -230,7 +237,7 @@ class sensor(object):
                     self.sensorMessage = self.message
                     #pass
                 except:
-                    logging.error("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING - too many errors %d" % maxSensorReadErrors)
+                    logger.error("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING - too many errors %d" % maxSensorReadErrors)
                     
                         #emulate high temp to enable safe mode
             
@@ -247,10 +254,10 @@ class sensor(object):
             elif ( abs(self.temperature - self.prevTemp) < 30) and ( (self.humidity >= 10)
                 and (self.humidity <= 100)) or (self.prevTemp == 30): #if temp diff smallish, assume good sample
                 #print( "..read sensor SUCCESS" )
-                logging.info("..read sensor success at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
+                logger.info("..read sensor success at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
                 
                 self.prevReadTime = datetime.datetime.now()
-                logging.info("Prev read time: %s" % self.prevReadTime)
+                logger.info("Prev read time: %s" % self.prevReadTime)
                 
                 #self.prevTempHumiMillis = self.currentMillis
                 self.temperature = round(self.temperature, 1)
@@ -259,12 +266,12 @@ class sensor(object):
                 #filter temp function
                 #self.proc_temp = self.proc_temp + ( 0.333 * (self.temperature - self.proc_temp))
                 #self.proc_temp = round(self.proc_temp, 3)
-                logging.warning('Temp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
+                logger.info('Temp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
 
             else:
                 #bad sample even though good crc
-                logging.error('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))
-                logging.error('..DODGY TEMP READING USING - OLD VALS---------------- ')
+                logger.error('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))
+                logger.error('..DODGY TEMP READING USING - OLD VALS---------------- ')
                 
                 				#TODO limit emails sent 
 
@@ -275,7 +282,7 @@ class sensor(object):
                         self.sensorMessage = self.message
 
                     except:
-                        logging.error("ERROR SENDING EMAIL - DODGY READING")
+                        logger.error("ERROR SENDING EMAIL - DODGY READING")
                 self.temperature = self.prevTemp  #restore prev sample readings
                 self.humidity = self.prevHumi
         
@@ -283,14 +290,14 @@ class sensor(object):
            
          
     def _power_cycle(self):
-            logging.warning("entering power cycle")
+            logger.warning("entering power cycle")
             if cfg.getItemValueFromConfig('platform_name') == "RPi2":
                 GPIO.setup(self.powerPin, GPIO.OUT)  #set pin as OP
                 GPIO.output(self.powerPin, GPIO.LOW)        #set low to power off sensor
-                logging.warning("sensor power cycle - power off")
+                logger.warning("sensor power cycle - power off")
                 sleep(3)
                 GPIO.output(self.powerPin, GPIO.HIGH)        #hi to power on sensor
-                logging.warning("sensor power cycle - Power back ON")
+                logger.warning("sensor power cycle - Power back ON")
                 sleep(1)   
                              
             elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
@@ -303,7 +310,7 @@ class sensor(object):
         
 class platform(object):
     def __init__(self):
-        logging.info('creating platform board')
+        logger.info('creating platform board')
         #Make sure the GPIO pins are ready:
         if cfg.getItemValueFromConfig('platform_name') == "RPi2":
             GPIO.setmode(GPIO.BCM)
@@ -315,7 +322,7 @@ class platform(object):
         pass
         
     def _setupIO_pins(self):
-        logging.info('initialising io pins')
+        logger.info('initialising io pins')
         if cfg.getItemValueFromConfig('platform_name') == "RPi2":
             GPIO.setup(heaterRelay, GPIO.OUT)   #set pin as OP
             GPIO.output(heaterRelay, 0)         #heat off
