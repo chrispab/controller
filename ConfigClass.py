@@ -129,7 +129,7 @@ class Config(object):
     def updateCentralConfigTable(self):
         try:
             # Open database connection
-            logger.warning("=== update central config table ===")
+            logger.debug("=== update central config table ===")
             self.dbCentralConn = self.dbc.getDBConn(
                                     self.getItemValueFromConfig('central_db_hostname'),
                                     self.getItemValueFromConfig('central_db_username'),

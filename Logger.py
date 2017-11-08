@@ -115,14 +115,14 @@ class Logger(object):
             #self.state_changed = True
 
         if self.state_changed == True:
-            logger.warning("-- O/P State Change - OLD state --")
+            logger.debug("-- O/P State Change - OLD state --")
             self.dataHasChanged()  # write modded old change state(s)
             #restore new vals 
             self.vent_state = vent_state
             self.vent_speed_state = vent_speed_state
             self.heater_state = heater_state
             self.fan_state = fan_state
-            logger.warning("-- O/P State Change - NEW state --")
+            logger.debug("-- O/P State Change - NEW state --")
             #write new states
             self.dataHasChanged()  # write modded post change state(s)
             
@@ -138,9 +138,9 @@ class Logger(object):
             if ((self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval))
                     or (self.temperature != self.previous_temperature)):  # any change
                 if self.current_millis > (self.previous_CSV_write_millis + self.min_CSV_write_interval):
-                    logger.warning("..interval passed ..time for new CSV write")
+                    logger.debug("..min interval passed with no new samples..time for new CSV write")
                 else:
-                    logger.warning("..new data row generated.. new temp")
+                    logger.debug("..new data row generated.. new temp")
                 self.dataHasChanged()
                 self.previous_CSV_write_millis = self.current_millis  # reset timer
 
@@ -157,7 +157,7 @@ class Logger(object):
     #routine called when any data has changed state or temp or periodic timer
     def dataHasChanged(self):
         
-        logger.warning("*** Data Has Changed- updating csv, dbs ***")
+        logger.warning("Readings have changed - updating local and remote dbs")
         #logger.warning("DataChanged Time: %s", str(datetime.datetime.now()))
         #logger.warning("DataChanged Time: %s", str(datetime.datetime.now()))
         data = self._write_to_CSV()
@@ -168,14 +168,14 @@ class Logger(object):
         db.update_central_db()
         time2 = datetime.datetime.now()
         duration = time2 - time1
-        logger.warning("TTTTT - update central db duration : %s" % (duration))
+        logger.debug("TTTTT - update central db duration : %s" % (duration))
         
         return
         
 
     def _write_to_CSV(self):
 
-        logger.warning('=== _write_to_CSV data record ===')
+        logger.info('=== _write_to_CSV data record ===')
         data = ['time', 'temp', 'humi', 'heaterstate',
                 'ventstate', 'fanstate']
         # round timestamp to nearest second

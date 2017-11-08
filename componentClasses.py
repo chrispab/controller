@@ -320,7 +320,7 @@ class system_timer(object):
             # toggle watchdog pin
             GPIO.output(self.watchDogPin, not GPIO.input(self.watchDogPin))
 
-            logger.warning("DDDDDDDDDD    FORCE   Patted the DOG  DDDDDDDDDD")
+            logger.warning("FORCING Pat the watchDOG")
 #return
 
         #return
@@ -416,7 +416,7 @@ def sd_notify(unset_environment, s_cmd):
 
         s_adr = os.environ.get('NOTIFY_SOCKET', None)
         if init : # report this only one time
-            sys.stderr.write("Notify socket xxx = " + str(s_adr) + "\n")
+            logger.info("Notify socket xxx = " + str(s_adr) + "\n")
             # this will normally return : /run/systemd/notify
             init = False
 
@@ -429,7 +429,7 @@ def sd_notify(unset_environment, s_cmd):
         # sendto() returns number of bytes send
         # in the original code, the return was tested against > 0 ???
         if sock.sendto(s_cmd, s_adr) == 0:
-            sys.stderr.write("error : incorrect sock.sendto  return value\n")
+            logger.error("error : incorrect sock.sendto  return value\n")
             return(1)
     except :
             logger.error("????? sd_notify error ???")

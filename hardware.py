@@ -140,7 +140,7 @@ class sensor(object):
         logger.info("_rs humi: %s" % self.humidity)
             
     def _enableSafeMode(self):
-		#TODO safe mode should also put fan on full speed
+        #TODO safe mode should also put fan on full speed
         #self.temperature = 25 #self.safeModeTemp
         self.temperature = 25 #self.safeModeTemp
         self.safeMode = True	#enable safe mode
@@ -230,7 +230,7 @@ class sensor(object):
             logger.error("..DODGY TEMP READING")
             if cfg.getItemValueFromConfig('emailEnabled') == True:
                 zone = cfg.getItemValueFromConfig('zoneName')
-				#TODO limit emails sent 
+                #TODO limit emails sent 
                 self.message = 'Power cycling sensor due to too many,' + str(maxSensorReadErrors) + ', errors'
                 try:
                     #emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)
@@ -266,14 +266,15 @@ class sensor(object):
                 #filter temp function
                 #self.proc_temp = self.proc_temp + ( 0.333 * (self.temperature - self.proc_temp))
                 #self.proc_temp = round(self.proc_temp, 3)
-                logger.info('Temp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
+                #print('')
+                logger.warning('Temp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
 
             else:
                 #bad sample even though good crc
                 logger.error('..temp: %2.1f, proc_temp: %2.1f, humi: %2.1f' %(self.temperature, self.proc_temp, self.humidity))
                 logger.error('..DODGY TEMP READING USING - OLD VALS---------------- ')
                 
-                				#TODO limit emails sent 
+                #TODO limit emails sent 
 
                 if cfg.getItemValueFromConfig('emailEnabled') == True:
                     self.message = 'Readings, Temp = '+ str(self.temperature) + ',  Humi = '+ str(self.humidity)

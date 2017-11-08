@@ -77,7 +77,7 @@ def execAndTimeFunc(func):
     func()
     time2 = datetime.datetime.now()
     duration = time2 - time1
-    logger.warning("TTTTTTTTTTTT - update central CONFIG table duration called BY FUNC: %s" % (duration))	
+    logger.debug("execute and time a function: %s, duration: %s" % (func, duration))	
 
 
 class Controller(object):
@@ -185,7 +185,7 @@ def main():
                                     fanState, heaterState, ventSpeedState,
                                     current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
         if stateChanged :
-            print("->")
+            #print("->")
             logger.debug("======== start state changed main list ======")
             # check for alarm levels etc
             if temperature > cfg.getItemValueFromConfig('tempAlertHi'):
@@ -242,9 +242,9 @@ def main():
             #logger.warning("======== % memory available: %s ======",mem.percent)
 
         
-        else:
-            sys.stdout.write(">")
-            sys.stdout.flush()
+        #else:
+            #sys.stdout.write(">")
+            #sys.stdout.flush()
         #tracker.print_diff()
         #logger.warning(mem_top()) # Or just print().
 
