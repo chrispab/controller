@@ -152,7 +152,7 @@ def main():
         startT = time.time()
         
         #read sensor
-        sensorMessage = ''
+        #sensorMessage = ''
         humidity, temperature,sensorMessage = ctl1.sensor1.read()
         if sensorMessage :
             #emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)	

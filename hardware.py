@@ -180,7 +180,7 @@ class sensor(object):
 
         logger.debug("...try to read sensor at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
         self.readErrs = 0    #reset err count
-        self.message = ""   #reset err message
+        self.sensorMessage = ""   #reset err message
         
         
         #save previous values if reqd later
