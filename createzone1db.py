@@ -6,7 +6,7 @@ import sys
 import os
 
 
-db_filename = 'zone3db.db'
+db_filename = 'zone1db.db'
 
 schema_filename = 'zoneDBSchema.sql'
 
