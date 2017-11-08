@@ -26,7 +26,7 @@ class DBCore(object):
         if (hostName == '127.0.0.1'):
             try:
                 #logger.warning("******* ATTEMPTING SQLITE CONN  *******")
-                self.dbConn = lite.connect(databaseName)
+                self.dbConn = lite.connect(databaseName + '.db')
                 #logger.warning("***** SQLITE3  OPEN getDBconn connected *: %s, %s SQLITE3 *****" % (hostName, databaseName))
             #except lite.Error, e:
             except Exception as e:

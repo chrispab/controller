@@ -61,14 +61,14 @@ class Config(object):
         #get old config style data
         cfgFilename = "config_" + socket.gethostname() + ".yaml"
         logger.info(cfgFilename)
-        fileStr = os.path.abspath( cfgFilename )
+        #fileStr = os.path.abspath( cfgFilename )
         #f = open('/home/pi/controlleroo/config.yaml')
-        f = open(fileStr)
+        #f = open(fileStr)
         # use safe_load instead load
-        config = yaml.safe_load(f)
+        ##config = yaml.safe_load(f)
         logger.warning("==Reading config settings from yaml file==")
-        logger.warning(yaml.dump(config))
-        f.close()
+        #logger.warning(yaml.dump(config))
+        #f.close()
 
         ################################################################
         # now we have the 3 config structs configLocations and configZones
