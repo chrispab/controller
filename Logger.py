@@ -207,16 +207,10 @@ class Logger(object):
         else:
             data[5] = 1  # on line on graph
 
-        #data[6] = round(self.proc_temp, 1)  # add processed temp value
-        #sys.stdout.write(data.tostring() )
-        with open(path, "ab") as csv_file:
-            # with open(path, 'w', newline='') as csv_file:
-            writer = csv.writer(csv_file, delimiter=',')
-            # for line in data:
-            # outfile.write(bytes(plaintext, 'UTF-8'))
-            writer.writerow(data)
-            self.previous_CSV_write_millis = self.current_millis  # note time row written
-        #self.datastore.writedb(self.current_time, self.temperature, self.humidity, self.heater_state, self.vent_state, self.fan_state)
+        #with open(path, "ab") as csv_file:
+            #writer = csv.writer(csv_file, delimiter=',')
+            #writer.writerow(data)
+            #self.previous_CSV_write_millis = self.current_millis  # note time row written
         
         return data
 
