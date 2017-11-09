@@ -6,6 +6,7 @@ import logging
 import sys    # for stdout print
 import datetime
 
+logger = logging.getLogger(__name__)
 
 from ConfigObject import cfg # singleton global
 
@@ -13,7 +14,7 @@ from ConfigObject import cfg # singleton global
 class MyEmail(object):
 
     def __init__(self):
-        logging.info("Creating email object")
+        logger.info("Creating email object")
 
         self.prevEmailSendMillis = 0  # last time an email was sent
         self.currentDateTime = 0
@@ -29,7 +30,7 @@ class MyEmail(object):
 
 
     def send(self, subject, message):
-        logging.info('==try to send email==')
+        logger.info('==try to send email==')
         
         if self.emailEnabled:
             self.updateClocks()
@@ -38,9 +39,9 @@ class MyEmail(object):
                 self.sendemail(subject, message)
                 #update time of last email send
                 self.prevEmailSendMillis = self.elapsedMillis
-                logging.warning("== NEW EMAIL METHOD SENT: %s =", self.elapsedMillis)
+                logger.warning("== NEW EMAIL METHOD SENT: %s =", self.elapsedMillis)
             else:
-                logging.warning("== NEW EMAIL METHOD NOT_SENT: %s =", self.elapsedMillis)
+                logger.warning("== NEW EMAIL METHOD NOT_SENT: %s =", self.elapsedMillis)
                     
         return
         
@@ -74,10 +75,10 @@ class MyEmail(object):
                 server.sendmail(secureFile.USERNAME, secureFile.MAILTO, msg.as_string())
                 server.quit()
             except:
-                logging.error("????? Error sending email ???")
+                logger.error("????? Error sending email ???")
                 e = sys.exc_info()[0]
-                logging.error( "????? Error: %s ?????" % e )
-                logging.error("????IN NEW EMAIL ROUTINE????")
+                logger.error( "????? Error: %s ?????" % e )
+                logger.error("????IN NEW EMAIL ROUTINE????")
         return
     
 

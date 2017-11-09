@@ -33,6 +33,7 @@ common:
   version: "Version Placeholder"
 
   emailSendTimeGap: 900000 # = 60 * 15 * 1000 = 900000, time in milli secs, 60 secs each 1000 ms
+  logSamplesToCSV: False # define wether data is written to csv file as well as to local db
   
   
 locations:
