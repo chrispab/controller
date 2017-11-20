@@ -20,7 +20,7 @@ common:
   sensorPin: 3   #phys pin 5
   heaterRelay: 5 #pyhs pin 29
   ventRelay: 26   #phys pin 37
-  fanRelay: 11    #phys pin 23
+  fanRelay: 13    #phys pin 23
   relay4: 6      #pyhs pin 31
   RCPin: 27 #phypin13
   alivePin: 22 #phy pin 15
@@ -69,6 +69,8 @@ locations:
   quietMode: True
 
 locationc:
+  fanRelay: 11    #phys pin 23
+
   id: "c"
   locationDisplayName: "CSV"
 

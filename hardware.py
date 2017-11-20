@@ -12,8 +12,6 @@ import sendemail as emailMe
 import logging
 
 
-
-
 logger = logging.getLogger(__name__)
 #logger.basicConfig(level=logging.DEBUG)
 #logging.basicConfig(level=logging.DEBUG)
@@ -30,17 +28,7 @@ if cfg.getItemValueFromConfig('platform_name') == "RPi2": #rpi platform
     import RPi.GPIO as GPIO
     import Adafruit_DHT
     sensor = Adafruit_DHT.DHT22
-    #=================hardware dependant pins values etc====================
-    #----pin assignments and related hardware defs----
-    powerPin = cfg.getItemValueFromConfig('powerPin')
-    led2 = cfg.getItemValueFromConfig('led2')    
-    sensorPin = cfg.getItemValueFromConfig('sensorPin')   
-    heaterRelay = cfg.getItemValueFromConfig('heaterRelay') 
-    ventRelay = cfg.getItemValueFromConfig('ventRelay')   
-    fanRelay = cfg.getItemValueFromConfig('fanRelay')    
-    relay4 = cfg.getItemValueFromConfig('relay4')      
-    alivePin = cfg.getItemValueFromConfig('alivePin')
-    watchDogPin = cfg.getItemValueFromConfig('watchDogPin')
+
 
 elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":    # pcduino platform
     import gpio
@@ -318,6 +306,19 @@ class platform(object):
             GPIO.setwarnings(False)
         elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
             dht22.setup()               #init dht22 pins etc
+            
+        # get pin definitions from config object
+        self.heaterRelay = cfg.getItemValueFromConfig('heaterRelay')
+        self.ventRelay= cfg.getItemValueFromConfig('ventRelay')
+        self.fanRelay = cfg.getItemValueFromConfig('fanRelay')
+        self.relay4 = cfg.getItemValueFromConfig('relay4')     
+        
+    #=================hardware dependant pins values etc====================
+    #----pin assignments and related hardware defs----
+        self.led2 = cfg.getItemValueFromConfig('led2')    
+
+        self.alivePin = cfg.getItemValueFromConfig('alivePin')
+        self.watchDogPin = cfg.getItemValueFromConfig('watchDogPin')           
         
         self._setupIO_pins()
         pass
@@ -325,20 +326,20 @@ class platform(object):
     def _setupIO_pins(self):
         logger.info('initialising io pins')
         if cfg.getItemValueFromConfig('platform_name') == "RPi2":
-            GPIO.setup(heaterRelay, GPIO.OUT)   #set pin as OP
-            GPIO.output(heaterRelay, 0)         #heat off
-            GPIO.setup(ventRelay, GPIO.OUT)     #set pin as OP
-            GPIO.output(ventRelay, 1)           #vent on
-            GPIO.setup(fanRelay, GPIO.OUT)      #set pin as OP
-            GPIO.output(fanRelay, 1)            #fan on
-            GPIO.setup(relay4, GPIO.OUT)        #set pin as OP
-            GPIO.output(relay4, 0)              #speed low
+            GPIO.setup(self.heaterRelay, GPIO.OUT)   #set pin as OP
+            GPIO.output(self.heaterRelay, 0)         #heat off
+            GPIO.setup(self.ventRelay, GPIO.OUT)     #set pin as OP
+            GPIO.output(self.ventRelay, 1)           #vent on
+            GPIO.setup(self.fanRelay, GPIO.OUT)      #set pin as OP
+            GPIO.output(self.fanRelay, 1)            #fan on
+            GPIO.setup(self.relay4, GPIO.OUT)        #set pin as OP
+            GPIO.output(self.relay4, 0)              #speed low
             
-            GPIO.setup(alivePin, GPIO.OUT)        #set pin as OP
-            GPIO.output(alivePin, 1)              #signal alive to io board
+            GPIO.setup(self.alivePin, GPIO.OUT)        #set pin as OP
+            GPIO.output(self.alivePin, 1)              #signal alive to io board
             
-            GPIO.setup(watchDogPin, GPIO.OUT)        #set pin as OP
-            GPIO.output(watchDogPin, 1)              #signal alive to io board
+            GPIO.setup(self.watchDogPin, GPIO.OUT)        #set pin as OP
+            GPIO.output(self.watchDogPin, 1)              #signal alive to io board
             
         elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
             for portpin in relaypins:
@@ -351,10 +352,10 @@ class platform(object):
 		#if sensor.getSafeMode() 
         #print('....fan switch state', fanState)
         if cfg.getItemValueFromConfig('platform_name') == "RPi2":
-            GPIO.output(heaterRelay, heaterState)
-            GPIO.output(ventRelay, ventState)
-            GPIO.output(fanRelay, fanState)
-            GPIO.output(relay4, ventSpeedState)
+            GPIO.output(self.heaterRelay, heaterState)
+            GPIO.output(self.ventRelay, ventState)
+            GPIO.output(self.fanRelay, fanState)
+            GPIO.output(self.relay4, ventSpeedState)
         elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":
             #print 'switch relays'
             gpio.digitalWrite(heaterRelay, heaterState)
