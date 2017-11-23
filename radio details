@@ -1,0 +1,15 @@
+STATUS	 = 0x01 RX_DR=0 TX_DS=0 MAX_RT=0 RX_P_NO=0 TX_FULL=1
+RX_ADDR_P0-1	 = 0xfdfdfdfdfd 0x061b1f1d1d
+RX_ADDR_P2-5	 = 0xf8 0xf9 0xf9 0xf9 
+TX_ADDR		 = 0xfdfdfdfdfd
+RX_PW_P0-6	 = 0x00 0x00 0x00 0x00 0x00 0x00 
+EN_AA		 = 0x07 
+EN_RXADDR	 = 0x00 
+RF_CH		 = 0x1f 
+RF_SETUP	 = 0x00 
+CONFIG		 = 0x00 
+DYNPD/FEATURE	 = 0x00 0x00 
+Data Rate	 = 1MBPS
+Model		 = nRF24L01
+CRC Length	 = Disabled
+PA Power	 = PA_MIN

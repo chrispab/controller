@@ -20,11 +20,11 @@ common:
   sensorPin: 3   #phys pin 5
   heaterRelay: 5 #pyhs pin 29
   ventRelay: 26   #phys pin 37
-  fanRelay: 13    #phys pin 23
+  fanRelay: 11    #phys pin 23
   relay4: 6      #pyhs pin 31
   RCPin: 27 #phypin13
   alivePin: 22 #phy pin 15
-  watchDogPin: 17    
+  watchDogPin: 17    #phys pin 11
 
 #placeholder items - used for items pushed from system
   processUptime: "00:00:00"
@@ -68,16 +68,17 @@ locations:
   
   quietMode: True
 
+
 locationc:
-  fanRelay: 11    #phys pin 23
+  fanRelay: 13    #phys pin 33
 
   id: "c"
   locationDisplayName: "CSV"
 
-  tempSPLOn: 20.5   #target 24.o veg mp set point max with lon
+  tempSPLOn: 40.5   #target 24.o veg mp set point max with lon
   tempSPLOff: 15.0 #target = 21.0 veg, target loff
 
-  tempAlertHi: 27.0  #hi temp alert temp   tempAlertLo: 14.5  #lo temp alert
+  tempAlertHi: 39.0  #hi temp alert temp   tempAlertLo: 14.5  #lo temp alert
   #tempAlertHi: 30.0  #hi temp alert temp
   tempAlertLo: 14.5  #lo temp alert
 
@@ -86,18 +87,18 @@ locationc:
 
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
-  heater_on_t: 5000  #min time heater is on or off for in ms
-  heater_off_t: 30000  #min time heater is on or off for
+  heater_on_t: 8000  #min time heater is on or off for in ms
+  heater_off_t: 8000  #min time heater is on or off for
   heater_sp_offset: 0
 
-  ventOnDelta: 30000 #duration vent is on in millis - minimum mark
-  ventOffDelta: 90000 #vent off duration in miili sec
-  ventPulseOnDelta: 10000 #60 secs cooling on delta
+  ventOnDelta: 20000 #duration vent is on in millis - minimum mark
+  ventOffDelta: 29000 #vent off duration in miili sec
+  ventPulseOnDelta: 10 #60 secs cooling on delta
   vent_lon_sp_offset: 0.0 #offset
   vent_loff_sp_offset: 0.0 #
 
-  fan_on_t: 1400000  #vent on time
-  fan_off_t: 37000 #vent off time
+  fan_on_t: 40000  #vent on time
+  fan_off_t: 40000 #vent off time
 
   emailEnabled: True
   quietMode: True
