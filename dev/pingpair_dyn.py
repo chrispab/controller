@@ -41,32 +41,20 @@ radio = RF24(17, 0);
 def try_read_data(channel=0):
     if radio.available():
         while radio.available():
-            #len = radio.getDynamicPayloadSize()
-            receive_payload=radio.read(1 )
-            print('Got payload ',ord(receive_payload) )
+            payloadSize = radio.getDynamicPayloadSize()
+            receive_payload = radio.read(payloadSize)
+            print('Got payload size={} value="{}"'.format(payloadSize, receive_payload.decode('utf-8')))
             # First, stop listening so we can talk
             radio.stopListening()
-            
-            #receive_payload = ord(receive_payload)+1
+
             # Send the final one back.
             radio.write(receive_payload)
-            print('Sent response.',receive_payload)
+            print('Sent response.')
 
             # Now, resume listening so we catch the next packets.
             radio.startListening()
-            #time.sleep(1000)
 
-#pipes = [0xF0F0F0F0E1, 0xF0F0F0F0D2]
-#pipes = [[0xE8, 0xE8, 0xF0, 0xF0, 0xE1], [0xF0, 0xF0, 0xF0, 0xF0, 0xE1]]
-# conv byte addresses[][6] = {"1Node","2Node"}; to hex
-# 1Node == 0x31 0x4e 0x6f 0x64 0x65 == 314e6f6465
-# 2Node == 0x32 0x4e 0x6f 0x64 0x65 == 324e6f6465
-pipes = [0x65646f4e31, 0x65646f4e32]
-
-#pipes = [0x314E6F6465, 0x324E6F6465]
-
-
-
+pipes = [0xF0F0F0F0E1, 0xF0F0F0F0D2]
 min_payload_size = 4
 max_payload_size = 32
 payload_size_increments_by = 1
@@ -76,20 +64,9 @@ send_payload = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ789012'
 millis = lambda: int(round(time.time() * 1000))
 
 print('pyRF24/examples/pingpair_dyn/')
-
 radio.begin()
-
-
-radio.setPALevel(RF24_PA_LOW)
-
-radio.setDataRate(RF24_250KBPS)
-radio.setChannel(124)
-radio.setAutoAck(True)
-#radio.enableDynamicPayloads()
-#radio.enableAckPayload()
-
-#radio.enableDynamicPayloads()
-radio.setRetries(15,15)
+radio.enableDynamicPayloads()
+radio.setRetries(5,15)
 radio.printDetails()
 
 print(' ************ Role Setup *********** ')
@@ -98,8 +75,14 @@ while (inp_role !='0') and (inp_role !='1'):
 
 if inp_role == '0':
     print('Role: Pong Back, awaiting transmission')
-    radio.openWritingPipe(pipes[0])
-    radio.openReadingPipe(1,pipes[1])
+    if irq_gpio_pin is not None:
+        # set up callback for irq pin
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(irq_gpio_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(irq_gpio_pin, GPIO.FALLING, callback=try_read_data)
+
+    radio.openWritingPipe(pipes[1])
+    radio.openReadingPipe(1,pipes[0])
     radio.startListening()
 else:
     print('Role: Ping Out, starting transmission')
@@ -115,13 +98,17 @@ while 1:
         radio.stopListening()
 
         # Take the time, and send it.  This will block until complete
-        #print('Now sending length {} ... '.format(next_payload_size), end="")
-        print('Now sending char "n" ... ')
-        #mybuff = [0xff]
-        #buf = 125
-        radio.write('n')
-        #radio.write(send_payload[:next_payload_size])
+        #send_payload =  str(millis())
+        localtime = time.asctime( time.localtime(time.time()) )
+        send_payload =  str(localtime)
         
+        next_payload_size = len(send_payload)
+        
+        print('Now sending length {} ... '.format(next_payload_size), end="")
+        radio.write(send_payload)
+
+        
+
         # Now, continue listening
         radio.startListening()
 
@@ -137,11 +124,11 @@ while 1:
             print('failed, response timed out.')
         else:
             # Grab the response, compare, and send to debugging spew
-            len = radio.getDynamicPayloadSize()
-            receive_payload = radio.read(len)
+            payloadSize = radio.getDynamicPayloadSize()
+            receive_payload = radio.read(payloadSize)
 
             # Spew it
-            print('got response ',receive_payload)
+            print('got response size={} value="{}"'.format(payloadSize, receive_payload.decode('utf-8')))
 
         # Update size for next time.
         next_payload_size += payload_size_increments_by
