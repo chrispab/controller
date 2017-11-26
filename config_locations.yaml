@@ -36,6 +36,8 @@ common:
   
   
 locations:
+  fanRelay: 13    #phys pin 33 new for radio watchdog version
+
   id: "s"
   locationDisplayName: "SHD"
 
@@ -70,7 +72,7 @@ locations:
 
 
 locationc:
-  fanRelay: 13    #phys pin 33
+  fanRelay: 13    #phys pin 33 new for radio watchdog version
 
   id: "c"
   locationDisplayName: "CSV"

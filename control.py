@@ -148,7 +148,7 @@ def main():
         current_millis = ctl1.timer1.current_millis
         
         #call to systemd watchdog to hold off restart
-        #ctl1.timer1.holdOffWatchdog(current_millis)
+        ctl1.timer1.holdOffWatchdog(current_millis)
         
         # hold off wireless arduino watchdog
         # check radio link for a ping from Arduino watchdog, and respond to indicate alive

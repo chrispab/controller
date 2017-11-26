@@ -83,7 +83,7 @@ class RadioLink(object):
         
     ##########################################
     def try_read_data(self, channel=0):
-        print('checking for radio data available')
+        logger.warning('checking for nRF ping from arduino')
 
         self.radio.startListening()
         
@@ -98,7 +98,7 @@ class RadioLink(object):
                 # Send the final one back.
                 send_payload_2 = b'from pi -Ping Received'
                 self.radio.write(send_payload_2)
-                print('Sent response.')
+                logger.warning('Sent - IM ALIVE - response to arduino ping')
 
                 # Now, resume listening so we catch the next packets.
                 self.radio.startListening()
@@ -398,17 +398,19 @@ class system_timer(object):
             logger.debug("DDDDDDDDDD Patted the DOG  DDDDDDDDDD")
             
             logger.debug("starting : python daemon watchdog and fail test script started\n")
+            
+            
             #notify systemd that we've started
             retval = sd_notify(0, "READY=1")
             if retval <> 0:
                 logger.debug("terminating : fatal sd_notify() error for script start\n")
                 #exit(1)
     
-             #after the init, ping the watchdog and check for errors
-            
+            #after the init, ping the watchdog and check for errors
             retval = sd_notify(0, "WATCHDOG=1")
             if retval <> 0:
                 logger.error("terminating : fatal sd_notify() error for watchdog ping\n")
+                
 #return
         elif  (forceWatchdogToggle == True):
             logger.info("- FORCE Pat the DOG -")
