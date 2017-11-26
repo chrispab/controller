@@ -63,10 +63,13 @@ inp_role = 'none'
 send_payload = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ789012'
 millis = lambda: int(round(time.time() * 1000))
 
-print('pyRF24/examples/pingpair_dyn/')
+#print('pyRF24/examples/pingpair_dyn/')
 radio.begin()
+radio.setPALevel(RF24_PA_MAX)
+radio.setDataRate(RF24_250KBPS)
 radio.enableDynamicPayloads()
 radio.setRetries(5,15)
+radio.setChannel(124)
 radio.printDetails()
 
 print(' ************ Role Setup *********** ')

@@ -99,6 +99,7 @@ class Controller(object):
         self.heater1 = Heater()
         self.fan1 = Fan()
         self.light = Light()
+        self.radioLink1 = RadioLink()
         self.stateMonitor = Logger()
         self.timer1 = system_timer()
 
@@ -147,7 +148,11 @@ def main():
         current_millis = ctl1.timer1.current_millis
         
         #call to systemd watchdog to hold off restart
-        ctl1.timer1.holdOffWatchdog(current_millis)
+        #ctl1.timer1.holdOffWatchdog(current_millis)
+        
+        # hold off wireless arduino watchdog
+        # check radio link for a ping from Arduino watchdog, and respond to indicate alive
+        ctl1.radioLink1.holdOffWatchdog()
 
         startT = time.time()
         

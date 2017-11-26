@@ -28,6 +28,105 @@ import RPi.GPIO as GPIO
 
 import subprocess
 import os
+
+# for nrf radio link
+from RF24 import *
+irq_gpio_pin = None
+
+millis = lambda: int(round(time.time() * 1000))
+
+
+class RadioLink(object):
+
+    def __init__(self):
+        logger.info("Creating radio Link")
+        self.radio = RF24(17, 0);
+
+        self.prev_radio_millis = 0  # last time vent state updated
+        #self.fan_on_delta = cfg.getItemValueFromConfig('fan_on_t')  # vent on time
+        #self.fan_off_delta = cfg.getItemValueFromConfig('fan_off_t')  # vent off time
+        self.pipes = [0xF0F0F0F0E1, 0xF0F0F0F0D2]
+        self.min_payload_size = 4
+        self.max_payload_size = 32
+        self.payload_size_increments_by = 1
+        self.next_payload_size = self.min_payload_size
+        self.inp_role = 'none'
+        self.send_payload = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ789012'
+        
+        print(' ************ setting up radio Link *********** ')
+        self.radio.begin()
+        self.radio.setPALevel(RF24_PA_MAX)
+        self.radio.setDataRate(RF24_250KBPS)
+        self.radio.enableDynamicPayloads()
+        self.radio.setRetries(5,15)
+        self.radio.setChannel(124)
+        self.radio.printDetails()
+        
+        # setup pipes
+        self.radio.openWritingPipe(self.pipes[1])
+        self.radio.openReadingPipe(1,self.pipes[0])
+        self.radio.startListening()
+    
+        return
+        
+        
+    # hold wireless arduino watchdog
+    def holdOffWatchdog(self):
+        self.respondToPing()
+        return
+    
+    # respond to ping from arduino
+    def respondToPing(self):
+        self.try_read_data()
+        
+        return
+        
+    ##########################################
+    def try_read_data(self, channel=0):
+        print('checking for radio data available')
+
+        self.radio.startListening()
+        
+        if self.radio.available():
+            while self.radio.available():
+                self.payloadSize = self.radio.getDynamicPayloadSize()
+                self.receive_payload = self.radio.read(self.payloadSize)
+                print('Got payload size={} value="{}"'.format(self.payloadSize, self.receive_payload.decode('utf-8')))
+                # First, stop listening so we can talk
+                self.radio.stopListening()
+
+                # Send the final one back.
+                send_payload_2 = b'from pi -Ping Received'
+                self.radio.write(send_payload_2)
+                print('Sent response.')
+
+                # Now, resume listening so we catch the next packets.
+                self.radio.startListening()
+        return
+    
+    
+
+    def control(self, current_millis):
+        logger.info('==fan ctl==')
+        # if fan off, we must wait for the interval to expire before turning it on
+        logger.info('==current millis: %s' % (current_millis))
+        logger.info('==current fan state: %s' % (self.state))
+        if self.state == OFF:
+            # if time is up, so change the state to ON
+            if current_millis - self.prev_fan_millis >= self.fan_off_delta:
+                self.state = ON
+                logger.info("..FAN ON")
+                self.prev_fan_millis = current_millis
+        # else if fanState is ON
+        else:
+            # time is up, so change the state to LOW
+            if (current_millis - self.prev_fan_millis) >= self.fan_on_delta:
+                self.state = OFF
+                logger.info("..FAN OFF")
+                self.prev_fan_millis = current_millis
+        #self.state = ON
+        return
+
 class Relay(object):
 
     def __init__(self):
