@@ -53,10 +53,10 @@ locations:
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
   heater_on_t: 30000  #min time heater is on when below lo sp
-  heater_off_t: 60000  #min time heater is off for
+  heater_off_t: 30000  #min time heater is off for
   heater_sp_offset: 0
 
-  ventOnDelta: 30000 #duration vent is on in millis - minimum mark
+  ventOnDelta: 20000 #duration vent is on in millis - minimum mark
   ventOffDelta: 90000 #vent off duration in miili sec
   ventPulseOnDelta: 10000 #60 secs cooling on delta
   vent_lon_sp_offset: -0.1 #offset
