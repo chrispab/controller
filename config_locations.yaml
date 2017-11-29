@@ -125,7 +125,7 @@ locationc:
 
   readingPipeAddress: "Node0"  #pipe address for receiving from wireless watchdog
 
-  writingPipeAdress: "NodeC" # address for pipe to write to wireless watchdog
+  writingPipeAddress: "NodeC" # address for pipe to write to wireless watchdog
   ackMessage: "location CNV - ACK to watchdog"  #message sent back on reciept of arduino watchdog ping
 
 
