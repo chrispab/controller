@@ -43,8 +43,10 @@ class RadioLink(object):
         self.radio = RF24(17, 0);
 
         self.prev_radio_millis = 0  # last time vent state updated
-        #self.fan_on_delta = cfg.getItemValueFromConfig('fan_on_t')  # vent on time
-        #self.fan_off_delta = cfg.getItemValueFromConfig('fan_off_t')  # vent off time
+        self.writingPipeAddress = cfg.getItemValueFromConfig('writingPipeAddress')
+        self.readingPipeAddress = cfg.getItemValueFromConfig('readingPipeAddress') 
+        self.ackMessage = cfg.getItemValueFromConfig('ackMessage') 
+
         self.pipes = [0xF0F0F0F0E1, 0xF0F0F0F0D2]
         self.min_payload_size = 4
         self.max_payload_size = 32
@@ -58,13 +60,17 @@ class RadioLink(object):
         self.radio.setPALevel(RF24_PA_MAX)
         self.radio.setDataRate(RF24_250KBPS)
         self.radio.enableDynamicPayloads()
-        self.radio.setRetries(5,15)
+        self.radio.setRetries(15,15)
         self.radio.setChannel(124)
         self.radio.printDetails()
         
         # setup pipes
-        self.radio.openWritingPipe(self.pipes[1])
-        self.radio.openReadingPipe(1,self.pipes[0])
+        self.radio.openWritingPipe(self.writingPipeAddress)
+        
+        #self.radio.openWritingPipe(self.pipes[1])
+        self.radio.openReadingPipe(1,self.readingPipeAddress)
+        
+        #self.radio.openReadingPipe(1,self.pipes[0])
         self.radio.startListening()
     
         return
@@ -98,7 +104,8 @@ class RadioLink(object):
                 # Send the final one back.
                 send_payload_2 = b'from pi -Ping Received'
                 self.radio.write(send_payload_2)
-                logger.warning('Sent - IM ALIVE - response to arduino ping')
+                #logger.warning('Sent - IM ALIVE - response to arduino ping')
+                logger.warning(self.ackMessage)
 
                 # Now, resume listening so we catch the next packets.
                 self.radio.startListening()
@@ -323,7 +330,7 @@ class Light(object):
         count = RCtime(cfg.getItemValueFromConfig('RCPin')) # Measure timing using GPIO4
         #print count
 
-        if ( count > 2000):
+        if ( count > 1000):
             #sys.stdout.write("OFF")
             #sys.stdout.flush()
             lightState = OFF

@@ -34,6 +34,10 @@ common:
 
   emailSendTimeGap: 900000 # = 60 * 15 * 1000 = 900000, time in milli secs, 60 secs each 1000 ms
   
+  radioChannel: 124 # chanel nrf radios operate on
+  
+  
+  
   
 locations:
   fanRelay: 13    #phys pin 33 new for radio watchdog version
@@ -69,6 +73,16 @@ locations:
   emailEnabled: True
   
   quietMode: True
+  
+  readingPipeAddress: 0xF0F0F0F0E1  #pipe address for receiving from wireless watchdog
+
+  writingPipeAddress: 0xF0F0F0F0D2 # address for pipe to write to wireless watchdog
+  
+  #readingPipeAddress: "Node0"  #pipe address for receiving from wireless watchdog
+
+  #writingPipeAdress: "NodeC" # address for pipe to write to wireless watchdog
+  ackMessage: "location SHD - ACK to watchdog"  #message sent back on reciept of arduino watchdog ping
+  
 
 
 locationc:
@@ -104,6 +118,15 @@ locationc:
 
   emailEnabled: True
   quietMode: True
+  
+#  readingPipeAddress: 0xF0F0F0F0E1  #pipe address for receiving from wireless watchdog
+
+#  writingPipeAdress: 0xF0F0F0F0D2 # address for pipe to write to wireless watchdog
+
+  readingPipeAddress: "Node0"  #pipe address for receiving from wireless watchdog
+
+  writingPipeAdress: "NodeC" # address for pipe to write to wireless watchdog
+  ackMessage: "location CNV - ACK to watchdog"  #message sent back on reciept of arduino watchdog ping
 
 
 
