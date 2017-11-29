@@ -103,7 +103,10 @@ class RadioLink(object):
 
                 # Send the final one back.
                 send_payload_2 = b'from pi -Ping Received'
-                self.radio.write(send_payload_2)
+                #self.radio.write(send_payload_2)
+                self.radio.write(self.ackMessage)
+                
+                
                 #logger.warning('Sent - IM ALIVE - response to arduino ping')
                 logger.warning(self.ackMessage)
 
