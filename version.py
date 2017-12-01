@@ -1,1 +1,1 @@
-VERSION = "1.15 - channels"
+VERSION = "1.20"

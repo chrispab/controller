@@ -60,7 +60,7 @@ class RadioLink(object):
         self.radio.setPALevel(RF24_PA_MAX)
         self.radio.setDataRate(RF24_250KBPS)
         self.radio.enableDynamicPayloads()
-        self.radio.setRetries(15,15)
+        #self.radio.setRetries(5,15)
         self.radio.setChannel(124)
         self.radio.printDetails()
         
@@ -91,7 +91,7 @@ class RadioLink(object):
     def try_read_data(self, channel=0):
         logger.warning('checking for nRF ping from arduino')
 
-        self.radio.startListening()
+        #self.radio.startListening()
         
         if self.radio.available():
             while self.radio.available():
@@ -112,30 +112,10 @@ class RadioLink(object):
 
                 # Now, resume listening so we catch the next packets.
                 self.radio.startListening()
+            #self.radio.flush_rx()
         return
-    
     
 
-    def control(self, current_millis):
-        logger.info('==fan ctl==')
-        # if fan off, we must wait for the interval to expire before turning it on
-        logger.info('==current millis: %s' % (current_millis))
-        logger.info('==current fan state: %s' % (self.state))
-        if self.state == OFF:
-            # if time is up, so change the state to ON
-            if current_millis - self.prev_fan_millis >= self.fan_off_delta:
-                self.state = ON
-                logger.info("..FAN ON")
-                self.prev_fan_millis = current_millis
-        # else if fanState is ON
-        else:
-            # time is up, so change the state to LOW
-            if (current_millis - self.prev_fan_millis) >= self.fan_on_delta:
-                self.state = OFF
-                logger.info("..FAN OFF")
-                self.prev_fan_millis = current_millis
-        #self.state = ON
-        return
 
 class Relay(object):
 
