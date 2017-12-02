@@ -36,7 +36,8 @@ common:
   
   radioChannel: 124 # chanel nrf radios operate on
   
-  
+  heartBeatInterval: 10000 # 10 secs in msecs
+
   
   
 locations:
@@ -77,9 +78,9 @@ locations:
   #readingPipeAddress: 0xF0F0F0F0E1  #pipe address for receiving from wireless watchdog
   #writingPipeAddress: 0xF0F0F0F0D2 # address for pipe to write to wireless watchdog
   
-  readingPipeAddress: "Node0"  #pipe address for receiving from wireless watchdog
-  writingPipeAddress: "NodeS" # address for pipe to write to wireless watchdog
-  ackMessage: "location SHD - ACK to watchdog"  #message sent back on reciept of arduino watchdog ping
+  readingPipeAddress: "NodeS"  #pipe address for receiving from wireless watchdog
+  writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
+  ackMessage: "loc SHD - alive!"  #message sent back on reciept of arduino watchdog ping
   
 
 
@@ -121,10 +122,10 @@ locationc:
 
 #  writingPipeAdress: 0xF0F0F0F0D2 # address for pipe to write to wireless watchdog
 
-  readingPipeAddress: "Node0"  #pipe address for receiving from wireless watchdog
+  readingPipeAddress: "NodeC"  #pipe address for receiving from wireless watchdog
 
-  writingPipeAddress: "NodeC" # address for pipe to write to wireless watchdog
-  ackMessage: "location CNV - ACK to watchdog"  #message sent back on reciept of arduino watchdog ping
+  writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
+  ackMessage: "loc CNV - I'm here!"  #message sent back on reciept of arduino watchdog ping
 
 
 
@@ -162,6 +163,6 @@ locationg:
   emailEnabled: True
   quietMode: True
   
-  readingPipeAddress: "Node0"  #pipe address for receiving from wireless watchdog
-  writingPipeAddress: "NodeG" # address for pipe to write to wireless watchdog
-  ackMessage: "location GRG - ACK to watchdog"  #message sent back on reciept of arduino watchdog ping
+  readingPipeAddress: "NodeG"  #pipe address for receiving from wireless watchdog
+  writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
+  ackMessage: "loc GRG - alive"  #message sent back on reciept of arduino watchdog ping

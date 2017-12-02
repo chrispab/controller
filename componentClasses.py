@@ -40,14 +40,16 @@ class RadioLink(object):
 
     def __init__(self):
         logger.info("Creating radio Link")
-        self.radio = RF24(17, 0);
+        self.lastHeartBeatSentMillis = 0
+        self.heartBeatInterval = 10000 #5 secs in msecs
+        self.radio = RF24(17, 0)
 
         self.prev_radio_millis = 0  # last time vent state updated
         self.writingPipeAddress = cfg.getItemValueFromConfig('writingPipeAddress')
         self.readingPipeAddress = cfg.getItemValueFromConfig('readingPipeAddress') 
         self.ackMessage = cfg.getItemValueFromConfig('ackMessage') 
 
-        self.pipes = [0xF0F0F0F0E1, 0xF0F0F0F0D2]
+        #self.pipes = [0xF0F0F0F0E1, 0xF0F0F0F0D2]
         self.min_payload_size = 4
         self.max_payload_size = 32
         self.payload_size_increments_by = 1
@@ -78,7 +80,8 @@ class RadioLink(object):
         
     # hold wireless arduino watchdog
     def holdOffWatchdog(self):
-        self.respondToPing()
+        self.sendHeartBeatMessage()
+        #self.respondToPing()
         return
     
     # respond to ping from arduino
@@ -87,11 +90,25 @@ class RadioLink(object):
         
         return
         
+    def sendHeartBeatMessage(self):
+        self.radio.stopListening()
+
+        ticks = millis()
+        if ( ( (ticks) - self.lastHeartBeatSentMillis) >= self.heartBeatInterval): #ready to send
+            logger.warning('..sending heartbeat message')
+            logger.warning(self.ackMessage)
+            self.lastHeartBeatSentMillis = millis()
+
+            self.radio.write(self.ackMessage)
+
+        
+        return
+            
     ##########################################
     def try_read_data(self, channel=0):
         logger.warning('checking for nRF ping from arduino')
 
-        #self.radio.startListening()
+        self.radio.startListening()
         
         if self.radio.available():
             while self.radio.available():
@@ -112,7 +129,7 @@ class RadioLink(object):
 
                 # Now, resume listening so we catch the next packets.
         self.radio.startListening()
-            #self.radio.flush_rx()
+        #self.radio.flush_rx()
         return
     
 
