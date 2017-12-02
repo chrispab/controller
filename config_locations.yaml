@@ -80,7 +80,7 @@ locations:
   
   readingPipeAddress: "NodeS"  #pipe address for receiving from wireless watchdog
   writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
-  ackMessage: "loc SHD - alive!"  #message sent back on reciept of arduino watchdog ping
+  ackMessage: "SSS"  #message sent back on reciept of arduino watchdog ping
   
 
 
@@ -125,7 +125,7 @@ locationc:
   readingPipeAddress: "NodeC"  #pipe address for receiving from wireless watchdog
 
   writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
-  ackMessage: "loc CNV - I'm here!"  #message sent back on reciept of arduino watchdog ping
+  ackMessage: "CCC"  #message sent back on reciept of arduino watchdog ping
 
 
 
@@ -165,4 +165,4 @@ locationg:
   
   readingPipeAddress: "NodeG"  #pipe address for receiving from wireless watchdog
   writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
-  ackMessage: "loc GRG - alive"  #message sent back on reciept of arduino watchdog ping
+  ackMessage: "GGG"  #message sent back on reciept of arduino watchdog ping

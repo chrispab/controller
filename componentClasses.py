@@ -41,7 +41,7 @@ class RadioLink(object):
     def __init__(self):
         logger.info("Creating radio Link")
         self.lastHeartBeatSentMillis = 0
-        self.heartBeatInterval = 10000 #5 secs in msecs
+        self.heartBeatInterval = cfg.getItemValueFromConfig('heartBeatInterval')
         self.radio = RF24(17, 0)
 
         self.prev_radio_millis = 0  # last time vent state updated
