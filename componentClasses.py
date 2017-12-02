@@ -102,7 +102,7 @@ class RadioLink(object):
                 self.radio.stopListening()
 
                 # Send the final one back.
-                send_payload_2 = b'from pi -Ping Received'
+                #send_payload_2 = b'from pi -Ping Received'
                 #self.radio.write(send_payload_2)
                 self.radio.write(self.ackMessage)
                 
@@ -111,7 +111,7 @@ class RadioLink(object):
                 logger.warning(self.ackMessage)
 
                 # Now, resume listening so we catch the next packets.
-                self.radio.startListening()
+        self.radio.startListening()
             #self.radio.flush_rx()
         return
     
