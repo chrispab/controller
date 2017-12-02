@@ -2,7 +2,6 @@
 __pycache__
 myvenv
 db.sqlite3
-sendemail.py
 thdata.csv
 .DS_Store
 extradata.csv
@@ -17,7 +16,3 @@ venv
 secureFile.py
 myenvctl.log
 location.py
-zone1db.db
-zone2db.db
-zone3db.db
-/rftest
