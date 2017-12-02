@@ -149,7 +149,7 @@ locationg:
   heater_off_t: 30000  #min time heater is on or off for
   heater_sp_offset: 0
 
-  ventOnDelta: 30000 #duration vent is on in millis
+  ventOnDelta: 15000 #duration vent is on in millis
   ventOffDelta: 90000 #vent off duration in miili sec
   ventPulseOnDelta: 10000 #60 secs cooling on delta
   vent_lon_sp_offset: 0.0 #offset
