@@ -78,7 +78,7 @@ locations:
   #writingPipeAddress: 0xF0F0F0F0D2 # address for pipe to write to wireless watchdog
   
   readingPipeAddress: "Node0"  #pipe address for receiving from wireless watchdog
-  writingPipeAdress: "NodeS" # address for pipe to write to wireless watchdog
+  writingPipeAddress: "NodeS" # address for pipe to write to wireless watchdog
   ackMessage: "location SHD - ACK to watchdog"  #message sent back on reciept of arduino watchdog ping
   
 
