@@ -16,3 +16,6 @@ venv
 secureFile.py
 myenvctl.log
 location.py
+zone1db.db
+zone2db.db
+zone3db.db
