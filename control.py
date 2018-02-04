@@ -29,6 +29,15 @@ import sys    # for stdout print
 import socket # to get hostname
 import sendemail as emailMe
 
+import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
+
+Broker = "192.168.0.200"
+
+sub_topic = "/zone1/instructions"    # receive messages on this topic
+
+pub_topic = "/zone1/data"       # send messages to this topic
+
 from myemail import MyEmail
 
 from Logger import Logger
@@ -109,6 +118,37 @@ class Controller(object):
 logger.info("--- Creating the controller---")
 ctl1 = Controller()
 emailObj = MyEmail()
+
+############### MQTT section ##################
+
+# when connecting to mqtt do this;
+
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+    client.subscribe(sub_topic)
+
+# when receiving a mqtt message do this;
+
+def on_message(client, userdata, msg):
+    message = str(msg.payload)
+    print(msg.topic+" "+message)
+    display_sensehat(message)
+
+def on_publish(mosq, obj, mid):
+    print("mid: " + str(mid))
+
+
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect(Broker, 1883, 60)
+client.loop_start()
+
+#while True:
+#    sensor_data = [read_temp(), read_humidity(), read_pressure()]
+#    client.publish("monto/solar/sensors", str(sensor_data))
+#    time.sleep(1*60)
+##################################################    
 
 #cfg.
 def main():
@@ -191,6 +231,12 @@ def main():
                                     fanState, heaterState, ventSpeedState,
                                     current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
         if stateChanged :
+            sensor_data = [str(temperature), str(humidity), str(lightState)]
+            logger.warning("=============MQTT sending pre=")#, sensor_data)
+            client.publish("/zone1/TemperatureStatus", temperature)
+            client.publish("/zone1/HumidityStatus", humidity)
+            client.publish("/zone1/LightStatus", lightState)
+            logger.warning("=============MQTT sending post=")#, sensor_data)
             #print("->")
             logger.debug("======== start state changed main list ======")
             # check for alarm levels etc
