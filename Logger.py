@@ -143,7 +143,7 @@ class Logger(object):
                     logger.debug("..new data row generated.. new temp")
                 self.dataHasChanged()
                 self.previous_CSV_write_millis = self.current_millis  # reset timer
-
+                self.state_changed = True
         self.previous_temperature = self.temperature
         self.previous_humidity = self.humidity
         self.previous_heater_state = self.heater_state

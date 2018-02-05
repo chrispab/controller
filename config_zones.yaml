@@ -7,7 +7,7 @@
 
 #db params
 zone1:
-  zoneName: "Zone 1"
+  zoneName: "Zone1"
   db_hostname: "127.0.0.1"
   db_username: "zone1"
   db_password: "zone1"
@@ -21,7 +21,7 @@ zone1:
 # zone2 params
 # db params
 zone2:
-    zoneName: "Zone 2"
+    zoneName: "Zone2"
     db_hostname: "127.0.0.1"
     db_username: "zone2"
     db_password: "zone2"
@@ -34,7 +34,7 @@ zone2:
 
 #db params
 zone3:
-  zoneName: "Zone 3"
+  zoneName: "Zone3"
   db_hostname: "127.0.0.1"
   db_username: "zone3"
   db_password: "zone3"

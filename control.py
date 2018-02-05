@@ -65,6 +65,8 @@ path = cfg.getItemValueFromConfig('dataPath')
 
 processUptime = 0
 systemMessage = 0
+emailzone = ""
+
 
 from componentClasses import *   #components of controller board
 
@@ -164,6 +166,7 @@ def main():
     global systemMessage
     global controllerMessage
     global miscMessage
+    global emailzone
     
     
     #TODO ENABLE EMAIL ENABLED OBEY
@@ -172,10 +175,10 @@ def main():
     message = zone
     #if just booted
     if ctl1.timer1.secsSinceBoot() < 120:
-        zone = zone + ' REBOOT '
+        emailzone = zone + ' REBOOT '
     
     #emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
-    emailObj.send( zone + ' emailObj ' + location + ' - Process Started', message)
+    emailObj.send( emailzone + ' emailObj ' + location + ' - Process Started', message)
                 
     while 1:
 
@@ -233,9 +236,9 @@ def main():
         if stateChanged :
             sensor_data = [str(temperature), str(humidity), str(lightState)]
             logger.warning("=============MQTT sending pre=")#, sensor_data)
-            client.publish("/zone1/TemperatureStatus", temperature)
-            client.publish("/zone1/HumidityStatus", humidity)
-            client.publish("/zone1/LightStatus", lightState)
+            client.publish("/"+zone+"/TemperatureStatus", temperature)
+            client.publish("/"+zone+"/HumidityStatus", humidity)
+            client.publish("/"+zone+"/LightStatus", lightState)
             logger.warning("=============MQTT sending post=")#, sensor_data)
             #print("->")
             logger.debug("======== start state changed main list ======")
