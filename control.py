@@ -234,12 +234,18 @@ def main():
                                     fanState, heaterState, ventSpeedState,
                                     current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
         if stateChanged :
+            
             sensor_data = [str(temperature), str(humidity), str(lightState)]
             logger.warning("=============MQTT sending pre=")#, sensor_data)
             client.publish("/"+zone+"/TemperatureStatus", temperature)
             client.publish("/"+zone+"/HumidityStatus", humidity)
-            client.publish("/"+zone+"/LightStatus", lightState)
+            client.publish("/"+zone+"/HeaterStatus", heaterState)
+            
+            client.publish("/"+zone+"/ventStatus", ventState)
+            client.publish("/"+zone+"/fanStatus", fanState)
+            client.publish("/"+zone+"/ventSpeedStatus", ventSpeedState)
             logger.warning("=============MQTT sending post=")#, sensor_data)
+            
             #print("->")
             logger.debug("======== start state changed main list ======")
             # check for alarm levels etc
