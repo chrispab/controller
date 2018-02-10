@@ -1,1 +1,1 @@
-VERSION = "1.33 MQTT"
+VERSION = "1.34 email subject fix"

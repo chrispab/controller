@@ -66,6 +66,7 @@ path = cfg.getItemValueFromConfig('dataPath')
 processUptime = 0
 systemMessage = 0
 emailzone = ""
+zoneNumber = 0
 
 
 from componentClasses import *   #components of controller board
@@ -171,14 +172,15 @@ def main():
     
     #TODO ENABLE EMAIL ENABLED OBEY
     zone = cfg.getItemValueFromConfig('zoneName')
+    zoneNumber = cfg.getItemValueFromConfig('zoneNumber')
     location = cfg.getItemValueFromConfig('locationDisplayName')
     message = zone
     #if just booted
     if ctl1.timer1.secsSinceBoot() < 120:
-        emailzone = zone + ' REBOOT '
+        emailzone = "Zone " + zoneNumber + ' REBOOTED '
     
     #emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
-    emailObj.send( emailzone + ' emailObj ' + location + ' - Process Started', message)
+    emailObj.send( "Zone " + zoneNumber + " " + emailzone + location + ' - Process Started', message)
                 
     while 1:
 
