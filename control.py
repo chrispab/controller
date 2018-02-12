@@ -243,9 +243,10 @@ def main():
             client.publish("/"+zone+"/HumidityStatus", humidity)
             client.publish("/"+zone+"/HeaterStatus", heaterState)
             
-            client.publish("/"+zone+"/ventStatus", ventState)
-            client.publish("/"+zone+"/fanStatus", fanState)
-            client.publish("/"+zone+"/ventSpeedStatus", ventSpeedState)
+            client.publish("/"+zone+"/VentStatus", ventState)
+            client.publish("/"+zone+"/FanStatus", fanState)
+            client.publish("/"+zone+"/VentSpeedStatus", ventSpeedState)
+            client.publish("/"+zone+"/LightStatus", lightState)
             logger.warning("=============MQTT sending post=")#, sensor_data)
             
             #print("->")

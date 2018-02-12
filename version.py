@@ -1,1 +1,1 @@
-VERSION = "1.34 email subject fix"
+VERSION = "1.35 topic caps"
