@@ -250,11 +250,7 @@ class sensor(object):
                 #self.prevTempHumiMillis = self.currentMillis
                 self.temperature = round(self.temperature, 1)
                 self.humidity = round(self.humidity, 1)
-                
-                #filter temp function
-                #self.proc_temp = self.proc_temp + ( 0.333 * (self.temperature - self.proc_temp))
-                #self.proc_temp = round(self.proc_temp, 3)
-                #print('')
+
                 logger.warning('Temp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
 
             else:

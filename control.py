@@ -206,7 +206,8 @@ def main():
         humidity, temperature,sensorMessage = ctl1.sensor1.read()
         if sensorMessage :
             #emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)	
-            emailObj.send(zone + ': bad sensor reads  - PowerCycle', sensorMessage)
+            emailObj.send("Zone " + zoneNumber + " " + emailzone + location + ' - : bad sensor reads  - PowerCycle', sensorMessage)
+            #emailObj.send( "Zone " + zoneNumber + " " + emailzone + location + ' - Process Started', message)
 
         endT= time.time()
         duration = endT-startT
