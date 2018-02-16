@@ -240,14 +240,14 @@ def main():
             
             sensor_data = [str(temperature), str(humidity), str(lightState)]
             logger.warning("=============MQTT sending pre=")#, sensor_data)
-            client.publish("/"+zone+"/TemperatureStatus", temperature)
-            client.publish("/"+zone+"/HumidityStatus", humidity)
-            client.publish("/"+zone+"/HeaterStatus", heaterState)
+            client.publish(zone+"/TemperatureStatus", temperature)
+            client.publish(zone+"/HumidityStatus", humidity)
+            client.publish(zone+"/HeaterStatus", heaterState)
             
-            client.publish("/"+zone+"/VentStatus", ventState)
-            client.publish("/"+zone+"/FanStatus", fanState)
-            client.publish("/"+zone+"/VentSpeedStatus", ventSpeedState)
-            client.publish("/"+zone+"/LightStatus", lightState)
+            client.publish(zone+"/VentStatus", ventState)
+            client.publish(zone+"/FanStatus", fanState)
+            client.publish(zone+"/VentSpeedStatus", ventSpeedState)
+            client.publish(zone+"/LightStatus", lightState)
             logger.warning("=============MQTT sending post=")#, sensor_data)
             
             #print("->")
