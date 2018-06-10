@@ -1,1 +1,1 @@
-VERSION = "1.36 email subj correct"
+VERSION = "1.37 remoteDBEn flag"
