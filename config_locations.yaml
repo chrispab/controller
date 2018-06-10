@@ -82,6 +82,8 @@ locations:
   writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
   ackMessage: "SSS"  #message sent back on reciept of arduino watchdog ping
   
+  remoteDBEnabled: False
+  
 
 
 locationc:
@@ -126,6 +128,8 @@ locationc:
 
   writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
   ackMessage: "CCC"  #message sent back on reciept of arduino watchdog ping
+  
+  remoteDBEnabled: False
 
 
 
@@ -156,8 +160,8 @@ locationg:
   vent_lon_sp_offset: 0.0 #offset
   vent_loff_sp_offset: 2.0 #
 
-  fan_on_t: 9000000  #vent on time
-  fan_off_t: 5000 #vent off time
+  fan_on_t: 9000  #vent on time
+  fan_off_t: 50000 #vent off time
 
 
   emailEnabled: True
@@ -166,3 +170,6 @@ locationg:
   readingPipeAddress: "NodeG"  #pipe address for receiving from wireless watchdog
   writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
   ackMessage: "GGG"  #message sent back on reciept of arduino watchdog ping
+ 
+  remoteDBEnabled: False
+
