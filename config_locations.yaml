@@ -1,0 +1,175 @@
+# YAML
+
+# stores location specific params
+
+#===config params to store in config obj so tunable via web interface====
+
+common:
+  platform_name: "RPi2"
+  hardware: "RaspberryPi2"
+
+  readDelay: 3 #sensor read delay   
+  RelayOff: 0 #state for relay OFF
+  RelayOn: 1  #state for on
+  dataPath: "data/thdata.csv"
+#extraPath: "data/extradata.csv"   
+#=================hardware dependant pins values etc====================
+#----pin assignments and related hardware defs----
+  powerPin: 2    #pyhs pin 3
+  led2: 4        #phys pin 5
+  sensorPin: 3   #phys pin 5
+  heaterRelay: 5 #pyhs pin 29
+  ventRelay: 26   #phys pin 37
+  fanRelay: 11    #phys pin 23
+  relay4: 6      #pyhs pin 31
+  RCPin: 27 #phypin13
+  alivePin: 22 #phy pin 15
+  watchDogPin: 17    #phys pin 11
+
+#placeholder items - used for items pushed from system
+  processUptime: "00:00:00"
+  systemMessage: "system message"
+  systemUpTime: "00:00:00"
+  version: "Version Placeholder"
+
+  emailSendTimeGap: 900000 # = 60 * 15 * 1000 = 900000, time in milli secs, 60 secs each 1000 ms
+  
+  radioChannel: 124 # chanel nrf radios operate on
+  
+  heartBeatInterval: 10000 # 10 secs in msecs
+
+  
+  
+locations:
+  fanRelay: 13    #phys pin 33 new for radio watchdog version
+
+  id: "s"
+  locationDisplayName: "SHD"
+
+  tempSPLOn: 22.5   #
+  tempSPLOff: 16.0 #
+
+  tempAlertHi: 30.0  #hi temp alert temp
+  tempAlertLo: 14.5  #lo temp alert
+
+  lightOnT: "20:00:00"    # time light on hh:mm:ss
+  lightOffT: "14:00:00"   # time off
+
+  min_CSV_write_interval: 60000 #interval min bet csv writes
+
+  heater_on_t: 30000  #min time heater is on when below lo sp
+  heater_off_t: 30000  #min time heater is off for
+  heater_sp_offset: 0
+
+  ventOnDelta: 60000 #duration vent is on in millis - minimum mark
+  ventOffDelta: 60000 #vent off duration in miili sec
+  ventPulseOnDelta: 60000 #60 secs cooling on delta
+  vent_lon_sp_offset: -0.1 #offset
+  vent_loff_sp_offset: 1.0 #
+
+  fan_on_t: 17400000  #vent on time ms
+  fan_off_t: 10000 #vent off time ms
+
+
+  emailEnabled: True
+  
+  quietMode: True
+  
+  #readingPipeAddress: 0xF0F0F0F0E1  #pipe address for receiving from wireless watchdog
+  #writingPipeAddress: 0xF0F0F0F0D2 # address for pipe to write to wireless watchdog
+  
+  readingPipeAddress: "NodeS"  #pipe address for receiving from wireless watchdog
+  writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
+  ackMessage: "SSS"  #message sent back on reciept of arduino watchdog ping
+  
+  remoteDBEnabled: False
+  
+
+
+locationc:
+  fanRelay: 13    #phys pin 33 new for radio watchdog version
+
+  id: "c"
+  locationDisplayName: "CSV"
+
+  tempSPLOn: 21.0   #target 24.o veg mp set point max with lon
+  tempSPLOff: 15.0 #target = 21.0 veg, target loff
+
+  tempAlertHi: 39.0  #hi temp alert temp   tempAlertLo: 14.5  #lo temp alert
+  #tempAlertHi: 30.0  #hi temp alert temp
+  tempAlertLo: 14.5  #lo temp alert
+
+  lightOnT: "20:00:00"    # time light on hh:mm:ss
+  lightOffT: "14:00:00"   # time off
+
+  min_CSV_write_interval: 60000 #interval min bet csv writes
+
+  heater_on_t: 8000  #min time heater is on or off for in ms
+  heater_off_t: 8000  #min time heater is on or off for
+  heater_sp_offset: 0
+
+  ventOnDelta: 20000 #duration vent is on in millis - minimum mark
+  ventOffDelta: 90000 #vent off duration in miili sec
+  ventPulseOnDelta: 30000 #60 secs cooling on delta
+  vent_lon_sp_offset: 0.0 #offset
+  vent_loff_sp_offset: 0.0 #
+
+  fan_on_t: 400000  #vent on time
+  fan_off_t: 40000 #vent off time
+
+  emailEnabled: True
+  quietMode: True
+  
+#  readingPipeAddress: 0xF0F0F0F0E1  #pipe address for receiving from wireless watchdog
+
+#  writingPipeAdress: 0xF0F0F0F0D2 # address for pipe to write to wireless watchdog
+
+  readingPipeAddress: "NodeC"  #pipe address for receiving from wireless watchdog
+
+  writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
+  ackMessage: "CCC"  #message sent back on reciept of arduino watchdog ping
+  
+  remoteDBEnabled: False
+
+
+
+locationg:
+  fanRelay: 13    #phys pin 33 new for radio watchdog version
+
+  id: "g"
+  locationDisplayName: "GRG"
+
+  tempSPLOn: 23.8   # 25.2 max calced
+  tempSPLOff: 16.0 #
+
+  tempAlertHi: 26.1  #hi temp alert temp
+  tempAlertLo: 15.0  #lo temp alert
+
+  lightOnT: "16:00:00"    # time light on hh:mm:ss
+  lightOffT: "10:00:00"   # time off
+
+  min_CSV_write_interval: 60000 #interval min bet csv writes
+
+  heater_on_t: 4000  #min time heater is on or off for
+  heater_off_t: 30000  #min time heater is on or off for
+  heater_sp_offset: 0
+
+  ventOnDelta: 15000 #duration vent is on in millis
+  ventOffDelta: 90000 #vent off duration in miili sec
+  ventPulseOnDelta: 10000 #60 secs cooling on delta
+  vent_lon_sp_offset: 0.0 #offset
+  vent_loff_sp_offset: 2.0 #
+
+  fan_on_t: 9000  #vent on time
+  fan_off_t: 50000 #vent off time
+
+
+  emailEnabled: True
+  quietMode: True
+  
+  readingPipeAddress: "NodeG"  #pipe address for receiving from wireless watchdog
+  writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
+  ackMessage: "GGG"  #message sent back on reciept of arduino watchdog ping
+ 
+  remoteDBEnabled: False
+

@@ -1,0 +1,88 @@
+install raspian
+
+enable ssh via raspi-config
+
+static ip
+sudo nano /etc/dhcpcd.conf
+add
+
+interface eth0
+
+static ip_address=192.168.0.10/24
+static routers=192.168.0.1
+static domain_name_servers=194.168.4.100 194.168.8.100
+
+remote in
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get dist-upgrade
+
+install webmin
+install maria db
+
+sudo apt-get update
+sudo apt install mariadb-server
+
+install myphpadmin
+
+sudo apt-get install myphpadmin
+
+accept install of apache2
+sudo nano  /etc/php5/apache2/php.ini
+
+382ish
+
+max_execution_time = 30
+to
+max_execution_time = 800
+
+max_input_time = 60
+
+to 
+max_input_time = 800
+
+line 449 ish
+change
+error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
+to
+error_reporting = E_ALL
+for dev work
+
+display_errors = Off
+to
+display_errors = On
+
+display_startup_errors = Off
+
+to
+display_startup_errors = On
+
+660ish
+post_max_size = 8M
+to
+post_max_size = 32M
+
+line 820 ish
+upload_max_filesize = 2M
+to
+upload_max_filesize = 32M
+
+save and restart apache
+import sensordb from other zone
+or via cli
+mysql -u root -p < zone1sensordbexport.sql
+
+install yaml
+sudo pip install pyyaml
+
+
+install Adafruit Python DHT Sensor Library
+sudo apt-get update
+sudo apt-get install build-essential python-dev
+
+Install the library by downloading with the download link on the right, unzipping the archive, and executing:
+https://github.com/adafruit/Adafruit_Python_DHT/archive/master.zip
+
+sudo python setup.py install
+
+

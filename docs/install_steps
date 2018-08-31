@@ -1,0 +1,11 @@
+to create new db ready
+
+cd controller
+
+rm zone2db.db
+
+python createZoneDb.py
+
+
+
+

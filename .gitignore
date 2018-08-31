@@ -2,7 +2,6 @@
 __pycache__
 myvenv
 db.sqlite3
-sendemail.py
 thdata.csv
 .DS_Store
 extradata.csv
@@ -12,7 +11,11 @@ venv
 /chartx
 /C_Python_sensor_driver
 
-Adafruit_Python_DHT-master/
-master.zip
-myenvctl.log
+/Adafruit_Python_DHT
+/build
 secureFile.py
+myenvctl.log
+location.py
+zone1db.db
+zone2db.db
+zone3db.db

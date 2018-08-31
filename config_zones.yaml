@@ -1,0 +1,50 @@
+# YAML
+
+# contains config vals for all zones
+
+#===config params to store in config obj so tunable via web interface====
+
+
+#db params
+zone1:
+  zoneName: "Zone1"
+  zoneNumber: "1"
+  db_hostname: "127.0.0.1"
+  db_username: "zone1"
+  db_password: "zone1"
+  db_dbname: "zone1db"
+
+  central_db_hostname: "192.168.0.201"
+  central_db_username: "zone1"
+  central_db_password: "zone1"
+  central_db_dbname: "zone1centraldb"
+
+# zone2 params
+# db params
+zone2:
+    zoneName: "Zone2"
+    zoneNumber: "2"
+    db_hostname: "127.0.0.1"
+    db_username: "zone2"
+    db_password: "zone2"
+    db_dbname: "zone2db"
+
+    central_db_hostname: "192.168.0.201"
+    central_db_username: "zone2"
+    central_db_password: "zone2"
+    central_db_dbname: "zone2centraldb"
+
+#db params
+zone3:
+  zoneName: "Zone3"
+  zoneNumber: "3"
+  db_hostname: "127.0.0.1"
+  db_username: "zone3"
+  db_password: "zone3"
+  db_dbname: "zone3db"
+
+  central_db_hostname: "192.168.0.201"
+  central_db_username: "zone3"
+  central_db_password: "zone3"
+  central_db_dbname: "zone3centraldb"
+

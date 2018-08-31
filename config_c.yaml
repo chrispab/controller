@@ -1,0 +1,83 @@
+# YAML
+
+#===config params to store in config obj so tunable via web interface====
+
+#Zone 2 - RPi
+zoneName: "Zone 2"
+#location: "CTY"
+
+#Hardware specific config items
+# comment out for hardware used as appropriate
+platform_name: "RPi2"
+#platform_name = "PCDuino"
+hardware: "RaspberryPi2"
+#hardware = "PCDuino3"
+readDelay: 3 #sensor read delay
+##
+tempSPLOn: 21.0   #target 24.o veg mp set point max with lon
+tempSPLOff: 16.0 #target = 21.0 veg, target loff
+
+tempAlertHi: 27.0  #hi temp alert temp
+tempAlertLo: 14.5  #lo temp alert
+
+lightOnT: "20:00:00"    # time light on hh:mm:ss
+lightOffT: "14:00:00"   # time off
+
+min_CSV_write_interval: 60000 #interval min bet csv writes
+
+##----L control params----
+heat_off_hours: [ 20,21,22,23,0,1,2,3,4,5,6,7,8,9,10,11,12,13 ]   #hours when heater should NOT operate
+
+RelayOff: 0 #state for relay OFF
+RelayOn: 1  #state for on
+
+heater_on_t: 5000  #min time heater is on or off for
+heater_off_t: 30000  #min time heater is on or off for
+heater_sp_offset: 0
+
+ventOnDelta: 20000 #duration vent is on in millis - minimum mark
+ventOffDelta: 97000 #vent off duration in miili sec
+ventPulseOnDelta: 10000 #60 secs cooling on delta
+vent_lon_sp_offset: -0.1 #offset
+vent_loff_sp_offset: 1.0 #
+
+fan_on_t: 1400000  #vent on time
+fan_off_t: 37000 #vent off time
+
+dataPath: "data/thdata.csv"
+#extraPath: "data/extradata.csv"
+
+emailEnabled: True
+
+#db params
+db_hostname: "127.0.0.1"
+db_username: "zone2"
+db_password: "zone2"
+db_dbname: "zone2db"
+
+central_db_hostname: "192.168.0.201"
+central_db_username: "zone2"
+central_db_password: "zone2"
+central_db_dbname: "zone2centraldb"
+
+#placeholder items - used for items pushed from system
+processUptime: "00:00:00"
+systemMessage: "system message"
+systemUpTime: "00:00:00"
+version: "Version Placeholder"
+
+quietMode: True
+#=================hardware dependant pins values etc====================
+#----pin assignments and related hardware defs----
+powerPin: 2    #pyhs pin 3
+led2: 4        #phys pin 5
+sensorPin: 3   #phys pin 5
+heaterRelay: 5 #pyhs pin 29
+ventRelay: 26   #phys pin 37
+fanRelay: 11    #phys pin 23
+relay4: 6      #pyhs pin 31
+RCPin: 27 #phypin13
+alivePin: 22 #phy pin 15
+watchDogPin: 17
+
+
