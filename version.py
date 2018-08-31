@@ -1,1 +1,1 @@
-VERSION = "1.37 remoteDBEn flag"
+VERSION = "1.40 master merge mqtt"
