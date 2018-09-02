@@ -318,7 +318,7 @@ def main():
             
             cfg.setConfigItemInLocalDB('miscMessage', location)
             
-            systemMessage = ctl1.timer1.getUpTime().strip()
+            # systemMessage = ctl1.timer1.getUpTime().strip()
             cfg.setConfigItemInLocalDB('systemMessage', systemMessage  )
 
             ipAddress = get_ip_address()

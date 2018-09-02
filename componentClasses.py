@@ -29,6 +29,8 @@ import RPi.GPIO as GPIO
 import subprocess
 import os
 
+import sdnotify
+
 # for nrf radio link
 from RF24 import *
 irq_gpio_pin = None
@@ -384,6 +386,8 @@ class system_timer(object):
         self.updateClocks()
 
     def holdOffWatchdog(self, current_millis, forceWatchdogToggle=False):
+
+        n = sdnotify.SystemdNotifier()
         
         logger.info('==Hold Off Watchdog==')
         logger.debug('==current millis: %s' % (current_millis))
@@ -408,17 +412,18 @@ class system_timer(object):
             
             
             #notify systemd that we've started
-            retval = sd_notify(0, "READY=1")
-            if (retval != 0):
-                logger.debug("terminating : fatal sd_notify() error for script start\n")
+            # retval = sd_notify(0, "READY=1")
+            retval = n.notify("READY=1")
+            # if (retval != 0):
+            #     logger.debug("terminating : fatal sd_notify() error for script start\n")
                 #exit(1)
     
             #after the init, ping the watchdog and check for errors
-            retval = sd_notify(0, "WATCHDOG=1")
-            if (retval != 0):
-                logger.error("terminating : fatal sd_notify() error for watchdog ping\n")
+           # retval = sd_notify(0, "WATCHDOG=1")
+            retval = n.notify("WATCHDOG=1")
+            # if (retval != 0):
+            #     logger.error("terminating : fatal sd_notify() error for watchdog ping\n")
                 
-#return
         elif  (forceWatchdogToggle == True):
             logger.info("- FORCE Pat the DOG -")
             #print('==WOOF==')
@@ -429,27 +434,7 @@ class system_timer(object):
             GPIO.output(self.watchDogPin, not GPIO.input(self.watchDogPin))
 
             logger.warning("FORCING Pat the watchDOG")
-#return
-
-        #return
-            
-            
-            # else if fanState is ON
-            
-            
-            #sd_notify(0, WATCHDOG_READY)
-            #subprocess.call(['/bin/systemd-notify WATCHDOG=1'], shell=True)
-            #subprocess.call(['/bin/systemd-notify','--pid=' + str(os.getpid()),'WATCHDOG=1'] shell=True)
-            #subprocess.call(["/bin/systemd-notify","--pid=" + str(os.getpid()),"WATCHDOG=1"] shell=True)
-            #subprocess.call(['/bin/systemd-notify','--pid=' + str(os.getpid()),'WATCHDOG=1'], shell=True)
-            
-
-                #exit(1)
-
-        #sys.stdout.write("WF")
-        #sys.stdout.flush()
-			
-		#force watchdog toggle	
+            retval = n.notify("WATCHDOG=1")
 
         return
         
