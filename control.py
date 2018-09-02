@@ -171,25 +171,25 @@ This program will echo back the reverse of whatever it recieves.
 Messages are output to the terminal for debuggin purposes. 
 ''' 
  
-class WSHandler(tornado.websocket.WebSocketHandler):
-    def open(self):
-        print ('new connection')
+# class WSHandler(tornado.websocket.WebSocketHandler):
+#     def open(self):
+#         print ('new connection')
       
-    def on_message(self, message):
-        print ('message received:  %s' % message)
-        # Reverse Message and send it back
-        print ('sending back message: %s' % message[::-1])
-        self.write_message(message[::-1])
+#     def on_message(self, message):
+#         print ('message received:  %s' % message)
+#         # Reverse Message and send it back
+#         print ('sending back message: %s' % message[::-1])
+#         self.write_message(message[::-1])
  
-    def on_close(self):
-        print ('connection closed')
+#     def on_close(self):
+#         print ('connection closed')
  
-    def check_origin(self, origin):
-        return True
+#     def check_origin(self, origin):
+#         return True
  
-application = tornado.web.Application([
-    (r'/ws', WSHandler),
-])
+# application = tornado.web.Application([
+#     (r'/ws', WSHandler),
+# ])
 #cfg.
 def main():
 
