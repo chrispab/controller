@@ -111,7 +111,7 @@ class sensor(object):
         
         #cope with faulty sensor. i.e readings are both NULL
         if (self.humidity is None or self.temperature is None):
-            print self.temperature
+            print (self.temperature)
             print ("FFFFFFFF Posssible faulty sensor detected - returning 0 values")
             #self.temperature = 99
             #self.humidity = 0    
@@ -134,7 +134,7 @@ class sensor(object):
         self.humidity = 70
         #GPIO.setup(heaterRelay, GPIO.OUT)   #set pin as OP
         #GPIO.output(heaterRelay, 0)         #heat off        
-        print self.temperature
+        print (self.temperature)
         logger.error("FFFFFFFF Posssible faulty sensor detected - SAFE MODE ENABLED")        
         return        
                     

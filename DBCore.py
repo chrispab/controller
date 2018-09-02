@@ -30,7 +30,7 @@ class DBCore(object):
                 #logger.warning("***** SQLITE3  OPEN getDBconn connected *: %s, %s SQLITE3 *****" % (hostName, databaseName))
             #except lite.Error, e:
             except Exception as e:
-                print "Error %s:" % e.args[0]
+                print ("Error %s:" % e.args[0])
                 #sys.exit(1)
                 self.dbConn = 0
                 

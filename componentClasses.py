@@ -45,8 +45,8 @@ class RadioLink(object):
         self.radio = RF24(17, 0)
 
         self.prev_radio_millis = 0  # last time vent state updated
-        self.writingPipeAddress = cfg.getItemValueFromConfig('writingPipeAddress')
-        self.readingPipeAddress = cfg.getItemValueFromConfig('readingPipeAddress') 
+        self.writingPipeAddress = cfg.getItemValueFromConfig('writingPipeAddress').encode()
+        self.readingPipeAddress = cfg.getItemValueFromConfig('readingPipeAddress').encode()
         self.ackMessage = cfg.getItemValueFromConfig('ackMessage') 
 
         #self.pipes = [0xF0F0F0F0E1, 0xF0F0F0F0D2]
@@ -99,7 +99,7 @@ class RadioLink(object):
             logger.warning(self.ackMessage)
             self.lastHeartBeatSentMillis = millis()
 
-            self.radio.write(self.ackMessage)
+            self.radio.write(self.ackMessage.encode())
 
         
         return
@@ -409,13 +409,13 @@ class system_timer(object):
             
             #notify systemd that we've started
             retval = sd_notify(0, "READY=1")
-            if retval <> 0:
+            if (retval != 0):
                 logger.debug("terminating : fatal sd_notify() error for script start\n")
                 #exit(1)
     
             #after the init, ping the watchdog and check for errors
             retval = sd_notify(0, "WATCHDOG=1")
-            if retval <> 0:
+            if (retval != 0):
                 logger.error("terminating : fatal sd_notify() error for watchdog ping\n")
                 
 #return
