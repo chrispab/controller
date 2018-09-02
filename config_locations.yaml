@@ -8,7 +8,7 @@ common:
   platform_name: "RPi2"
   hardware: "RaspberryPi2"
 
-  readDelay: 3 #sensor read delay   
+  readDelay: 5 #sensor read delay   
   RelayOff: 0 #state for relay OFF
   RelayOn: 1  #state for on
   dataPath: "data/thdata.csv"

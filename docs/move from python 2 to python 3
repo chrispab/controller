@@ -125,5 +125,150 @@ Successfully installed RPi.GPIO-0.6.3
 to setup R24 lib for use with python 3 must:
 clone lib
 setup libboost - to allow craeation of python3 wrapper for the C lang RF24 lib
+install lib booost ; https://tmrh20.github.io/RF24/Python.html
+
+notes from http://www.joernesdohr.com/tutorials/using-the-rf24-library-for-nrf24l01-on-raspberry-pi-with-python-3/
+to install lib booostmodded here
+1. Get the Boost sources
+from https://www.boost.org/users/download/
+
+download to home dir 
+unzip it via webmin 
+Compile and install Boost.Python
+Go into the unpacked boost folder
+./bootstrap.sh --with-libraries=python --with-python=python3
+
+pi@zone1:~ $ cd boost_1_68_0
+pi@zone1:~/boost_1_68_0 $ ./bootstrap.sh --with-libraries=python --with-python=python3
+Building Boost.Build engine with toolset gcc... tools/build/src/engine/bin.linuxarm/b2
+Detecting Python version... 3.5
+Detecting Python root... /usr
+Unicode/ICU support for Boost.Regex?... not found.
+Generating Boost.Build configuration in project-config.jam...
+
+Bootstrapping is done. To build, run:
+
+    ./b2
+    
+To adjust configuration, edit 'project-config.jam'.
+Further information:
+
+   - Command line help:
+     ./b2 --help
+     
+   - Getting started guide: 
+     http://www.boost.org/more/getting_started/unix-variants.html
+     
+   - Boost.Build documentation:
+     http://www.boost.org/build/doc/html/index.html
+
+pi@zone1:~/boost_1_68_0 $ 
+
+sudo ./b2 install
+!! THis takes ages
+& lots of warnings etc on screen
+ends with:
+gcc.archive bin.v2/libs/python/build/gcc-6.3.0/release/link-static/threading-multi/libboost_python35.a
+common.copy /usr/local/lib/libboost_python35.a
+...updated 14788 targets...
+
+now setup RF24 lib to work with python3
+Install the python-dev (or python3-dev) and boost libraries
+sudo apt-get install python3-dev libboost-python-dev 
+
+grab the repo and clone into the controller folder
+
+cd controller
+git clone https://github.com/nRF24/RF24.git
+
+cd RF24
+
+# Build it.
+./configure && make
+
+# Build the Python modules.
+cd pyRF24
+sudo python3 setup.py build
+
+dont forget 
+sudo python3 setup.py install    also
+
+You need to link the following library, but worked like a charm:
+
+sudo ln -s /usr/lib/arm-linux-gnueabihf/libboost_python-py35.so /usr/lib/arm-linux-gnueabihf/libboost_python3.so
+
+to check if linksetup do:
+ls /usr/lib/arm-linux-gnueabihf/libboost_python*
+line in red indicates prob so del it and recreate link
+sudo rm /usr/lib/arm-linux-gnueabihf/libboost_python3.so
+sudo ln -s /usr/lib/arm-linux-gnueabihf/libboost_python-py35.so /usr/lib/arm-linux-gnueabihf/libboost_python3.so
+
+
+~/RF24Python/pyRF24 $ python3 setup.py build
+running build
+running build_ext
+building 'RF24' extension
+
+
 
 compile c lib RF24then run in pyRF24 setup to create the pyhton3 wrapper
+
+
+notes from: https://github.com/nRF24/RF24/issues/419
+
+now modify systemd unit file to launch controller.py with python 3
+
+edit file
+sudo nano /lib/systemd/system/zone_controller.service
+restart and register file
+sudo systemctl daemon-reload
+sudo systemctl enable zone_controller.service
+
+git pull?
+
+sudo systemctl restart zone_controller.service
+sudo journalctl --follow -u zone_controller.service
+
+
+You can also do an rpi-update and apt dist-upgrade.
+
+
+
+fix for pyyaml no module
+sudo apt-get install python3-yaml
+
+fix 
+sudo apt-get install python3-pymysql
+
+for paho no module fix is:
+  303  cd controller
+  304  git clone https://github.com/eclipse/paho.mqtt.python
+  305  cd paho.mqtt.python
+  306  python3 setup.py install
+  307  sudo python3 setup.py install
+
+pi@zone1:~/controller/paho.mqtt.python $ pip3 install tornado
+Collecting tornado
+  Downloading https://www.piwheels.org/simple/tornado/tornado-5.1-cp35-cp35m-linux_armv7l.whl (459kB)
+    100% |████████████████████████████████| 460kB 180kB/s 
+Installing collected packages: tornado
+Successfully installed tornado-5.1
+
+sudo apt-get install python3-tornado
+
+sudo apt-get install python3-RPi.GPIO
+
+DHT install
+pi@zone1:~/controller/paho.mqtt.python $ cd ~
+pi@zone1:~ $ git clone https://github.com/adafruit/Adafruit_Python_DHT.git
+Cloning into 'Adafruit_Python_DHT'...
+remote: Counting objects: 286, done.
+remote: Compressing objects: 100% (15/15), done.
+remote: Total 286 (delta 8), reused 14 (delta 5), pack-reused 265
+Receiving objects: 100% (286/286), 89.43 KiB | 56.00 KiB/s, done.
+Resolving deltas: 100% (155/155), done.
+pi@zone1:~ $ cd Adafruit_Python_DHT
+pi@zone1:~/Adafruit_Python_DHT $ sudo python3 setup.py install
+
+sudo apt-get install python3-psutil
+

@@ -127,6 +127,10 @@ class Config(object):
         return
 
     def updateCentralConfigTable(self):
+
+        if (self.getItemValueFromConfig('remoteDBEnabled') == False):
+            logger.warning("-------------remoteDB DISABLED ------------------------")
+            return
         try:
             # Open database connection
             logger.debug("=== update central config table ===")
