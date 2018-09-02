@@ -1,1 +1,1 @@
-VERSION = "1.40 master merge mqtt"
+VERSION = "1.41 master python3"
