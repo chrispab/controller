@@ -40,7 +40,7 @@ import socket
 
 #import RF24
 
-#import asyncio
+import asyncio
 
 Broker = "192.168.0.200"
 
@@ -171,25 +171,25 @@ This program will echo back the reverse of whatever it recieves.
 Messages are output to the terminal for debuggin purposes. 
 ''' 
  
-# class WSHandler(tornado.websocket.WebSocketHandler):
-#     def open(self):
-#         print 'new connection'
+class WSHandler(tornado.websocket.WebSocketHandler):
+    def open(self):
+        print ('new connection')
       
-#     def on_message(self, message):
-#         print 'message received:  %s' % message
-#         # Reverse Message and send it back
-#         print 'sending back message: %s' % message[::-1]
-#         self.write_message(message[::-1])
+    def on_message(self, message):
+        print ('message received:  %s' % message)
+        # Reverse Message and send it back
+        print ('sending back message: %s' % message[::-1])
+        self.write_message(message[::-1])
  
-#     def on_close(self):
-#         print 'connection closed'
+    def on_close(self):
+        print ('connection closed')
  
-#     def check_origin(self, origin):
-#         return True
+    def check_origin(self, origin):
+        return True
  
-# application = tornado.web.Application([
-#     (r'/ws', WSHandler),
-# ])
+application = tornado.web.Application([
+    (r'/ws', WSHandler),
+])
 #cfg.
 def main():
 
@@ -344,13 +344,6 @@ def main():
             logger.debug("MMMMMM memory pc.available: %0.2f MMMMMM",((float(mem.available)/float(mem.total)))*100)
             #logger.warning("======== % memory available: %s ======",mem.percent)
 
-        
-        #else:
-            #sys.stdout.write(">")
-            #sys.stdout.flush()
-        #tracker.print_diff()
-        #logger.warning(mem_top()) # Or just print().
-
 
 
 if __name__ == "__main__":
@@ -358,7 +351,7 @@ if __name__ == "__main__":
     # http_server = tornado.httpserver.HTTPServer(application)
     # http_server.listen(8888)
     # # tornado.ioloop.IOLoop.instance().start()
-    # tornado.ioloop.IOLoop.instance().run_sync(main)
+    # tornado.ioloop.IOLoop.current().run_sync(main)
 
 
     main()
