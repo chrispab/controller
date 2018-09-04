@@ -98,7 +98,7 @@ class sensor(object):
             logger.error("..ERROR TRYING TO READ SENSOR on PRIME sensor read")
             self.readErrs += 1
 
-            sleep(self.delay) #wait before re-read
+            sleep(3) #wait before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
             
             ##self.prevTempHumiMillis = self.currentMillis
@@ -207,7 +207,7 @@ class sensor(object):
             logger.error("..ERROR TRYING TO READ SENSOR on sensor read test")
             self.readErrs += 1
 
-            sleep(self.delay) #wait secs before re-read
+            sleep(3) #wait secs before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
             logger.debug("readings %s, %s" % (self.temperature, self.humidity))
 
