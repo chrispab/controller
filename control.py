@@ -250,19 +250,13 @@ def main():
         ctl1.radioLink1.holdOffWatchdog()
 
         startT = time.time()
-
-        # read sensor
-        # sensorMessage = ''
         humidity, temperature, sensorMessage = ctl1.sensor1.read()
         if sensorMessage:
-            # emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)
             emailObj.send("Zone " + zoneNumber + " " + emailzone + location +
                           ' - : bad sensor reads  - PowerCycle', sensorMessage)
-            # emailObj.send( "Zone " + zoneNumber + " " + emailzone + location + ' - Process Started', message)
-
         endT = time.time()
         duration = endT-startT
-        logger.debug("+++ Aquisition sampletime: %s +++", duration)
+        #logger.error("^^^^^^^^^^  Aquisition sampletime: %s ^^^^^^^^^^^", duration)
 
         # get all states
         lightState = ctl1.light.getLightState()
@@ -292,6 +286,7 @@ def main():
                                                          fanState, heaterState, ventSpeedState,
                                                          current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
         if stateChanged:
+            # logger.error("^^^^^^^^^^  Aquisition sampletime: %d ^^^^^^^^^^^", duration)
 
             sensor_data = [str(temperature), str(humidity), str(lightState)]
             # , sensor_data)
@@ -368,15 +363,15 @@ def main():
 
 def worker():
     """worker function"""
-    print('========================================================Worker start==================================')
+    print('=========================Worker start==================')
     # name = multiprocessing.current_process().name
     # with s:
     # pool.makeActive(name)
 
     while 1:
         logger.warning(
-            "++++++++++++++++++++++++++++++++++++++++++++++======== worker warning logger ======")
-        print('========================================================Worker random==================================')
+            "++++++++++++++I'm a websocket process - Hi! ++++++++++++")
+        print('==================Worker random======================')
         time.sleep(random.random()*100)
         # pool.makeInactive(name)
 
