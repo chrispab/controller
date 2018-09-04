@@ -180,7 +180,7 @@ class sensor(object):
         #print("Time Gap : %s" %timeGap)
         #sleep(cfg.getItemValueFromConfig('readDelay'))
         #timeToGo = timeGap < time.delta(seconds-3)
-        if (timeGap < timedelta(seconds=3)):
+        if (timeGap < timedelta(seconds=self.delay)):
             #sleep(self.delay)
             #print("Time Gap to go : %s" %timeGap)
 

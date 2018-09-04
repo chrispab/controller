@@ -5,16 +5,16 @@
 import logging
 # logger options
 ###############
-#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
-#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
+# logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
+# logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 #
 logging.basicConfig(level=logging.WARNING)
-#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
-#logging.basicConfig(format='[%(filename)s:%(lineno)s - %(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
-#logging.basicConfig(format='[%(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
-#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s',filename='myenvctl.log', filemode='w', level=logging.DEBUG)
-#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
-#logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
+# logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
+# logging.basicConfig(format='[%(filename)s:%(lineno)s - %(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
+# logging.basicConfig(format='[%(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
+# logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s',filename='myenvctl.log', filemode='w', level=logging.DEBUG)
+# logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
+# logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 
 from version import VERSION
 # ===================general imports=====================================
@@ -38,9 +38,9 @@ import tornado.ioloop
 import tornado.web
 import socket
 
-#import RF24
+# import RF24
 
-#import asyncio
+# import asyncio
 
 import multiprocessing
 import random
@@ -115,9 +115,9 @@ class Controller(object):
     def __init__(self):
         logger.info("init controller")
         # start the c watchdog
-        #logger.warning("WWWWW starting my_watchdog WWWWW")
+        # logger.warning("WWWWW starting my_watchdog WWWWW")
 #        os.system("sudo ./watchdog/my_watchdog &")
-        #os.system("sudo ./watchdog/my_watchdog -r &")
+        # os.system("sudo ./watchdog/my_watchdog -r &")
 
         # subprocess.call(["sudo","./watchdog/my_watchdog"])
 
@@ -139,33 +139,6 @@ logger.info("--- Creating the controller---")
 ctl1 = Controller()
 emailObj = MyEmail()
 
-############### MQTT section ##################
-
-# when connecting to mqtt do this;
-
-
-def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
-    client.subscribe(sub_topic)
-
-# when receiving a mqtt message do this;
-
-
-def on_message(client, userdata, msg):
-    message = str(msg.payload)
-    print(msg.topic+" "+message)
-    display_sensehat(message)
-
-
-def on_publish(mosq, obj, mid):
-    print("mid: " + str(mid))
-
-
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-client.connect(Broker, 1883, 60)
-client.loop_start()
 
 # while True:
 #    sensor_data = [read_temp(), read_humidity(), read_pressure()]
@@ -177,7 +150,7 @@ client.loop_start()
 This is a simple Websocket Echo server that uses the Tornado websocket handler.
 Please run `pip install tornado` with python of version 2.7.9 or greater to install tornado.
 This program will echo back the reverse of whatever it recieves.
-Messages are output to the terminal for debuggin purposes. 
+Messages are output to the terminal for debuggin purposes.
 '''
 
 # class WSHandler(tornado.websocket.WebSocketHandler):
@@ -202,7 +175,35 @@ Messages are output to the terminal for debuggin purposes.
 # cfg.
 
 
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+    client.subscribe(sub_topic)
+
+# when receiving a mqtt message do this;
+
+
+def on_message(client, userdata, msg):
+    message = str(msg.payload)
+    print(msg.topic+" "+message)
+    # display_sensehat(message)
+
+
+def on_publish(mosq, obj, mid):
+    print("mid: " + str(mid))
+
+
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+    client.subscribe(sub_topic)
+
+
 def main():
+
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(Broker, 1883, 60)
+    client.loop_start()
 
     # call to systemd watchdog to hold off restart
     ctl1.timer1.holdOffWatchdog(0, True)
@@ -222,11 +223,11 @@ def main():
     zoneNumber = cfg.getItemValueFromConfig('zoneNumber')
     location = cfg.getItemValueFromConfig('locationDisplayName')
     message = zone
-    # if just booted
+   # if just booted
     if ctl1.timer1.secsSinceBoot() < 120:
         emailzone = "Zone " + zoneNumber + ' REBOOTED '
 
-    #emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
+    # emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
     emailObj.send("Zone " + zoneNumber + " " + emailzone +
                   location + ' - Process Started', message)
 
@@ -234,7 +235,7 @@ def main():
         # tornado.ioloop.IOLoop.instance().loop()
 
         logger.info("=main while loop=")
-        #logger.warning("== process uptime: %s =",processUptime)
+        # logger.warning("== process uptime: %s =",processUptime)
 
         logger.debug(socket.gethostname())
         logger.info("current time: %s" % (ctl1.timer1.current_time))
@@ -251,13 +252,13 @@ def main():
         startT = time.time()
 
         # read sensor
-        #sensorMessage = ''
+        # sensorMessage = ''
         humidity, temperature, sensorMessage = ctl1.sensor1.read()
         if sensorMessage:
-            #emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)
+            # emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)
             emailObj.send("Zone " + zoneNumber + " " + emailzone + location +
                           ' - : bad sensor reads  - PowerCycle', sensorMessage)
-            #emailObj.send( "Zone " + zoneNumber + " " + emailzone + location + ' - Process Started', message)
+            # emailObj.send( "Zone " + zoneNumber + " " + emailzone + location + ' - Process Started', message)
 
         endT = time.time()
         duration = endT-startT
@@ -293,7 +294,8 @@ def main():
         if stateChanged:
 
             sensor_data = [str(temperature), str(humidity), str(lightState)]
-            logger.warning("publish MQTT messages...")  # , sensor_data)
+            # , sensor_data)
+            logger.warning("========== start publish MQTT messages...")
             client.publish(zone+"/TemperatureStatus", temperature)
             client.publish(zone+"/HumidityStatus", humidity)
             client.publish(zone+"/HeaterStatus", heaterState)
@@ -302,7 +304,7 @@ def main():
             client.publish(zone+"/FanStatus", fanState)
             client.publish(zone+"/VentSpeedStatus", ventSpeedState)
             client.publish(zone+"/LightStatus", lightState)
-            # logger.warning("=============MQTT sending post=")#, sensor_data)
+            logger.warning("============= MQTT sendt=")  # , sensor_data)
 
             # print("->")
             logger.debug("======== start state changed main list ======")
@@ -327,11 +329,11 @@ def main():
             end_time = time.time()
             processUptime = end_time - start_time
             processUptime = str(timedelta(seconds=int(processUptime)))
-            #cfg.setConfigItemInLocalDB('processUptime', "Process Up Time: " +processUptime)
+            # cfg.setConfigItemInLocalDB('processUptime', "Process Up Time: " +processUptime)
             cfg.setConfigItemInLocalDB('processUptime', processUptime)
 
             systemUpTime = ctl1.timer1.getSystemUpTimeFromProc()
-            #cfg.setConfigItemInLocalDB('systemUpTime',  "System Up Time: " + systemUpTime)
+            # cfg.setConfigItemInLocalDB('systemUpTime',  "System Up Time: " + systemUpTime)
             cfg.setConfigItemInLocalDB('systemUpTime', systemUpTime)
 
             cfg.setConfigItemInLocalDB('miscMessage', location)
@@ -345,35 +347,36 @@ def main():
 
             cfg.setConfigItemInLocalDB('lightState', int(lightState))
 
-            #time1 = datetime.datetime.now()
+            # time1 = datetime.datetime.now()
             # cfg.updateCentralConfigTable()
-            #time2 = datetime.datetime.now()
-            #duration = time2 - time1
-            #logger.warning("TTTTT - update central CONFIG table duration : %s" % (duration))
+            # time2 = datetime.datetime.now()
+            # duration = time2 - time1
+            # logger.warning("TTTTT - update central CONFIG table duration : %s" % (duration))
 
             execAndTimeFunc(cfg.updateCentralConfigTable)
 
-            #uptime = cfg.getConfigItemFromLocalDB('processUptime')
+            # uptime = cfg.getConfigItemFromLocalDB('processUptime')
             logger.info("======== process uptime: %s ======", processUptime)
             mem = psutil.virtual_memory()
-            #logger.warning("MMMMMM total memory       : %s MMMMMM",mem.total)
+            # logger.warning("MMMMMM total memory       : %s MMMMMM",mem.total)
 
-            #logger.warning("MMMMMM memory available   : %s MMMMMM",mem.available)
+            # logger.warning("MMMMMM memory available   : %s MMMMMM",mem.available)
             logger.debug("MMMMMM memory pc.available: %0.2f MMMMMM",
                          ((float(mem.available)/float(mem.total)))*100)
-            #logger.warning("======== % memory available: %s ======",mem.percent)
+            # logger.warning("======== % memory available: %s ======",mem.percent)
 
 
 def worker():
     """worker function"""
-    print ('========================================================Worker start==================================')
-    #name = multiprocessing.current_process().name
+    print('========================================================Worker start==================================')
+    # name = multiprocessing.current_process().name
     # with s:
     # pool.makeActive(name)
 
     while 1:
-        logger.warning("++++++++++++++++++++++++++++++++++++++++++++++======== worker warning logger ======")
-        print ('========================================================Worker random==================================')
+        logger.warning(
+            "++++++++++++++++++++++++++++++++++++++++++++++======== worker warning logger ======")
+        print('========================================================Worker random==================================')
         time.sleep(random.random()*100)
         # pool.makeInactive(name)
 
@@ -385,12 +388,12 @@ if __name__ == "__main__":
     # # tornado.ioloop.IOLoop.instance().start()
     # tornado.ioloop.IOLoop.current().run_sync(main)
 
-    # jobs = []
-    # # for i in range(5):
-    # p = multiprocessing.Process(target=main)
-    # jobs.append(p)
-    # p.start()
-    # q = multiprocessing.Process(target=worker)
-    # jobs.append(q)
-    # q.start()
-     main()
+    jobs = []
+    # for i in range(5):
+    p = multiprocessing.Process(target=main)
+    jobs.append(p)
+    p.start()
+    q = multiprocessing.Process(target=worker)
+    jobs.append(q)
+    q.start()
+    # main()
