@@ -73,6 +73,8 @@ from ConfigObject import cfg  # singleton global
 import hardware as hw
 from support import round_time as round_time
 
+import websocketserver
+
 OFF = cfg.getItemValueFromConfig('RelayOff')  # state for relay OFF
 ON = cfg.getItemValueFromConfig('RelayOn')  # state for on
 
@@ -197,7 +199,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(sub_topic)
 
 
-def main():
+def control(in_queue, out_queue):
 
     client = mqtt.Client()
     client.on_connect = on_connect
@@ -252,8 +254,8 @@ def main():
         startT = time.time()
         humidity, temperature, sensorMessage = ctl1.sensor1.read()
         if sensorMessage:
-            emailObj.send("Zone " + zoneNumber + " " + emailzone + location +
-                          ' - : bad sensor reads  - PowerCycle', sensorMessage)
+            subject= "Zone " + zoneNumber + " " + emailzone + location + " - : bad sensor reads  - PowerCycle"
+            emailObj.send(subject, sensorMessage)
         endT = time.time()
         duration = endT-startT
         #logger.error("^^^^^^^^^^  Aquisition sampletime: %s ^^^^^^^^^^^", duration)
@@ -360,21 +362,7 @@ def main():
                          ((float(mem.available)/float(mem.total)))*100)
             # logger.warning("======== % memory available: %s ======",mem.percent)
 
-
-def worker():
-    """worker function"""
-    print('=========================Worker start==================')
-    # name = multiprocessing.current_process().name
-    # with s:
-    # pool.makeActive(name)
-
-    while 1:
-        logger.warning(
-            "++++++++++++++I'm a websocket process - Hi! ++++++++++++")
-        print('==================Worker random======================')
-        time.sleep(random.random()*100)
-        # pool.makeInactive(name)
-
+import websocketworker
 
 if __name__ == "__main__":
     # # stuff only to run when not called via 'import' here
@@ -383,12 +371,17 @@ if __name__ == "__main__":
     # # tornado.ioloop.IOLoop.instance().start()
     # tornado.ioloop.IOLoop.current().run_sync(main)
 
+    op_queue = multiprocessing.Queue()
+    ip_queue = multiprocessing.Queue()
+
     jobs = []
     # for i in range(5):
-    p = multiprocessing.Process(target=main)
+    p = multiprocessing.Process(target=control , args=(op_queue,ip_queue))
     jobs.append(p)
     p.start()
-    q = multiprocessing.Process(target=worker)
+    #q = multiprocessing.Process(target=websocketworker.worker)
+    q = multiprocessing.Process(target=websocketserver.main)
+
     jobs.append(q)
     q.start()
     # main()
