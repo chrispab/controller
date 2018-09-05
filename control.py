@@ -74,6 +74,9 @@ import hardware as hw
 from support import round_time as round_time
 
 import websocketserver
+#from websocketserver import clients
+#from websocketserver import send_to_all_clients
+
 
 OFF = cfg.getItemValueFromConfig('RelayOff')  # state for relay OFF
 ON = cfg.getItemValueFromConfig('RelayOn')  # state for on
@@ -198,6 +201,7 @@ def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     client.subscribe(sub_topic)
 
+import websocketworker
 
 def control(in_queue, out_queue):
 
@@ -361,8 +365,9 @@ def control(in_queue, out_queue):
             logger.debug("MMMMMM memory pc.available: %0.2f MMMMMM",
                          ((float(mem.available)/float(mem.total)))*100)
             # logger.warning("======== % memory available: %s ======",mem.percent)
+            #send_to_all_clients(processUptime)
+            websocketserver.WSHandler.send_message(processUptime)
 
-import websocketworker
 
 if __name__ == "__main__":
     # # stuff only to run when not called via 'import' here
