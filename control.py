@@ -45,6 +45,9 @@ import socket
 import multiprocessing
 import random
 
+import websocketserver
+
+
 
 Broker = "192.168.0.200"
 
@@ -73,7 +76,7 @@ from ConfigObject import cfg  # singleton global
 import hardware as hw
 from support import round_time as round_time
 
-import websocketserver
+#import websocketserver
 #from websocketserver import clients
 #from websocketserver import send_to_all_clients
 
@@ -201,7 +204,7 @@ def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     client.subscribe(sub_topic)
 
-import websocketworker
+#import websocketserver
 
 def control(in_queue, out_queue):
 
@@ -243,7 +246,7 @@ def control(in_queue, out_queue):
         logger.info("=main while loop=")
         # logger.warning("== process uptime: %s =",processUptime)
 
-        logger.debug(socket.gethostname())
+        #logger.debug(socket.gethostname())
         logger.info("current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.updateClocks()
         current_millis = ctl1.timer1.current_millis
@@ -366,7 +369,9 @@ def control(in_queue, out_queue):
                          ((float(mem.available)/float(mem.total)))*100)
             # logger.warning("======== % memory available: %s ======",mem.percent)
             #send_to_all_clients(processUptime)
-            websocketserver.WSHandler.send_message(processUptime)
+            #websocketserver.WSHandler.send_message(processUptime)
+            websocketserver.pre_send_message(processUptime)
+
 
 
 if __name__ == "__main__":
@@ -385,7 +390,7 @@ if __name__ == "__main__":
     jobs.append(p)
     p.start()
     #q = multiprocessing.Process(target=websocketworker.worker)
-    q = multiprocessing.Process(target=websocketserver.main)
+    q = multiprocessing.Process(target=websocketserver.createTornado)
 
     jobs.append(q)
     q.start()

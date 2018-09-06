@@ -12,7 +12,7 @@
         //document.getElementById("mybody").scrollIntoView();
 
         connection.onopen = function() {
-            connection.send('Message from Browser to ESP8266 yay its Working!! ' + new Date());
+            connection.send('Message from Browser to rpi, yay its Working!! ' + new Date());
             connection.send('ping');
 
             setInterval(function() {
@@ -63,14 +63,14 @@
 
 <body>
     LED Control:
-    <br/>
-    <br/> R:
+    <br />
+    <br /> R:
     <input id="r" type="range" min="0" max="255" step="1" onchange="sendRGB();" />
-    <br/> G:
+    <br /> G:
     <input id="g" type="range" min="0" max="255" step="1" onchange="sendRGB();" />
-    <br/> B:
+    <br /> B:
     <input id="b" type="range" min="0" max="255" step="1" onchange="sendRGB();" />
-    <br/>
+    <br />
     <div>
         <p id="mybody">
         </p>
