@@ -368,9 +368,17 @@ def control(in_queue, out_queue):
             logger.debug("MMMMMM memory pc.available: %0.2f MMMMMM",
                          ((float(mem.available)/float(mem.total)))*100)
             # logger.warning("======== % memory available: %s ======",mem.percent)
+
             #send_to_all_clients(processUptime)
             #websocketserver.WSHandler.send_message(processUptime)
-            websocketserver.pre_send_message(processUptime)
+            #websocketserver.WSHandler.pre_send_message(websocketserver.WSHandler, processUptime)
+            data = "CONTROL whatever"
+
+            logger.warning("======== DATA message to send: %s ======",data)
+
+            #retval = tornado.ioloop.IOLoop.current().add_callback(websocketserver.WSHandler.send_message, data)
+            #tornado.ioloop.IOLoop.current().add_callback(websocketserver.WSHandler.send_message, data)
+            websocketserver.pre_send_message( data)
 
 
 
@@ -385,13 +393,14 @@ if __name__ == "__main__":
     ip_queue = multiprocessing.Queue()
 
     jobs = []
-    # for i in range(5):
-    p = multiprocessing.Process(target=control , args=(op_queue,ip_queue))
-    jobs.append(p)
-    p.start()
-    #q = multiprocessing.Process(target=websocketworker.worker)
+        #q = multiprocessing.Process(target=websocketworker.worker)
     q = multiprocessing.Process(target=websocketserver.createTornado)
 
     jobs.append(q)
     q.start()
+    # for i in range(5):
+    p = multiprocessing.Process(target=control , args=(op_queue,ip_queue))
+    jobs.append(p)
+    p.start()
+
     # main()
