@@ -44,7 +44,7 @@ class Logger(object):
             'min_CSV_write_interval')
 
     def getStatusString(self):
-        data = self._write_to_CSV()
+        #data = self._write_to_CSV()
 
         statusString = str(datetime.datetime.now()) + ": "+str(self.temperature) + \
             ", " + str(self.humidity) + ", " + str(self.heater_state) + \
