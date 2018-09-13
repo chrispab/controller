@@ -3,6 +3,7 @@
 <meta charset="UTF-8">
 
 <head>
+
     <title>WebSocket demo</title>
 </head>
 
@@ -10,12 +11,14 @@
     <script>
         var ws = new WebSocket("ws://192.168.0.155:5678/"),
             messages = document.createElement('ul');
-        ws.onmessage = function(event) {
+        ws.onmessage = function (event) {
             var messages = document.getElementsByTagName('ul')[0],
                 message = document.createElement('li'),
                 content = document.createTextNode(event.data);
             message.appendChild(content);
             messages.appendChild(message);
+            var element = document.getElementById("body");
+            element.scrollIntoView(false);
         };
         document.body.appendChild(messages);
     </script>

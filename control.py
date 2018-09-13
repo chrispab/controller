@@ -46,8 +46,7 @@ import asyncio
 import random
 
 # import websocketserver
-import websockets 
-
+import websockets
 
 
 Broker = "192.168.0.200"
@@ -207,6 +206,7 @@ def on_connect(client, userdata, flags, rc):
 
 #import websocketserver
 
+
 async def control():
 
     client = mqtt.Client()
@@ -240,14 +240,14 @@ async def control():
     # emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
     emailObj.send("Zone " + zoneNumber + " " + emailzone +
                   location + ' - Process Started', message)
-
+    row = 0
     while 1:
         # tornado.ioloop.IOLoop.instance().loop()
 
         logger.info("=main while loop=")
         # logger.warning("== process uptime: %s =",processUptime)
 
-        #logger.debug(socket.gethostname())
+        # logger.debug(socket.gethostname())
         logger.info("current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.updateClocks()
         current_millis = ctl1.timer1.current_millis
@@ -264,7 +264,8 @@ async def control():
         startT = time.time()
         humidity, temperature, sensorMessage = ctl1.sensor1.read()
         if sensorMessage:
-            subject= "Zone " + zoneNumber + " " + emailzone + location + " - : bad sensor reads  - PowerCycle"
+            subject = "Zone " + zoneNumber + " " + emailzone + \
+                location + " - : bad sensor reads  - PowerCycle"
             emailObj.send(subject, sensorMessage)
         endT = time.time()
         duration = endT-startT
@@ -372,26 +373,23 @@ async def control():
                          ((float(mem.available)/float(mem.total)))*100)
             # logger.warning("======== % memory available: %s ======",mem.percent)
 
-            #send_to_all_clients(processUptime)
-            #websocketserver.WSHandler.send_message(processUptime)
-            #websocketserver.WSHandler.pre_send_message(websocketserver.WSHandler, processUptime)
             data = systemUpTime
+            currentStatusString = ctl1.stateMonitor.getStatusString()
+            currentStatusString = currentStatusString + \
+                ", " + str(lightState)
 
-            logger.warning("======== DATA message to send: %s ======",data)
+            logger.warning(
+                "==== DATA message to send: %s ====", currentStatusString)
 
-            #retval = tornado.ioloop.IOLoop.current().add_callback(websocketserver.WSHandler.send_message, data)
-            #tornado.ioloop.IOLoop.current().add_callback(websocketserver.WSHandler.send_message, data)
-            #websocketserver.pre_send_message( data)
-            #await asyncio.sleep(0) # yield back to asycioloop
-            # global proxysock
-            # if proxysock is None:
-            #     logger.warning("======== DATA NOTT SENT=================")
-            # else:
-            #     await proxysock.send(data)
-            #     logger.warning("======== DATA SENT=================")
-            
-            await txwebsocket(data)
+            if row >= 5:
+                print(row)
+                await txwebsocket(str(row))
+                row = 0
+            row = row + 1
+
+            await txwebsocket(currentStatusString)
             await asyncio.sleep(0)
+
 
 async def txwebsocket(message):
     global proxysock
@@ -403,29 +401,29 @@ async def txwebsocket(message):
     await asyncio.sleep(0)
 
 
-
 async def mytime(websocket, path):
     global proxysock
     proxysock = websocket
     logger.warning("CCCCCCCCCCCCC CONNECTION MADECCCCCCCCCCCCCCCC")
-
+    now = str(datetime.datetime.now())
+    await websocket.send(now)
     while True:
-        now = datetime.datetime.utcnow().isoformat() + 'Z'
-        await websocket.send(now)
-        logger.warning("======== DATe stamp SENT from mytime=================")
+        #now = str(datetime.datetime.now())
+        # await websocket.send(now)
+        #logger.warning("======== DATe stamp SENT from mytime=================")
 
-#        await websocket.send(str(counter))
+        #        await websocket.send(str(counter))
         await asyncio.sleep(30)
 
 proxysock = None
 
+
 async def main():
     start_server = websockets.serve(mytime, '', 5678)
 
-    #await control()
+    # await control()
     tasks = [control(), start_server]
     await asyncio.gather(*tasks)
-
 
 
 if __name__ == "__main__":
@@ -449,7 +447,7 @@ if __name__ == "__main__":
     # jobs.append(p)
     # p.start()
 
-    #main()
+    # main()
     ioloop = asyncio.get_event_loop()
     ioloop.run_until_complete(main())
     ioloop.close()

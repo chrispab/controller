@@ -1,1 +1,1 @@
-VERSION = "1.42 master python3"
+VERSION = "1.43 master asyncio"
