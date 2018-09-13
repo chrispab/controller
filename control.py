@@ -240,7 +240,7 @@ async def control():
     # emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
     emailObj.send("Zone " + zoneNumber + " " + emailzone +
                   location + ' - Process Started', message)
-    row = 0
+    row = 11
     while 1:
         # tornado.ioloop.IOLoop.instance().loop()
 
@@ -381,13 +381,13 @@ async def control():
             logger.warning(
                 "==== DATA message to send: %s ====", currentStatusString)
 
-            if row >= 5:
-                print(row)
-                await txwebsocket(str(row))
+            if row >= 10:
+                header= "<samp style='white-space:pre;'>Timestamp                   T     H     H  V  F  S  L</samp>"
+                await txwebsocket(header)
                 row = 0
             row = row + 1
 
-            await txwebsocket(currentStatusString)
+            await txwebsocket("<samp style='white-space:pre;'>" + currentStatusString + "</samp>")
             await asyncio.sleep(0)
 
 
