@@ -32,20 +32,21 @@ import sendemail as emailMe
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 
-import tornado.httpserver
-import tornado.websocket
-import tornado.ioloop
-import tornado.web
-import socket
+# import tornado.httpserver
+# import tornado.websocket
+# import tornado.ioloop
+# import tornado.web
+# import socket
 
 # import RF24
 
-# import asyncio
+import asyncio
 
-import multiprocessing
+#import multiprocessing
 import random
 
-import websocketserver
+# import websocketserver
+import websockets 
 
 
 
@@ -206,7 +207,7 @@ def on_connect(client, userdata, flags, rc):
 
 #import websocketserver
 
-def control(in_queue, out_queue):
+async def control():
 
     client = mqtt.Client()
     client.on_connect = on_connect
@@ -257,6 +258,8 @@ def control(in_queue, out_queue):
         # hold off wireless arduino watchdog
         # check radio link for a ping from Arduino watchdog, and respond to indicate alive
         ctl1.radioLink1.holdOffWatchdog()
+
+        await asyncio.sleep(0)
 
         startT = time.time()
         humidity, temperature, sensorMessage = ctl1.sensor1.read()
@@ -372,13 +375,56 @@ def control(in_queue, out_queue):
             #send_to_all_clients(processUptime)
             #websocketserver.WSHandler.send_message(processUptime)
             #websocketserver.WSHandler.pre_send_message(websocketserver.WSHandler, processUptime)
-            data = "CONTROL whatever"
+            data = systemUpTime
 
             logger.warning("======== DATA message to send: %s ======",data)
 
             #retval = tornado.ioloop.IOLoop.current().add_callback(websocketserver.WSHandler.send_message, data)
             #tornado.ioloop.IOLoop.current().add_callback(websocketserver.WSHandler.send_message, data)
-            websocketserver.pre_send_message( data)
+            #websocketserver.pre_send_message( data)
+            #await asyncio.sleep(0) # yield back to asycioloop
+            # global proxysock
+            # if proxysock is None:
+            #     logger.warning("======== DATA NOTT SENT=================")
+            # else:
+            #     await proxysock.send(data)
+            #     logger.warning("======== DATA SENT=================")
+            
+            await txwebsocket(data)
+            await asyncio.sleep(0)
+
+async def txwebsocket(message):
+    global proxysock
+    if proxysock is None:
+        logger.warning("======== DATA NOTT SENT=================")
+    else:
+        await proxysock.send(message)
+        logger.warning("======== DATA SENT=================")
+    await asyncio.sleep(0)
+
+
+
+async def mytime(websocket, path):
+    global proxysock
+    proxysock = websocket
+    logger.warning("CCCCCCCCCCCCC CONNECTION MADECCCCCCCCCCCCCCCC")
+
+    while True:
+        now = datetime.datetime.utcnow().isoformat() + 'Z'
+        await websocket.send(now)
+        logger.warning("======== DATe stamp SENT from mytime=================")
+
+#        await websocket.send(str(counter))
+        await asyncio.sleep(30)
+
+proxysock = None
+
+async def main():
+    start_server = websockets.serve(mytime, '', 5678)
+
+    #await control()
+    tasks = [control(), start_server]
+    await asyncio.gather(*tasks)
 
 
 
@@ -389,18 +435,21 @@ if __name__ == "__main__":
     # # tornado.ioloop.IOLoop.instance().start()
     # tornado.ioloop.IOLoop.current().run_sync(main)
 
-    op_queue = multiprocessing.Queue()
-    ip_queue = multiprocessing.Queue()
+    # op_queue = multiprocessing.Queue()
+    # ip_queue = multiprocessing.Queue()
 
-    jobs = []
-        #q = multiprocessing.Process(target=websocketworker.worker)
-    q = multiprocessing.Process(target=websocketserver.createTornado)
+    # jobs = []
+    #     #q = multiprocessing.Process(target=websocketworker.worker)
+    # q = multiprocessing.Process(target=websocketserver.createTornado)
 
-    jobs.append(q)
-    q.start()
-    # for i in range(5):
-    p = multiprocessing.Process(target=control , args=(op_queue,ip_queue))
-    jobs.append(p)
-    p.start()
+    # jobs.append(q)
+    # q.start()
+    # # for i in range(5):
+    # p = multiprocessing.Process(target=control , args=(op_queue,ip_queue))
+    # jobs.append(p)
+    # p.start()
 
-    # main()
+    #main()
+    ioloop = asyncio.get_event_loop()
+    ioloop.run_until_complete(main())
+    ioloop.close()
