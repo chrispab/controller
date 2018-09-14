@@ -42,7 +42,7 @@ import paho.mqtt.publish as publish
 
 import asyncio
 
-#import multiprocessing
+# import multiprocessing
 import random
 
 # import websocketserver
@@ -76,9 +76,9 @@ from ConfigObject import cfg  # singleton global
 import hardware as hw
 from support import round_time as round_time
 
-#import websocketserver
-#from websocketserver import clients
-#from websocketserver import send_to_all_clients
+# import websocketserver
+# from websocketserver import clients
+# from websocketserver import send_to_all_clients
 
 
 OFF = cfg.getItemValueFromConfig('RelayOff')  # state for relay OFF
@@ -183,6 +183,7 @@ Messages are output to the terminal for debuggin purposes.
 # cfg.
 
 
+# !MQTT stuff - handlers etc
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     client.subscribe(sub_topic)
@@ -204,7 +205,7 @@ def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     client.subscribe(sub_topic)
 
-#import websocketserver
+# import websocketserver
 
 
 async def control():
@@ -269,7 +270,7 @@ async def control():
             emailObj.send(subject, sensorMessage)
         endT = time.time()
         duration = endT-startT
-        #logger.error("^^^^^^^^^^  Aquisition sampletime: %s ^^^^^^^^^^^", duration)
+        # logger.error("^^^^^^^^^^  Aquisition sampletime: %s ^^^^^^^^^^^", duration)
 
         # get all states
         lightState = ctl1.light.getLightState()
@@ -382,7 +383,7 @@ async def control():
                 "==== DATA message to send: %s ====", currentStatusString)
 
             if row >= 10:
-                header= "<samp style='white-space:pre;'>Timestamp                   T     H     H  V  F  S  L</samp>"
+                header = "<samp style='white-space:pre;'>Timestamp                   T     H     H  V  F  S  L</samp>"
                 await txwebsocket(header)
                 row = 0
             row = row + 1
@@ -405,12 +406,19 @@ async def mytime(websocket, path):
     global proxysock
     proxysock = websocket
     logger.warning("CCCCCCCCCCCCC CONNECTION MADECCCCCCCCCCCCCCCC")
-    now = str(datetime.datetime.now())
+    #now = str(datetime.datetime.now())
+    now = "websocket server connected on " + \
+        cfg.getItemValueFromConfig('zoneName')
     await websocket.send(now)
+
+    header = "<samp style='white-space:pre;'>Timestamp                   T     H     H  V  F  S  L</samp>"
+    await websocket.send(header)
+    
+
     while True:
-        #now = str(datetime.datetime.now())
+        # now = str(datetime.datetime.now())
         # await websocket.send(now)
-        #logger.warning("======== DATe stamp SENT from mytime=================")
+        # logger.warning("======== DATe stamp SENT from mytime=================")
 
         #        await websocket.send(str(counter))
         await asyncio.sleep(30)
