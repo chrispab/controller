@@ -46,11 +46,16 @@ class Logger(object):
     def getStatusString(self):
         #data = self._write_to_CSV()
 
-        statusString = str(datetime.datetime.now()) + ": "+str(self.temperature) + \
+        statusString = self.format_time() + ": "+str(self.temperature) + \
             ", " + str(self.humidity) + ", " + str(self.heater_state) + \
             ", " + str(self.vent_state) + ", " + str(self.fan_state) + \
             ", " + str(self.vent_speed_state) 
         return str(statusString)
+
+    def format_time(self):
+        t = datetime.datetime.now()
+        s = t.strftime('%Y-%m-%d %H:%M:%S.%f')
+        return s[:-4]
 
     def checkForChanges(self, temperature, humidity, vent_state,
                         fan_state, heater_state, vent_speed_state,

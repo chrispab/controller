@@ -383,7 +383,7 @@ async def control():
                 "==== DATA message to send: %s ====", currentStatusString)
 
             if row >= 10:
-                header = "<samp style='white-space:pre;'>Timestamp                   T     H     H  V  F  S  L</samp>"
+                header = "<samp style='white-space:pre;'>Timestamp               T     H     H  V  F  S  L</samp>"
                 await txwebsocket(header)
                 row = 0
             row = row + 1
@@ -405,13 +405,13 @@ async def txwebsocket(message):
 async def mytime(websocket, path):
     global proxysock
     proxysock = websocket
-    logger.warning("CCCCCCCCCCCCC CONNECTION MADECCCCCCCCCCCCCCCC")
+    logger.warning("CCCCCCCCCCCCC CONNECTION MADE CCCCCCCCCCCCCCCC")
     #now = str(datetime.datetime.now())
     now = "websocket server connected on " + \
         cfg.getItemValueFromConfig('zoneName')
     await websocket.send(now)
 
-    header = "<samp style='white-space:pre;'>Timestamp                   T     H     H  V  F  S  L</samp>"
+    header = "<samp style='white-space:pre;'>Timestamp               T     H     H  V  F  S  L</samp>"
     await websocket.send(header)
     
 
@@ -435,25 +435,6 @@ async def main():
 
 
 if __name__ == "__main__":
-    # # stuff only to run when not called via 'import' here
-    # http_server = tornado.httpserver.HTTPServer(application)
-    # http_server.listen(8888)
-    # # tornado.ioloop.IOLoop.instance().start()
-    # tornado.ioloop.IOLoop.current().run_sync(main)
-
-    # op_queue = multiprocessing.Queue()
-    # ip_queue = multiprocessing.Queue()
-
-    # jobs = []
-    #     #q = multiprocessing.Process(target=websocketworker.worker)
-    # q = multiprocessing.Process(target=websocketserver.createTornado)
-
-    # jobs.append(q)
-    # q.start()
-    # # for i in range(5):
-    # p = multiprocessing.Process(target=control , args=(op_queue,ip_queue))
-    # jobs.append(p)
-    # p.start()
 
     # main()
     ioloop = asyncio.get_event_loop()
