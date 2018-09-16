@@ -382,7 +382,7 @@ async def control():
             logger.warning(
                 "==== DATA message to send: %s ====", currentStatusString)
 
-            if row >= 10:
+            if row >= 15:
                 header = "<samp style='white-space:pre;'>Timestamp               T     H     H  V  F  S  L</samp>"
                 await txwebsocket(header)
                 row = 0
