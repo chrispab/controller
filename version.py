@@ -1,1 +1,1 @@
-VERSION = "1.43 master asyncio"
+VERSION = "1.44 master web console"

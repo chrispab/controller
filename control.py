@@ -395,17 +395,17 @@ async def control():
 async def txwebsocket(message):
     global proxysock
     if proxysock is None:
-        logger.warning("======== DATA NOTT SENT=================")
+        logger.warning("======== NO OPEN SOCKETS - DATA NOT SENT=================")
     else:
         await proxysock.send(message)
-        logger.warning("======== DATA SENT=================")
+        logger.warning("======== DATA SENT to websocket =================")
     await asyncio.sleep(0)
 
 
 async def mytime(websocket, path):
     global proxysock
     proxysock = websocket
-    logger.warning("CCCCCCCCCCCCC CONNECTION MADE CCCCCCCCCCCCCCCC")
+    logger.warning("CCCCCC CONNECTION MADE CCCCCC")
     #now = str(datetime.datetime.now())
     now = "websocket server connected on " + \
         cfg.getItemValueFromConfig('zoneName')
@@ -414,13 +414,7 @@ async def mytime(websocket, path):
     header = "<samp style='white-space:pre;'>Timestamp               T     H     H  V  F  S  L</samp>"
     await websocket.send(header)
     
-
     while True:
-        # now = str(datetime.datetime.now())
-        # await websocket.send(now)
-        # logger.warning("======== DATe stamp SENT from mytime=================")
-
-        #        await websocket.send(str(counter))
         await asyncio.sleep(30)
 
 proxysock = None
@@ -428,15 +422,42 @@ proxysock = None
 
 async def main():
     start_server = websockets.serve(mytime, '', 5678)
+    #mywebapp= web.run_app(app)
 
-    # await control()
+
+
+    server = web.Server(hello)
+    await asyncio.get_event_loop().create_server(server, "", 8081)
+    print("======= Serving on http://127.0.0.1:8080/ ======")
+    # pause here for very long time by serving HTTP requests and
+    # waiting for keyboard interruption
+    #await asyncio.sleep(100*3600)
+
+
     tasks = [control(), start_server]
+    #web.run_app(app)
     await asyncio.gather(*tasks)
 
 
-if __name__ == "__main__":
+#==============================
+from aiohttp import web
 
-    # main()
+async def hello(request):
+    #return web.Response(text="Hello, world")
+    return web.FileResponse('websocketTests/zones.html')
+
+
+
+app = web.Application()
+app.add_routes([web.get('/', hello)])
+
+#web.run_app(app)
+
+
+#===================================
+
+
+if __name__ == "__main__":
     ioloop = asyncio.get_event_loop()
     ioloop.run_until_complete(main())
     ioloop.close()
