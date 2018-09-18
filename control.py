@@ -356,12 +356,6 @@ async def control():
 
             cfg.setConfigItemInLocalDB('lightState', int(lightState))
 
-            # time1 = datetime.datetime.now()
-            # cfg.updateCentralConfigTable()
-            # time2 = datetime.datetime.now()
-            # duration = time2 - time1
-            # logger.warning("TTTTT - update central CONFIG table duration : %s" % (duration))
-
             execAndTimeFunc(cfg.updateCentralConfigTable)
 
             # uptime = cfg.getConfigItemFromLocalDB('processUptime')
@@ -383,12 +377,12 @@ async def control():
                 "==== DATA message to send: %s ====", currentStatusString)
 
             if row >= 15:
-                header = "<samp style='white-space:pre;'>Timestamp               T     H     H  V  F  S  L</samp>"
+                header = "Timestamp               T     H     H  V  F  S  L"
                 await txwebsocket(header)
                 row = 0
             row = row + 1
 
-            await txwebsocket("<samp style='white-space:pre;'>" + currentStatusString + "</samp>")
+            await txwebsocket(currentStatusString )
             await asyncio.sleep(0)
 
 
@@ -402,7 +396,7 @@ async def txwebsocket(message):
     await asyncio.sleep(0)
 
 
-async def mytime(websocket, path):
+async def whenConnect(websocket, path):
     global proxysock
     proxysock = websocket
     logger.warning("CCCCCC CONNECTION MADE CCCCCC")
@@ -411,7 +405,7 @@ async def mytime(websocket, path):
         cfg.getItemValueFromConfig('zoneName')
     await websocket.send(now)
 
-    header = "<samp style='white-space:pre;'>Timestamp               T     H     H  V  F  S  L</samp>"
+    header = "Timestamp               T     H     H  V  F  S  L"
     await websocket.send(header)
     
     while True:
@@ -421,10 +415,8 @@ proxysock = None
 
 
 async def main():
-    start_server = websockets.serve(mytime, '', 5678)
+    start_server = websockets.serve(whenConnect, '', 5678)
     #mywebapp= web.run_app(app)
-
-
 
     server = web.Server(hello)
     await asyncio.get_event_loop().create_server(server, "", 8081)
@@ -432,7 +424,6 @@ async def main():
     # pause here for very long time by serving HTTP requests and
     # waiting for keyboard interruption
     #await asyncio.sleep(100*3600)
-
 
     tasks = [control(), start_server]
     #web.run_app(app)
