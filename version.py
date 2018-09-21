@@ -1,1 +1,1 @@
-VERSION = "1.44 master web console"
+VERSION = "1.50 master web console"

@@ -386,14 +386,26 @@ async def control():
             await asyncio.sleep(0)
 
 
+
+USERS = set()
+
 async def txwebsocket(message):
     global proxysock
     if proxysock is None:
         logger.warning("======== NO OPEN SOCKETS - DATA NOT SENT=================")
     else:
-        await proxysock.send(message)
+        #await proxysock.send(message)
+        await asyncio.wait([user.send(message) for user in USERS]) 
         logger.warning("======== DATA SENT to websocket =================")
     await asyncio.sleep(0)
+
+async def register(websocket):
+    USERS.add(websocket)
+    #await notify_users()
+
+async def unregister(websocket):
+    USERS.remove(websocket)
+    #await notify_users()
 
 
 async def whenConnect(websocket, path):
@@ -404,10 +416,30 @@ async def whenConnect(websocket, path):
     now = "websocket server connected on " + \
         cfg.getItemValueFromConfig('zoneName')
     await websocket.send(now)
+    #await websocket.
 
     header = "Timestamp               T     H     H  V  F  S  L"
     await websocket.send(header)
     
+
+    # register(websocket) sends user_event() to websocket
+    await register(websocket)
+    # try:
+    #     await websocket.send(state_event())
+    #     async for message in websocket:
+    #         data = json.loads(message)
+    #         if data['action'] == 'minus':
+    #             STATE['value'] -= 1
+    #             await notify_state()
+    #         elif data['action'] == 'plus':
+    #             STATE['value'] += 1
+    #             await notify_state()
+    #         else:
+    #             logging.error(
+    #                 "unsupported event: {}", data)
+    # finally:
+    #     await unregister(websocket)
+
     while True:
         await asyncio.sleep(30)
 
@@ -418,7 +450,7 @@ async def main():
     start_server = websockets.serve(whenConnect, '', 5678)
     #mywebapp= web.run_app(app)
 
-    server = web.Server(hello)
+    server = web.Server(serveConsolePage)
     await asyncio.get_event_loop().create_server(server, "", 8081)
     print("======= Serving on http://127.0.0.1:8080/ ======")
     # pause here for very long time by serving HTTP requests and
@@ -433,14 +465,14 @@ async def main():
 #==============================
 from aiohttp import web
 
-async def hello(request):
-    #return web.Response(text="Hello, world")
+async def serveConsolePage(request):
+    #return web.Response(text="serveConsolePage, world")
     return web.FileResponse('websocketTests/zones.html')
 
 
 
 app = web.Application()
-app.add_routes([web.get('/', hello)])
+app.add_routes([web.get('/', serveConsolePage)])
 
 #web.run_app(app)
 
