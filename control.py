@@ -382,72 +382,122 @@ async def control():
                 row = 0
             row = row + 1
 
-            await txwebsocket(currentStatusString )
+            await txwebsocket(currentStatusString)
             await asyncio.sleep(0)
-
 
 
 USERS = set()
 
+
 async def txwebsocket(message):
     global proxysock
+    #if USERS.
+    for clientConn in USERS:
+        logger.warning("======== DATA SENT to websocket(s) ==========")
+        logger.warning(clientConn)
+        try:
+            if clientConn.open:
+                await asyncio.wait([clientConn.send(message) ])
+                logger.warning("EEEE message sent to wdClient EEEE")
+            else:
+                logger.warning("UUUU unregging a wsconn UUUU")
+              #  await unregister(clientConn)                
+        except:
+            logger.warning("UUUU unregging a wsconn UUUU")
+            await unregister(clientConn)
+
+    return
+
     if proxysock is None:
-        logger.warning("======== NO OPEN SOCKETS - DATA NOT SENT=================")
+        logger.warning(
+            "======== NO OPEN SOCKETS - DATA NOT SENT=================")
     else:
-        #await proxysock.send(message)
-        await asyncio.wait([user.send(message) for user in USERS]) 
-        logger.warning("======== DATA SENT to websocket =================")
+        # await proxysock.send(message)
+        await asyncio.wait([user.send(message) for user in USERS])
+        logger.warning("======== DATA SENT to websocket(s) ==========")
     await asyncio.sleep(0)
+
 
 async def register(websocket):
     USERS.add(websocket)
-    #await notify_users()
+    # await notify_users()
+
 
 async def unregister(websocket):
     USERS.remove(websocket)
-    #await notify_users()
+    # await notify_users()
 
 
-async def whenConnect(websocket, path):
+async def MyWSHandler(websocket, path):
     global proxysock
     proxysock = websocket
+    await register(websocket)
     logger.warning("CCCCCC CONNECTION MADE CCCCCC")
     #now = str(datetime.datetime.now())
     now = "websocket server connected on " + \
         cfg.getItemValueFromConfig('zoneName')
-    await websocket.send(now)
-    #await websocket.
 
+    await websocket.send(now)
     header = "Timestamp               T     H     H  V  F  S  L"
     await websocket.send(header)
-    
-
     # register(websocket) sends user_event() to websocket
-    await register(websocket)
-    # try:
-    #     await websocket.send(state_event())
-    #     async for message in websocket:
-    #         data = json.loads(message)
-    #         if data['action'] == 'minus':
-    #             STATE['value'] -= 1
-    #             await notify_state()
-    #         elif data['action'] == 'plus':
-    #             STATE['value'] += 1
-    #             await notify_state()
-    #         else:
-    #             logging.error(
-    #                 "unsupported event: {}", data)
-    # finally:
-    #     await unregister(websocket)
 
+    # try ping socket
+    # if response cont
+    # if no response remove websocket from set
+    #!!
     while True:
-        await asyncio.sleep(30)
+        try:
+            msg = await asyncio.wait_for(websocket.recv(), timeout=20)
+        except asyncio.TimeoutError:
+            # No data in 20 seconds, check the connection.
+            try:
+                logger.warning("NNNN No data in 20 secs from client- checking the connection NNNN")
+                #await unregister(websocket)
+                #break
+                pong_waiter = await websocket.ping()
+                await asyncio.wait_for(pong_waiter, timeout=10)
+                logger.warning("PPPPP ping rxed - client aliveb PPPP")
+            except asyncio.TimeoutError:
+                # No response to ping in 10 seconds, disconnect.
+                logger.warning("RRRR no ping response - Remove dead client websocet RRRR")
+
+                await unregister(websocket)
+                break
+        else:
+            logger.warning(
+                "MMMMM msg rxed from client - syill conn so do nothing MMMMM")
+
+        # do something with msg
+        #!!
+        #    ...
+        # try:
+        #     await websocket.send(state_event())
+        #     async for message in websocket:
+        #         data = json.loads(message)
+        #         if data['action'] == 'minus':
+        #             STATE['value'] -= 1
+        #             await notify_state()
+        #         elif data['action'] == 'plus':
+        #             STATE['value'] += 1
+        #             await notify_state()
+        #         else:
+        #             logging.error(
+        #                 "unsupported event: {}", data)
+        # finally:
+        # await unregister(websocket)
+
+    # while True:
+    #     await asyncio.sleep(30)
+
+    logger.warning("DDDDD drop our of onConnect handler DDDDDD")
+
 
 proxysock = None
 
 
 async def main():
-    start_server = websockets.serve(whenConnect, '', 5678)
+    start_server = websockets.serve(MyWSHandler, '', 5678)
     #mywebapp= web.run_app(app)
 
     server = web.Server(serveConsolePage)
@@ -455,29 +505,29 @@ async def main():
     print("======= Serving on http://127.0.0.1:8080/ ======")
     # pause here for very long time by serving HTTP requests and
     # waiting for keyboard interruption
-    #await asyncio.sleep(100*3600)
+    # await asyncio.sleep(100*3600)
 
     tasks = [control(), start_server]
-    #web.run_app(app)
+    # web.run_app(app)
     await asyncio.gather(*tasks)
 
 
-#==============================
+# ==============================
 from aiohttp import web
 
-async def serveConsolePage(request):
-    #return web.Response(text="serveConsolePage, world")
-    return web.FileResponse('websocketTests/zones.html')
 
+async def serveConsolePage(request):
+    # return web.Response(text="serveConsolePage, world")
+    return web.FileResponse('websocketTests/zones.html')
 
 
 app = web.Application()
 app.add_routes([web.get('/', serveConsolePage)])
 
-#web.run_app(app)
+# web.run_app(app)
 
 
-#===================================
+# ===================================
 
 
 if __name__ == "__main__":
