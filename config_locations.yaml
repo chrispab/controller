@@ -47,7 +47,7 @@ locations:
   locationDisplayName: "SHD"
 
   tempSPLOn: 22.5   #
-  tempSPLOff: 16.0 #
+  tempSPLOff: 15.0 #
 
   tempAlertHi: 30.0  #hi temp alert temp
   tempAlertLo: 13.0  #lo temp alert
