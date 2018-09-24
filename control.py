@@ -386,7 +386,7 @@ USERS = set()
 
 
 async def txwebsocket(message):
-    global proxysock
+    #global proxysock
     #if USERS.
     for clientConn in USERS:
         logger.warning("DDDD Sending DATA SENT to websocket(s)")
@@ -407,15 +407,6 @@ async def txwebsocket(message):
 
     return
 
-    # if proxysock is None:
-    #     logger.warning(
-    #         "NNNN NO OPEN SOCKETS - DATA NOT SENT")
-    # else:
-    #     # await proxysock.send(message)
-    #     await asyncio.wait([user.send(message) for user in USERS])
-    #     logger.warning("======== DATA SENT to websocket(s) ==========")
-    # await asyncio.sleep(0)
-
 
 async def register(websocket):
     USERS.add(websocket)
@@ -428,8 +419,6 @@ async def unregister(websocket):
 
 
 async def MyWSHandler(websocket, path):
-    #global proxysock
-    #proxysock = websocket
 #    await register(websocket)
     USERS.add(websocket)
 
@@ -441,10 +430,8 @@ async def MyWSHandler(websocket, path):
     await websocket.send(now)
     header = "Timestamp               T     H     H  V  F  S  L"
     await websocket.send(header)
-    # register(websocket) sends user_event() to websocket
 
-    # try ping socket
-    # if response cont
+    # try ping socket # if response cont
     # if no response remove websocket from set
     #!!
     while True:
@@ -460,7 +447,7 @@ async def MyWSHandler(websocket, path):
                 pong_waiter = await websocket.ping()
                 await asyncio.wait_for(pong_waiter, timeout=10)
                 logger.warning("PPPPP ping rxed - client aliveb PPPP")
-            except asyncio.TimeoutError:
+            except: # asyncio.TimeoutError:
                 # No response to ping in 10 seconds, disconnect.
                 logger.warning("RRRR no ping response - Remove dead client websocet RRRR")
 
@@ -470,32 +457,11 @@ async def MyWSHandler(websocket, path):
             logger.warning(
                 "RRRR msg RXED from client - still connected so do nothing")
 
-        # do something with msg
-        #!!
-        #    ...
-        # try:
-        #     await websocket.send(state_event())
-        #     async for message in websocket:
-        #         data = json.loads(message)
-        #         if data['action'] == 'minus':
-        #             STATE['value'] -= 1
-        #             await notify_state()
-        #         elif data['action'] == 'plus':
-        #             STATE['value'] += 1
-        #             await notify_state()
-        #         else:
-        #             logging.error(
-        #                 "unsupported event: {}", data)
-        # finally:
-        # await unregister(websocket)
-
-    # while True:
-    #     await asyncio.sleep(30)
-
+        # do something with msg?
     logger.warning("DDDDD drop our of onConnect handler DDDDDD")
 
 
-proxysock = None
+#proxysock = None
 
 
 async def main():

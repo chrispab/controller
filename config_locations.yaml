@@ -25,6 +25,7 @@ common:
   RCPin: 27 #phypin13
   alivePin: 22 #phy pin 15
   watchDogPin: 17    #phys pin 11
+  fanRelay: 13    #phys pin 33 new for radio watchdog version
 
 #placeholder items - used for items pushed from system
   processUptime: "00:00:00"
@@ -41,7 +42,6 @@ common:
   
   
 locations:
-  fanRelay: 13    #phys pin 33 new for radio watchdog version
 
   id: "s"
   locationDisplayName: "SHD"
@@ -50,10 +50,7 @@ locations:
   tempSPLOff: 16.0 #
 
   tempAlertHi: 30.0  #hi temp alert temp
-  tempAlertLo: 14.0  #lo temp alert
-
-  #lightOnT: "20:00:00"    # time light on hh:mm:ss
-  #lightOffT: "14:00:00"   # time off
+  tempAlertLo: 13.0  #lo temp alert
 
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
@@ -87,7 +84,6 @@ locations:
 
 
 locationc:
-  fanRelay: 13    #phys pin 33 new for radio watchdog version
 
   id: "c"
   locationDisplayName: "CSV"
@@ -98,9 +94,6 @@ locationc:
   tempAlertHi: 39.0  #hi temp alert temp   tempAlertLo: 14.5  #lo temp alert
   #tempAlertHi: 30.0  #hi temp alert temp
   tempAlertLo: 14.5  #lo temp alert
-
-  # lightOnT: "20:00:00"    # time light on hh:mm:ss
-  # lightOffT: "14:00:00"   # time off
 
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
@@ -121,7 +114,6 @@ locationc:
   quietMode: True
   
 #  readingPipeAddress: 0xF0F0F0F0E1  #pipe address for receiving from wireless watchdog
-
 #  writingPipeAdress: 0xF0F0F0F0D2 # address for pipe to write to wireless watchdog
 
   readingPipeAddress: "NodeC"  #pipe address for receiving from wireless watchdog
@@ -134,7 +126,6 @@ locationc:
 
 
 locationg:
-  fanRelay: 13    #phys pin 33 new for radio watchdog version
 
   id: "g"
   locationDisplayName: "GRG"
@@ -144,9 +135,6 @@ locationg:
 
   tempAlertHi: 26.1  #hi temp alert temp
   tempAlertLo: 15.0  #lo temp alert
-
-  # lightOnT: "16:00:00"    # time light on hh:mm:ss
-  # lightOffT: "10:00:00"   # time off
 
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
