@@ -309,22 +309,22 @@ class Light(object):
 
     #return true if testTime between timeOn and TimeOff, else false if in off period
     def getLightState(self ):
-        logger.info('==light - get light state==')
+        # logger.info('==light - get light state==')
 
-        tOff = cfg.getTOff()
-        tOn = cfg.getTOn()
-        currT = datetime.datetime.now().time()
-        X = False
-        if (tOn > tOff):
-            X = True
+        # tOff = cfg.getTOff()
+        # tOn = cfg.getTOn()
+        # currT = datetime.datetime.now().time()
+        # X = False
+        # if (tOn > tOff):
+        #     X = True
 
-        lightState = OFF
-        if (( currT > tOn) and (currT < tOff)):
-            lightState = ON
-        if (((currT > tOn) or (currT < tOff)) and ( X )):
-            lightState = ON
+        # lightState = OFF
+        # if (( currT > tOn) and (currT < tOff)):
+        #     lightState = ON
+        # if (((currT > tOn) or (currT < tOff)) and ( X )):
+        #     lightState = ON
 
-        logger.debug("==light state check. ON: %s, OFF: %s, NOW: %s, state: %d" % (tOn.strftime("%H:%M:%S"), tOff.strftime("%H:%M:%S"), currT.strftime("%H:%M:%S"), lightState))
+        # logger.debug("==light state check. ON: %s, OFF: %s, NOW: %s, state: %d" % (tOn.strftime("%H:%M:%S"), tOff.strftime("%H:%M:%S"), currT.strftime("%H:%M:%S"), lightState))
 
 
         #new ldr based routine test

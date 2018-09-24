@@ -27,7 +27,7 @@ import yaml
 import datetime as dt
 import sys    # for stdout print
 import socket  # to get hostname
-import sendemail as emailMe
+#import sendemail as emailMe
 
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
@@ -148,10 +148,6 @@ ctl1 = Controller()
 emailObj = MyEmail()
 
 
-# while True:
-#    sensor_data = [read_temp(), read_humidity(), read_pressure()]
-#    client.publish("monto/solar/sensors", str(sensor_data))
-#    time.sleep(1*60)
 ##################################################
 
 '''
@@ -184,14 +180,14 @@ Messages are output to the terminal for debuggin purposes.
 
 
 # !MQTT stuff - handlers etc
-def on_connect(client, userdata, flags, rc):
+def on_connect(MQTTClient, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-    client.subscribe(sub_topic)
+    MQTTClient.subscribe(sub_topic)
 
 # when receiving a mqtt message do this;
 
 
-def on_message(client, userdata, msg):
+def on_message(MQTTClient, userdata, msg):
     message = str(msg.payload)
     print(msg.topic+" "+message)
     # display_sensehat(message)
@@ -201,20 +197,20 @@ def on_publish(mosq, obj, mid):
     print("mid: " + str(mid))
 
 
-def on_connect(client, userdata, flags, rc):
+def on_connect(MQTTClient, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-    client.subscribe(sub_topic)
+    MQTTClient.subscribe(sub_topic)
 
 # import websocketserver
 
 
 async def control():
 
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.connect(Broker, 1883, 60)
-    client.loop_start()
+    MQTTClient = mqtt.Client()
+    MQTTClient.on_connect = on_connect
+    MQTTClient.on_message = on_message
+    MQTTClient.connect(Broker, 1883, 60)
+    MQTTClient.loop_start()
 
     # call to systemd watchdog to hold off restart
     ctl1.timer1.holdOffWatchdog(0, True)
@@ -302,18 +298,18 @@ async def control():
         if stateChanged:
             # logger.error("^^^^^^^^^^  Aquisition sampletime: %d ^^^^^^^^^^^", duration)
 
-            sensor_data = [str(temperature), str(humidity), str(lightState)]
+            #sensor_data = [str(temperature), str(humidity), str(lightState)]
             # , sensor_data)
-            logger.warning("========== start publish MQTT messages...")
-            client.publish(zone+"/TemperatureStatus", temperature)
-            client.publish(zone+"/HumidityStatus", humidity)
-            client.publish(zone+"/HeaterStatus", heaterState)
+            logger.warning("QQQQ Publish MQTT messages...")
+            MQTTClient.publish(zone+"/TemperatureStatus", temperature)
+            MQTTClient.publish(zone+"/HumidityStatus", humidity)
+            MQTTClient.publish(zone+"/HeaterStatus", heaterState)
 
-            client.publish(zone+"/VentStatus", ventState)
-            client.publish(zone+"/FanStatus", fanState)
-            client.publish(zone+"/VentSpeedStatus", ventSpeedState)
-            client.publish(zone+"/LightStatus", lightState)
-            logger.warning("============= MQTT sendt=")  # , sensor_data)
+            MQTTClient.publish(zone+"/VentStatus", ventState)
+            MQTTClient.publish(zone+"/FanStatus", fanState)
+            MQTTClient.publish(zone+"/VentSpeedStatus", ventSpeedState)
+            MQTTClient.publish(zone+"/LightStatus", lightState)
+            logger.warning("QQQQ MQTT messages sent")  # , sensor_data)
 
             # print("->")
             logger.debug("======== start state changed main list ======")
@@ -333,7 +329,7 @@ async def control():
                     logger.error("...ERROR SENDING EMAIL - low temp alert")
 
             location = cfg.getItemValueFromConfig('locationDisplayName')
-            logger.debug("LLLLLLLLLL - loc : %s" % (location))
+            #logger.debug("Location : %s" % (location))
 
             end_time = time.time()
             processUptime = end_time - start_time
@@ -368,7 +364,7 @@ async def control():
                          ((float(mem.available)/float(mem.total)))*100)
             # logger.warning("======== % memory available: %s ======",mem.percent)
 
-            data = systemUpTime
+            #data = systemUpTime
             currentStatusString = ctl1.stateMonitor.getStatusString()
             currentStatusString = currentStatusString + \
                 ", " + str(lightState)
@@ -393,29 +389,32 @@ async def txwebsocket(message):
     global proxysock
     #if USERS.
     for clientConn in USERS:
-        logger.warning("======== DATA SENT to websocket(s) ==========")
+        logger.warning("DDDD Sending DATA SENT to websocket(s)")
         logger.warning(clientConn)
         try:
             if clientConn.open:
-                await asyncio.wait([clientConn.send(message) ])
+                #await asyncio.wait([clientConn.send(message) ])
+                await clientConn.send(message)
+
                 logger.warning("EEEE message sent to wdClient EEEE")
-            else:
-                logger.warning("UUUU unregging a wsconn UUUU")
-              #  await unregister(clientConn)                
+            else : #websockets.ConnectionClosed:
+                logger.warning("UUUU1 unregging a wsconn UUUU")
+                #await unregister(clientConn)    
+                #USERS.remove(clientConn)            
         except:
-            logger.warning("UUUU unregging a wsconn UUUU")
+            logger.warning("UUUU2 unregging a wsconn UUUU")
             await unregister(clientConn)
 
     return
 
-    if proxysock is None:
-        logger.warning(
-            "======== NO OPEN SOCKETS - DATA NOT SENT=================")
-    else:
-        # await proxysock.send(message)
-        await asyncio.wait([user.send(message) for user in USERS])
-        logger.warning("======== DATA SENT to websocket(s) ==========")
-    await asyncio.sleep(0)
+    # if proxysock is None:
+    #     logger.warning(
+    #         "NNNN NO OPEN SOCKETS - DATA NOT SENT")
+    # else:
+    #     # await proxysock.send(message)
+    #     await asyncio.wait([user.send(message) for user in USERS])
+    #     logger.warning("======== DATA SENT to websocket(s) ==========")
+    # await asyncio.sleep(0)
 
 
 async def register(websocket):
@@ -429,9 +428,11 @@ async def unregister(websocket):
 
 
 async def MyWSHandler(websocket, path):
-    global proxysock
-    proxysock = websocket
-    await register(websocket)
+    #global proxysock
+    #proxysock = websocket
+#    await register(websocket)
+    USERS.add(websocket)
+
     logger.warning("CCCCCC CONNECTION MADE CCCCCC")
     #now = str(datetime.datetime.now())
     now = "websocket server connected on " + \
@@ -449,6 +450,7 @@ async def MyWSHandler(websocket, path):
     while True:
         try:
             msg = await asyncio.wait_for(websocket.recv(), timeout=20)
+            logger.warning("SSSS RXED message is: %s ", msg)
         except asyncio.TimeoutError:
             # No data in 20 seconds, check the connection.
             try:
@@ -466,7 +468,7 @@ async def MyWSHandler(websocket, path):
                 break
         else:
             logger.warning(
-                "MMMMM msg rxed from client - syill conn so do nothing MMMMM")
+                "RRRR msg RXED from client - still connected so do nothing")
 
         # do something with msg
         #!!

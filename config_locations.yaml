@@ -52,8 +52,8 @@ locations:
   tempAlertHi: 30.0  #hi temp alert temp
   tempAlertLo: 14.0  #lo temp alert
 
-  lightOnT: "20:00:00"    # time light on hh:mm:ss
-  lightOffT: "14:00:00"   # time off
+  #lightOnT: "20:00:00"    # time light on hh:mm:ss
+  #lightOffT: "14:00:00"   # time off
 
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
@@ -61,9 +61,9 @@ locations:
   heater_off_t: 30000  #min time heater is off for
   heater_sp_offset: 0
 
-  ventOnDelta: 30000 #duration vent is on in millis - minimum mark
-  ventOffDelta: 30000 #vent off duration in miili sec
-  ventPulseOnDelta: 30000 #60 secs cooling on delta
+  ventOnDelta: 10000 #duration vent is on in millis - minimum mark
+  ventOffDelta: 47000 #vent off duration in miili sec
+  ventPulseOnDelta: 10000 #60 secs cooling on delta
   vent_lon_sp_offset: -0.1 #offset
   vent_loff_sp_offset: 1.0 #
 
@@ -99,8 +99,8 @@ locationc:
   #tempAlertHi: 30.0  #hi temp alert temp
   tempAlertLo: 14.5  #lo temp alert
 
-  lightOnT: "20:00:00"    # time light on hh:mm:ss
-  lightOffT: "14:00:00"   # time off
+  # lightOnT: "20:00:00"    # time light on hh:mm:ss
+  # lightOffT: "14:00:00"   # time off
 
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
@@ -145,8 +145,8 @@ locationg:
   tempAlertHi: 26.1  #hi temp alert temp
   tempAlertLo: 15.0  #lo temp alert
 
-  lightOnT: "16:00:00"    # time light on hh:mm:ss
-  lightOffT: "10:00:00"   # time off
+  # lightOnT: "16:00:00"    # time light on hh:mm:ss
+  # lightOffT: "10:00:00"   # time off
 
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
