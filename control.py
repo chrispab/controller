@@ -388,23 +388,29 @@ USERS = set()
 async def txwebsocket(message):
     #global proxysock
     #if USERS.
+    removeMe=False
     for clientConn in USERS:
         logger.warning("DDDD Sending DATA SENT to websocket(s)")
         logger.warning(clientConn)
         try:
             if clientConn.open:
-                #await asyncio.wait([clientConn.send(message) ])
-                await clientConn.send(message)
+                await asyncio.wait([clientConn.send(message) ])
+                #await clientConn.send(message)
 
                 logger.warning("EEEE message sent to wdClient EEEE")
             else : #websockets.ConnectionClosed:
                 logger.warning("UUUU1 unregging a wsconn UUUU")
+                removeMe = clientConn
                 #await unregister(clientConn)    
                 #USERS.remove(clientConn)            
         except:
             logger.warning("UUUU2 unregging a wsconn UUUU")
             await unregister(clientConn)
 
+    #if wsocket marked for removal
+    if removeMe:
+        USERS.remove(removeMe)
+        #await unregister(clientConn) 
     return
 
 
