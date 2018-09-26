@@ -18,7 +18,9 @@ import yaml
 import datetime as dt
 import sys    # for stdout print
 import socket # to get hostname
-import sendemail as emailMe
+#import sendemail as emailMe
+#from myemail import MyEmail
+
 from Logger import Logger
 
 logger = logging.getLogger(__name__)

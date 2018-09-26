@@ -8,7 +8,7 @@
 from time import sleep
 import datetime
 from datetime import timedelta, time
-import sendemail as emailMe
+#import sendemail as emailMe
 import logging
 
 

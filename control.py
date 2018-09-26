@@ -405,7 +405,8 @@ async def txwebsocket(message):
                 #USERS.remove(clientConn)            
         except:
             logger.warning("UUUU2 unregging a wsconn UUUU")
-            await unregister(clientConn)
+            #await unregister(clientConn)
+            removeMe = clientConn
 
     #if wsocket marked for removal
     if removeMe:
@@ -430,10 +431,10 @@ async def MyWSHandler(websocket, path):
 
     logger.warning("CCCCCC CONNECTION MADE CCCCCC")
     #now = str(datetime.datetime.now())
-    now = "websocket server connected on " + \
+    initialMessage = "websocket server connected on " + \
         cfg.getItemValueFromConfig('zoneName')
 
-    await websocket.send(now)
+    await websocket.send(initialMessage)
     header = "Timestamp               T     H     H  V  F  S  L"
     await websocket.send(header)
 
