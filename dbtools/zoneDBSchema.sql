@@ -1,4 +1,3 @@
--- Schema for to-do application examples.
 
 -- thdata stores data samples
 create table thdata (
@@ -11,7 +10,6 @@ create table thdata (
     fanstate    INT
 );
 
--- Tasks are steps that can be taken to complete a project
 create table config (
     id           integer primary key  not null,
     tempSPLOn    REAL not null,

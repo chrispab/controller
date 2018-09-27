@@ -304,27 +304,25 @@ async def control():
             MQTTClient.publish(zone+"/TemperatureStatus", temperature)
             MQTTClient.publish(zone+"/HumidityStatus", humidity)
             MQTTClient.publish(zone+"/HeaterStatus", heaterState)
-
             MQTTClient.publish(zone+"/VentStatus", ventState)
             MQTTClient.publish(zone+"/FanStatus", fanState)
             MQTTClient.publish(zone+"/VentSpeedStatus", ventSpeedState)
             MQTTClient.publish(zone+"/LightStatus", lightState)
-            logger.warning("QQQQ MQTT messages sent")  # , sensor_data)
+            # logger.warning("QQQQ MQTT messages sent")  # , sensor_data)
 
-            # print("->")
             logger.debug("======== start state changed main list ======")
             # check for alarm levels etc
             if temperature > cfg.getItemValueFromConfig('tempAlertHi'):
                 try:
                     emailObj.send(zone + ' - Hi Temp warning' +
-                                  temperature, message)
+                                  temperature, 'Hi Temp warning')
                 except:
                     logger.error("...ERROR SENDING EMAIL - for hi temp alert")
 
             if temperature < cfg.getItemValueFromConfig('tempAlertLo'):
                 try:
                     emailObj.send(zone + ' - Lo Temp warning' +
-                                  temperature, message)
+                                  temperature, 'Lo Temp warning')
                 except:
                     logger.error("...ERROR SENDING EMAIL - low temp alert")
 
@@ -334,27 +332,17 @@ async def control():
             end_time = time.time()
             processUptime = end_time - start_time
             processUptime = str(timedelta(seconds=int(processUptime)))
-            # cfg.setConfigItemInLocalDB('processUptime', "Process Up Time: " +processUptime)
             cfg.setConfigItemInLocalDB('processUptime', processUptime)
-
             systemUpTime = ctl1.timer1.getSystemUpTimeFromProc()
-            # cfg.setConfigItemInLocalDB('systemUpTime',  "System Up Time: " + systemUpTime)
             cfg.setConfigItemInLocalDB('systemUpTime', systemUpTime)
-
             cfg.setConfigItemInLocalDB('miscMessage', location)
-
-            # systemMessage = ctl1.timer1.getUpTime().strip()
             cfg.setConfigItemInLocalDB('systemMessage', systemMessage)
-
             ipAddress = get_ip_address()
             cfg.setConfigItemInLocalDB('controllerMessage', "V: " + VERSION + ", IP: " + "<a href=" +
                                        "https://" + ipAddress + ":10000" + ' target="_blank"' + ">" + ipAddress + "</a>")
-
             cfg.setConfigItemInLocalDB('lightState', int(lightState))
-
             execAndTimeFunc(cfg.updateCentralConfigTable)
 
-            # uptime = cfg.getConfigItemFromLocalDB('processUptime')
             logger.info("======== process uptime: %s ======", processUptime)
             mem = psutil.virtual_memory()
             # logger.warning("MMMMMM total memory       : %s MMMMMM",mem.total)
@@ -364,7 +352,6 @@ async def control():
                          ((float(mem.available)/float(mem.total)))*100)
             # logger.warning("======== % memory available: %s ======",mem.percent)
 
-            #data = systemUpTime
             currentStatusString = ctl1.stateMonitor.getStatusString()
             currentStatusString = currentStatusString + \
                 ", " + str(lightState)
@@ -382,36 +369,36 @@ async def control():
             await asyncio.sleep(0)
 
 
-USERS = set()
 
+USERS = set()
 
 async def txwebsocket(message):
     #global proxysock
-    #if USERS.
-    removeMe=False
+    # if USERS.
+    removeMe = False
     for clientConn in USERS:
         logger.warning("DDDD Sending DATA SENT to websocket(s)")
         logger.warning(clientConn)
         try:
             if clientConn.open:
-                await asyncio.wait([clientConn.send(message) ])
-                #await clientConn.send(message)
+                await asyncio.wait([clientConn.send(message)])
+                # await clientConn.send(message)
 
                 logger.warning("EEEE message sent to wdClient EEEE")
-            else : #websockets.ConnectionClosed:
+            else:  # websockets.ConnectionClosed:
                 logger.warning("UUUU1 unregging a wsconn UUUU")
                 removeMe = clientConn
-                #await unregister(clientConn)    
-                #USERS.remove(clientConn)            
+                # await unregister(clientConn)
+                # USERS.remove(clientConn)
         except:
             logger.warning("UUUU2 unregging a wsconn UUUU")
-            #await unregister(clientConn)
+            # await unregister(clientConn)
             removeMe = clientConn
 
-    #if wsocket marked for removal
+    # if wsocket marked for removal
     if removeMe:
         USERS.remove(removeMe)
-        #await unregister(clientConn) 
+        # await unregister(clientConn)
     return
 
 
@@ -426,7 +413,7 @@ async def unregister(websocket):
 
 
 async def MyWSHandler(websocket, path):
-#    await register(websocket)
+    #    await register(websocket)
     USERS.add(websocket)
 
     logger.warning("CCCCCC CONNECTION MADE CCCCCC")
@@ -448,15 +435,17 @@ async def MyWSHandler(websocket, path):
         except asyncio.TimeoutError:
             # No data in 20 seconds, check the connection.
             try:
-                logger.warning("NNNN No data in 20 secs from client- checking the connection NNNN")
-                #await unregister(websocket)
-                #break
+                logger.warning(
+                    "NNNN No data in 20 secs from client- checking the connection NNNN")
+                # await unregister(websocket)
+                # break
                 pong_waiter = await websocket.ping()
                 await asyncio.wait_for(pong_waiter, timeout=10)
                 logger.warning("PPPPP ping rxed - client aliveb PPPP")
-            except: # asyncio.TimeoutError:
+            except:  # asyncio.TimeoutError:
                 # No response to ping in 10 seconds, disconnect.
-                logger.warning("RRRR no ping response - Remove dead client websocet RRRR")
+                logger.warning(
+                    "RRRR no ping response - Remove dead client websocet RRRR")
 
                 await unregister(websocket)
                 break
