@@ -171,7 +171,8 @@ async def control():
     # emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
     emailObj.send("Zone " + zoneNumber + " " + emailzone +
                   location + ' - Process Started', message)
-    wsDisplayRows = 11
+    maxWSDisplayRows = 10
+    currentWSDisplayRow=1
     while 1:
         # tornado.ioloop.IOLoop.instance().loop()
 
@@ -293,24 +294,24 @@ async def control():
             logger.warning(
                 "==== DATA message to send: %s ====", currentStatusString)
 
-            if wsDisplayRows >= 15:
+            if currentWSDisplayRow >= maxWSDisplayRows:
                 header = "Timestamp               T     H     H  V  F  S  L"
                 await txwebsocket(header)
-                wsDisplayRows = 0
-            wsDisplayRows = wsDisplayRows + 1
+                currentWSDisplayRow = 0
+            currentWSDisplayRow = currentWSDisplayRow + 1
 
             await txwebsocket(currentStatusString)
             await asyncio.sleep(0)
 
 
 
-USERS = set()
+wsClients = set()
 
 async def txwebsocket(message):
     #global proxysock
-    # if USERS.
+    # if wsClients.
     removeMe = False
-    for clientConn in USERS:
+    for clientConn in wsClients:
         logger.warning("DDDD Sending DATA SENT to websocket(s)")
         logger.warning(clientConn)
         try:
@@ -323,7 +324,7 @@ async def txwebsocket(message):
                 logger.warning("UUUU1 unregging a wsconn UUUU")
                 removeMe = clientConn
                 # await unregister(clientConn)
-                # USERS.remove(clientConn)
+                # wsClients.remove(clientConn)
         except:
             logger.warning("UUUU2 unregging a wsconn UUUU")
             # await unregister(clientConn)
@@ -331,24 +332,24 @@ async def txwebsocket(message):
 
     # if wsocket marked for removal
     if removeMe:
-        USERS.remove(removeMe)
+        wsClients.remove(removeMe)
         # await unregister(clientConn)
     return
 
 
 async def register(websocket):
-    USERS.add(websocket)
-    # await notify_users()
+    wsClients.add(websocket)
+    # await notify_wsClients()
 
 
 async def unregister(websocket):
-    USERS.remove(websocket)
-    # await notify_users()
+    wsClients.remove(websocket)
+    # await notify_wsClients()
 
 
 async def MyWSHandler(websocket, path):
     #    await register(websocket)
-    USERS.add(websocket)
+    wsClients.add(websocket)
 
     logger.warning("CCCCCC CONNECTION MADE CCCCCC")
     #now = str(datetime.datetime.now())
