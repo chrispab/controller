@@ -27,36 +27,17 @@ import yaml
 import datetime as dt
 import sys    # for stdout print
 import socket  # to get hostname
-#import sendemail as emailMe
-
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
-
-# import tornado.httpserver
-# import tornado.websocket
-# import tornado.ioloop
-# import tornado.web
-# import socket
-
-# import RF24
-
 import asyncio
-
-# import multiprocessing
 import random
-
-# import websocketserver
 import websockets
 
-
-Broker = "192.168.0.200"
-
+MQTTBroker = "192.168.0.200"
 sub_topic = "/zone1/instructions"    # receive messages on this topic
-
 pub_topic = "/zone1/data"       # send messages to this topic
 
 from myemail import MyEmail
-
 from Logger import Logger
 import pprint
 
@@ -64,7 +45,6 @@ import pprint
 logger = logging.getLogger(__name__)
 
 import RPi.GPIO as GPIO
-
 import subprocess
 import os
 
@@ -75,11 +55,6 @@ from ConfigObject import cfg  # singleton global
 
 import hardware as hw
 from support import round_time as round_time
-
-# import websocketserver
-# from websocketserver import clients
-# from websocketserver import send_to_all_clients
-
 
 OFF = cfg.getItemValueFromConfig('RelayOff')  # state for relay OFF
 ON = cfg.getItemValueFromConfig('RelayOn')  # state for on
@@ -95,7 +70,6 @@ zoneNumber = 0
 from componentClasses import *  # components of controller board
 
 # ============================common code start==========================
-
 
 def get_ip_address():
     try:
@@ -148,45 +122,13 @@ ctl1 = Controller()
 emailObj = MyEmail()
 
 
-##################################################
-
-'''
-This is a simple Websocket Echo server that uses the Tornado websocket handler.
-Please run `pip install tornado` with python of version 2.7.9 or greater to install tornado.
-This program will echo back the reverse of whatever it recieves.
-Messages are output to the terminal for debuggin purposes.
-'''
-
-# class WSHandler(tornado.websocket.WebSocketHandler):
-#     def open(self):
-#         print ('new connection')
-
-#     def on_message(self, message):
-#         print ('message received:  %s' % message)
-#         # Reverse Message and send it back
-#         print ('sending back message: %s' % message[::-1])
-#         self.write_message(message[::-1])
-
-#     def on_close(self):
-#         print ('connection closed')
-
-#     def check_origin(self, origin):
-#         return True
-
-# application = tornado.web.Application([
-#     (r'/ws', WSHandler),
-# ])
-# cfg.
-
-
 # !MQTT stuff - handlers etc
 def on_connect(MQTTClient, userdata, flags, rc):
     print("Connected with result code "+str(rc))
+    logger.warning("MMMMM - MQTT CONNECTED - MMMMM")
     MQTTClient.subscribe(sub_topic)
 
 # when receiving a mqtt message do this;
-
-
 def on_message(MQTTClient, userdata, msg):
     message = str(msg.payload)
     print(msg.topic+" "+message)
@@ -196,27 +138,7 @@ def on_message(MQTTClient, userdata, msg):
 def on_publish(mosq, obj, mid):
     print("mid: " + str(mid))
 
-
-def on_connect(MQTTClient, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
-    MQTTClient.subscribe(sub_topic)
-
-# import websocketserver
-
-
 async def control():
-
-    MQTTClient = mqtt.Client()
-    MQTTClient.on_connect = on_connect
-    MQTTClient.on_message = on_message
-    MQTTClient.connect(Broker, 1883, 60)
-    MQTTClient.loop_start()
-
-    # call to systemd watchdog to hold off restart
-    ctl1.timer1.holdOffWatchdog(0, True)
-
-    start_time = time.time()
-    humidity, temperature, sensorMessage = ctl1.sensor1.read()
 
     global systemUpTime
     global processUptime
@@ -224,6 +146,18 @@ async def control():
     global controllerMessage
     global miscMessage
     global emailzone
+
+    MQTTClient = mqtt.Client()
+    MQTTClient.on_connect = on_connect
+    MQTTClient.on_message = on_message
+    MQTTClient.connect(MQTTBroker, 1883, 60)
+    MQTTClient.loop_start()
+
+    # call to systemd watchdog to hold off restart
+    ctl1.timer1.holdOffWatchdog(0, True)
+
+    start_time = time.time()
+    humidity, temperature, sensorMessage = ctl1.sensor1.read()
 
     # TODO ENABLE EMAIL ENABLED OBEY
     zone = cfg.getItemValueFromConfig('zoneName')
@@ -237,7 +171,7 @@ async def control():
     # emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
     emailObj.send("Zone " + zoneNumber + " " + emailzone +
                   location + ' - Process Started', message)
-    row = 11
+    wsDisplayRows = 11
     while 1:
         # tornado.ioloop.IOLoop.instance().loop()
 
@@ -359,11 +293,11 @@ async def control():
             logger.warning(
                 "==== DATA message to send: %s ====", currentStatusString)
 
-            if row >= 15:
+            if wsDisplayRows >= 15:
                 header = "Timestamp               T     H     H  V  F  S  L"
                 await txwebsocket(header)
-                row = 0
-            row = row + 1
+                wsDisplayRows = 0
+            wsDisplayRows = wsDisplayRows + 1
 
             await txwebsocket(currentStatusString)
             await asyncio.sleep(0)
