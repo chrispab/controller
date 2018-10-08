@@ -96,13 +96,6 @@ class Controller(object):
 
     def __init__(self):
         logger.info("init controller")
-        # start the c watchdog
-        # logger.warning("WWWWW starting my_watchdog WWWWW")
-#        os.system("sudo ./watchdog/my_watchdog &")
-        # os.system("sudo ./watchdog/my_watchdog -r &")
-
-        # subprocess.call(["sudo","./watchdog/my_watchdog"])
-
         logger.info("---Creating system Objects---")
         self.board1 = hw.platform()
         self.sensor1 = hw.sensor()
@@ -134,9 +127,9 @@ def on_message(MQTTClient, userdata, msg):
     print(msg.topic+" "+message)
     # display_sensehat(message)
 
-
 def on_publish(mosq, obj, mid):
     print("mid: " + str(mid))
+# EMQTT
 
 async def control():
 
@@ -159,12 +152,11 @@ async def control():
     start_time = time.time()
     humidity, temperature, sensorMessage = ctl1.sensor1.read()
 
-    # TODO ENABLE EMAIL ENABLED OBEY
     zone = cfg.getItemValueFromConfig('zoneName')
     zoneNumber = cfg.getItemValueFromConfig('zoneNumber')
     location = cfg.getItemValueFromConfig('locationDisplayName')
     message = zone
-   # if just booted
+    # if just booted
     if ctl1.timer1.secsSinceBoot() < 120:
         emailzone = "Zone " + zoneNumber + ' REBOOTED '
 
@@ -174,12 +166,7 @@ async def control():
     maxWSDisplayRows = 10
     currentWSDisplayRow=1
     while 1:
-        # tornado.ioloop.IOLoop.instance().loop()
-
         logger.info("=main while loop=")
-        # logger.warning("== process uptime: %s =",processUptime)
-
-        # logger.debug(socket.gethostname())
         logger.info("current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.updateClocks()
         current_millis = ctl1.timer1.current_millis
@@ -231,11 +218,7 @@ async def control():
                                                          fanState, heaterState, ventSpeedState,
                                                          current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
         if stateChanged:
-            # logger.error("^^^^^^^^^^  Aquisition sampletime: %d ^^^^^^^^^^^", duration)
-
-            #sensor_data = [str(temperature), str(humidity), str(lightState)]
-            # , sensor_data)
-            logger.warning("QQQQ Publish MQTT messages...")
+            logger.warning("QQQQ Publishing MQTT messages...")
             MQTTClient.publish(zone+"/TemperatureStatus", temperature)
             MQTTClient.publish(zone+"/HumidityStatus", humidity)
             MQTTClient.publish(zone+"/HeaterStatus", heaterState)
@@ -243,7 +226,6 @@ async def control():
             MQTTClient.publish(zone+"/FanStatus", fanState)
             MQTTClient.publish(zone+"/VentSpeedStatus", ventSpeedState)
             MQTTClient.publish(zone+"/LightStatus", lightState)
-            # logger.warning("QQQQ MQTT messages sent")  # , sensor_data)
 
             logger.debug("======== start state changed main list ======")
             # check for alarm levels etc
@@ -308,8 +290,6 @@ async def control():
 wsClients = set()
 
 async def txwebsocket(message):
-    #global proxysock
-    # if wsClients.
     removeMe = False
     for clientConn in wsClients:
         logger.warning("DDDD Sending DATA SENT to websocket(s)")
@@ -339,16 +319,13 @@ async def txwebsocket(message):
 
 async def register(websocket):
     wsClients.add(websocket)
-    # await notify_wsClients()
 
 
 async def unregister(websocket):
     wsClients.remove(websocket)
-    # await notify_wsClients()
 
 
 async def MyWSHandler(websocket, path):
-    #    await register(websocket)
     wsClients.add(websocket)
 
     logger.warning("CCCCCC CONNECTION MADE CCCCCC")
@@ -362,7 +339,6 @@ async def MyWSHandler(websocket, path):
 
     # try ping socket # if response cont
     # if no response remove websocket from set
-    #!!
     while True:
         try:
             msg = await asyncio.wait_for(websocket.recv(), timeout=20)
@@ -390,9 +366,6 @@ async def MyWSHandler(websocket, path):
 
         # do something with msg?
     logger.warning("DDDDD drop our of onConnect handler DDDDDD")
-
-
-#proxysock = None
 
 
 async def main():
@@ -423,12 +396,8 @@ async def serveConsolePage(request):
 app = web.Application()
 app.add_routes([web.get('/', serveConsolePage)])
 
-# web.run_app(app)
-
 
 # ===================================
-
-
 if __name__ == "__main__":
     ioloop = asyncio.get_event_loop()
     ioloop.run_until_complete(main())

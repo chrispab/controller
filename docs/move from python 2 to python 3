@@ -8,7 +8,7 @@ download RF24 lib from github, place in source tree
 remove it's git folder to allow sync with repo
 
 
-now uses lib sd notify to commwith systemd watchdog function
+now uses lib sd notify to comm with systemd watchdog function
 https://github.com/bb4242/sdnotify
 pip3 install sdnotify
 

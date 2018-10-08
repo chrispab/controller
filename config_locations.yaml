@@ -58,14 +58,14 @@ locations:
   heater_off_t: 30000  #min time heater is off for
   heater_sp_offset: 0
 
-  ventOnDelta: 10000 #duration vent is on in millis - minimum mark
-  ventOffDelta: 47000 #vent off duration in miili sec
-  ventPulseOnDelta: 10000 #60 secs cooling on delta
+  ventOnDelta: 15000 #duration vent is on in millis - minimum mark
+  ventOffDelta: 45000 #vent off duration in miili sec
+  ventPulseOnDelta: 15000 #nn msecs cooling on delta
   vent_lon_sp_offset: -0.1 #offset
   vent_loff_sp_offset: 1.0 #
 
-  fan_on_t: 17400000  #vent on time ms
-  fan_off_t: 10000 #vent off time ms
+  fan_on_t: 29000  #vent on time ms
+  fan_off_t: 23000 #vent off time ms
 
 
   emailEnabled: True
