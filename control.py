@@ -32,6 +32,7 @@ import paho.mqtt.publish as publish
 import asyncio
 import random
 import websockets
+import requests #allows us to send HTML POST request to IFTTT
 
 MQTTBroker = "192.168.0.200"
 sub_topic = "/zone1/instructions"    # receive messages on this topic
@@ -163,6 +164,10 @@ async def control():
     # emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
     emailObj.send("Zone " + zoneNumber + " " + emailzone +
                   location + ' - Process Started', message)
+
+    # Your IFTTT URL with event name, key and json parameters (values)
+    r = requests.post('https://maker.ifttt.com/trigger/zone3_test_event/with/key/dwqC0jPKLSaKn0NqYx7_D2', params={"value1":"none","value2":"none","value3":"none"})
+
     maxWSDisplayRows = 10
     currentWSDisplayRow=1
     while 1:
