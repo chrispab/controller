@@ -166,9 +166,9 @@ async def control():
                   location + ' - Process Started', message)
 
     # Your IFTTT URL with event name, key and json parameters (values)
-    r = requests.post('https://maker.ifttt.com/trigger/zone3_test_event/with/key/dwqC0jPKLSaKn0NqYx7_D2', params={"value1":"none","value2":"none","value3":"none"})
+    r = requests.post('https://maker.ifttt.com/trigger/zone3_test_event/with/key/dwqC0jPKLSaKn0NqYx7_D2', params={"value1":zone,"value2":"none","value3":"none"})
 
-    maxWSDisplayRows = 10
+    maxWSDisplayRows = 10 #! TODO FIX THIS - display issue
     currentWSDisplayRow=1
     while 1:
         logger.info("=main while loop=")
@@ -179,8 +179,8 @@ async def control():
         # call to systemd watchdog to hold off restart
         ctl1.timer1.holdOffWatchdog(current_millis)
 
-        # hold off wireless arduino watchdog
-        # check radio link for a ping from Arduino watchdog, and respond to indicate alive
+        # hold off wireless watchdog
+        # check radio link for a ping from watchdog, and respond to indicate alive
         ctl1.radioLink1.holdOffWatchdog()
 
         await asyncio.sleep(0)
