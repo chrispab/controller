@@ -166,7 +166,7 @@ async def control():
                   location + ' - Process Started', message)
 
     # Your IFTTT URL with event name, key and json parameters (values)
-    r = requests.post('https://maker.ifttt.com/trigger/zone3_test_event/with/key/dwqC0jPKLSaKn0NqYx7_D2', params={"value1":zone,"value2":"none","value3":"none"})
+    r = requests.post("https://maker.ifttt.com/trigger/zone_alert/with/key/dF1NEy_aQ5diUyluM3EKcd", params={"value1":zone,"value2":"REASON","value3":"DATA"})
 
     maxWSDisplayRows = 10 #! TODO FIX THIS - display issue
     currentWSDisplayRow=1
