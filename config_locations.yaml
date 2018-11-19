@@ -60,11 +60,11 @@ locations:
 
   ventOnDelta: 20000 #duration vent is on in millis - minimum mark
   ventOffDelta: 60000 #vent off duration in miili sec
-  ventPulseOnDelta: 15000 #nn msecs cooling on delta
+  ventPulseOnDelta: 20000 #nn msecs cooling on delta
   vent_lon_sp_offset: -0.1 #offset
   vent_loff_sp_offset: 2.0 #
 
-  fan_on_t: 33000  #vent on time ms
+  fan_on_t: 43000  #vent on time ms
   fan_off_t: 31000 #vent off time ms
 
   emailEnabled: True
