@@ -32,7 +32,7 @@ import paho.mqtt.publish as publish
 import asyncio
 import random
 import websockets
-import requests #allows us to send HTML POST request to IFTTT
+import requests  # allows us to send HTML POST request to IFTTT
 
 MQTTBroker = "192.168.0.200"
 sub_topic = "/zone1/instructions"    # receive messages on this topic
@@ -71,6 +71,7 @@ zoneNumber = 0
 from componentClasses import *  # components of controller board
 
 # ============================common code start==========================
+
 
 def get_ip_address():
     try:
@@ -123,14 +124,35 @@ def on_connect(MQTTClient, userdata, flags, rc):
     MQTTClient.subscribe(sub_topic)
 
 # when receiving a mqtt message do this;
+
+
 def on_message(MQTTClient, userdata, msg):
     message = str(msg.payload)
     print(msg.topic+" "+message)
     # display_sensehat(message)
 
+
 def on_publish(mosq, obj, mid):
     print("mid: " + str(mid))
 # EMQTT
+
+# IFTTT
+
+
+def postIFTTT(event_name, val1, val2, val3):
+    #event_name = "zone_alert"
+    #val1 = zone
+    #val2 = "-Reason-"
+    #val3 = "=Data="
+    iftttUrl = "https://maker.ifttt.com/trigger/" + \
+        event_name+"/with/key/dF1NEy_aQ5diUyluM3EKcd"
+    r = requests.post(iftttUrl, params={
+                      "value1": val1, "value2": val2, "value3": val3})
+
+    #r = requests.post("https://maker.ifttt.com/trigger/zone_alert/with/key/dF1NEy_aQ5diUyluM3EKcd", params={"value1":zone,"value2":"REASON","value3":"DATA"})
+
+# _IFTTT
+
 
 async def control():
 
@@ -165,11 +187,11 @@ async def control():
     emailObj.send("Zone " + zoneNumber + " " + emailzone +
                   location + ' - Process Started', message)
 
-    # Your IFTTT URL with event name, key and json parameters (values)
-    r = requests.post("https://maker.ifttt.com/trigger/zone_alert/with/key/dF1NEy_aQ5diUyluM3EKcd", params={"value1":zone,"value2":"REASON","value3":"DATA"})
+    # # Your IFTTT with event name, and json parameters (values)
+    postIFTTT("zone_alert", zone, "--ReasoN--", "==DatA==")
 
-    maxWSDisplayRows = 10 #! TODO FIX THIS - display issue
-    currentWSDisplayRow=1
+    maxWSDisplayRows = 10  # ! TODO FIX THIS - display issue
+    currentWSDisplayRow = 1
     while 1:
         logger.info("=main while loop=")
         logger.info("current time: %s" % (ctl1.timer1.current_time))
@@ -291,8 +313,8 @@ async def control():
             await asyncio.sleep(0)
 
 
-
 wsClients = set()
+
 
 async def txwebsocket(message):
     removeMe = False
