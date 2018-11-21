@@ -302,6 +302,43 @@ class Heater(object):
         return
 
 
+    def controlv2(self, current_temp, target_temp, d_state, current_millis):
+        logger.info('==Heat ctl==')
+        #calc new heater on t based on t gap
+        self.heater_on_delta = ((target_temp - current_temp) * 80 * 1000)  + cfg.getItemValueFromConfig('heater_on_t')
+        logger.info('==Heat tdelta on: %s',self.heater_on_delta)
+
+        #check for heater OFF hours #todo improve this
+        #current_hour = datetime.datetime.now().hour
+        #if current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
+        if d_state == ON: #current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
+
+            self.state = OFF
+            logger.info('..d on, in heat off hours - skipping lon heatctl')
+        else:  # d off here
+            logger.info('..do heatctl')
+            if current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
+                self.state = OFF
+                logger.info("...temp over sp - HEATER OFF")
+                self.prev_heater_millis = current_millis
+            elif self.state == ON:  # t below tsp if time is up, so check if change the state to OFF
+                if current_millis - self.prev_heater_millis >= self.heater_on_delta:
+                    self.state = OFF
+                    logger.info("...in heat auto cycle - switch HEATER OFF after pulse on")
+                    self.prev_heater_millis = current_millis
+                else:
+                   logger.info('in heat auto cycle - Heater still on - during low temp heat pulse')
+            elif current_millis - self.prev_heater_millis >= self.heater_off_delta:  # heater is off, turn on after delta
+                self.state = ON
+                logger.info("...in heat auto cycle - switch HEATER ON")
+                self.prev_heater_millis = current_millis
+            else:
+                logger.info("...in heat auto cycle - during heat OFF period")
+        # else:
+            #print("..in d-off, no heat ctl")
+        logger.info('Heater state: %s' , ('OFF' if self.state else 'ON') )
+        return
+
 class Light(object):
     def __init__(self):
         logger.info("creating light object")
