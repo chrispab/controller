@@ -159,6 +159,8 @@ class Vent(object):
         self.vent_pulse_on_delta = cfg.getItemValueFromConfig('ventPulseOnDelta')
         self.vent_loff_sp_offset = cfg.getItemValueFromConfig('vent_loff_sp_offset')
         self.vent_lon_sp_offset = cfg.getItemValueFromConfig('vent_lon_sp_offset')
+        self.ventDisableTemp = cfg.getItemValueFromConfig('ventDisableTemp')
+
         self.platformName = cfg.getItemValueFromConfig('hardware')
 
         self.vent_override = OFF  # settings.ventOverride
@@ -171,10 +173,13 @@ class Vent(object):
                 self.speed_state = ON  # high speed
             else:
                 self.speed_state = OFF  # lo speed
+        # loff vent/coolin
+        
+        #! vent off if loff - twemp test mod TODO fix/finalise
+        if (d_state == OFF) and (current_temp < self.ventDisableTemp):
+            self.state = OFF
+            return
 
-
-
-        # loff vent/cooling
         if ((d_state == OFF) and (current_temp > target_temp + self.vent_loff_sp_offset)):
             self.vent_override = ON
             self.state = ON
@@ -304,7 +309,7 @@ class Heater(object):
 
     def controlv2(self, current_temp, target_temp, d_state, current_millis):
         logger.info('==Heat ctl==')
-        #calc new heater on t based on t gap
+        #calc new heater on t based on current temp gap from required temp sp
         self.heater_on_delta = ((target_temp - current_temp) * 80 * 1000)  + cfg.getItemValueFromConfig('heater_on_t')
         logger.info('==Heat tdelta on: %s',self.heater_on_delta)
 
@@ -321,7 +326,9 @@ class Heater(object):
                 self.state = OFF
                 logger.info("...temp over sp - HEATER OFF")
                 self.prev_heater_millis = current_millis
-            elif self.state == ON:  # t below tsp if time is up, so check if change the state to OFF
+                return
+
+            elif self.state == OFF:  # t below tsp, check if has not been on for currt-last_off_time
                 if current_millis - self.prev_heater_millis >= self.heater_on_delta:
                     self.state = OFF
                     logger.info("...in heat auto cycle - switch HEATER OFF after pulse on")
