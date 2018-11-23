@@ -213,6 +213,7 @@ async def control():
             subject = "Zone " + zoneNumber + " " + emailzone + \
                 location + " - : bad sensor reads  - PowerCycle"
             emailObj.send(subject, sensorMessage)
+            
         endT = time.time()
         duration = endT-startT
         # logger.error("^^^^^^^^^^  Aquisition sampletime: %s ^^^^^^^^^^^", duration)
@@ -233,7 +234,7 @@ async def control():
         logger.debug(target_temp)
 
         ctl1.fan1.control(current_millis)
-        ctl1.vent1.control(temperature, target_temp,
+        ctl1.vent1.control(temperature, humidity, target_temp,
                            lightState, current_millis)
         ctl1.heater1.control(temperature, target_temp,
                              lightState, current_millis)

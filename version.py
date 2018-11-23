@@ -1,1 +1,1 @@
-VERSION = "1.57 master-IFTTT"
+VERSION = "1.59 master-IFTTT"

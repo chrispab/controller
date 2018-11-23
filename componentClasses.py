@@ -160,12 +160,11 @@ class Vent(object):
         self.vent_loff_sp_offset = cfg.getItemValueFromConfig('vent_loff_sp_offset')
         self.vent_lon_sp_offset = cfg.getItemValueFromConfig('vent_lon_sp_offset')
         self.ventDisableTemp = cfg.getItemValueFromConfig('ventDisableTemp')
-
+        self.ventDisableHumi = cfg.getItemValueFromConfig('ventDisableHumi')
         self.platformName = cfg.getItemValueFromConfig('hardware')
-
         self.vent_override = OFF  # settings.ventOverride
 
-    def control(self, current_temp, target_temp, d_state, current_millis):
+    def control(self, current_temp, currentHumi, target_temp, d_state, current_millis):
         logger.info('==Vent ctl==')
         self.speed_state = OFF  # lo speed
         if (self.platformName == 'RaspberryPi2'):
@@ -173,10 +172,10 @@ class Vent(object):
                 self.speed_state = ON  # high speed
             else:
                 self.speed_state = OFF  # lo speed
-        # loff vent/coolin
+        # loff vent/cooling
         
-        #! vent off if loff - twemp test mod TODO fix/finalise
-        if (d_state == OFF) and (current_temp < self.ventDisableTemp):
+        #! vent off if loff - temp/humi test mod TODO fix/finalise
+        if (d_state == OFF) and (current_temp < self.ventDisableTemp) and (currentHumi < self.ventDisableHumi):
             self.state = OFF
             return
 
@@ -211,7 +210,7 @@ class Vent(object):
                 else:
                     logger.info('..Vent off - during cycle OFF period')
             else:
-                # vent is on, we must wait for the duration to expire before
+                # vent is on, we must wait for the 'on' duration to expire before
                 # turning it off
                 # time up, change state to OFF
                 if (current_millis - self.prev_vent_millis) >= self.vent_on_delta:
@@ -355,23 +354,6 @@ class Light(object):
 
     #return true if testTime between timeOn and TimeOff, else false if in off period
     def getLightState(self ):
-        # logger.info('==light - get light state==')
-
-        # tOff = cfg.getTOff()
-        # tOn = cfg.getTOn()
-        # currT = datetime.datetime.now().time()
-        # X = False
-        # if (tOn > tOff):
-        #     X = True
-
-        # lightState = OFF
-        # if (( currT > tOn) and (currT < tOff)):
-        #     lightState = ON
-        # if (((currT > tOn) or (currT < tOff)) and ( X )):
-        #     lightState = ON
-
-        # logger.debug("==light state check. ON: %s, OFF: %s, NOW: %s, state: %d" % (tOn.strftime("%H:%M:%S"), tOff.strftime("%H:%M:%S"), currT.strftime("%H:%M:%S"), lightState))
-
 
         #new ldr based routine test
         #print("hi")

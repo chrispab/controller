@@ -58,12 +58,13 @@ locations:
   heater_off_t: 60000  #min time heater is off for
   heater_sp_offset: 0
 
-  ventOnDelta: 30000 #duration vent is on in millis - minimum mark
+  ventOnDelta: 45000 #duration vent is on in millis - minimum mark
   ventOffDelta: 60000 #vent off duration in miili sec
   ventPulseOnDelta: 20000 #nn msecs cooling on delta
   vent_lon_sp_offset: -0.1 #offset
   vent_loff_sp_offset: 2.0 #
   ventDisableTemp: 18 #temp below which vent is disabled if loff
+  ventDisableHumi: 60 #humi below which vent is disabled if loff
 
   fan_on_t: 67000  #vent on time ms
   fan_off_t: 21000 #vent off time ms
@@ -74,7 +75,7 @@ locations:
   
   readingPipeAddress: "NodeS"  #pipe address for receiving from wireless watchdog
   writingPipeAddress: "Node0" # address for pipe to write to wireless watchdog
-  ackMessage: "SSS"  #message sent back on reciept of arduino watchdog ping
+  ackMessage: "SSS"  #message sent back on reciept of bridge watchdog ping
   
   remoteDBEnabled: False
   
@@ -104,6 +105,7 @@ locationc:
   vent_lon_sp_offset: 0.0 #offset
   vent_loff_sp_offset: 2.0 #
   ventDisableTemp: 18 #temp below which vent is disabled if loff
+  ventDisableHumi: 60 #humi below which vent is disabled if loff
 
   fan_on_t: 400000  #vent on time
   fan_off_t: 40000 #vent off time
@@ -142,6 +144,7 @@ locationg:
   vent_lon_sp_offset: 0.0 #offset
   vent_loff_sp_offset: 2.0 #
   ventDisableTemp: 18 #temp below which vent is disabled if loff
+  ventDisableHumi: 65 #humi below which vent is disabled if loff
 
   fan_on_t: 23000  #vent on time
   fan_off_t: 50000 #vent off time
