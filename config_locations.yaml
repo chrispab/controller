@@ -64,10 +64,12 @@ locations:
   vent_lon_sp_offset: -0.1 #offset
   vent_loff_sp_offset: 2.0 #
   ventDisableTemp: 18 #temp below which vent is disabled if loff
-  ventDisableHumi: 60 #humi below which vent is disabled if loff
+  ventDisableHumi: 50 #humi below which vent is disabled if loff
+ # ventSpeedLevel: 2    #1 if vent has single speed, 2 if dual speed
+  ventEnableHighSpeed: False # enable high speed if available dep on vent
 
   fan_on_t: 67000  #vent on time ms
-  fan_off_t: 21000 #vent off time ms
+  fan_off_t: 17000 #vent off time ms
 
   emailEnabled: True
   
@@ -106,6 +108,7 @@ locationc:
   vent_loff_sp_offset: 2.0 #
   ventDisableTemp: 18 #temp below which vent is disabled if loff
   ventDisableHumi: 60 #humi below which vent is disabled if loff
+  ventEnableHighSpeed: False # enable high speed if available dep on vent
 
   fan_on_t: 400000  #vent on time
   fan_off_t: 40000 #vent off time
@@ -145,6 +148,7 @@ locationg:
   vent_loff_sp_offset: 2.0 #
   ventDisableTemp: 18 #temp below which vent is disabled if loff
   ventDisableHumi: 65 #humi below which vent is disabled if loff
+  ventEnableHighSpeed: False # enable high speed if available dep on vent
 
   fan_on_t: 23000  #vent on time
   fan_off_t: 50000 #vent off time

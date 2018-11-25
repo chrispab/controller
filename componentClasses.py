@@ -163,12 +163,13 @@ class Vent(object):
         self.ventDisableHumi = cfg.getItemValueFromConfig('ventDisableHumi')
         self.platformName = cfg.getItemValueFromConfig('hardware')
         self.vent_override = OFF  # settings.ventOverride
+        self.ventEnableHighSpeed = cfg.getItemValueFromConfig('ventEnableHighSpeed')
 
     def control(self, current_temp, currentHumi, target_temp, d_state, current_millis):
         logger.info('==Vent ctl==')
         self.speed_state = OFF  # lo speed
         if (self.platformName == 'RaspberryPi2'):
-            if d_state == ON:
+            if (d_state == ON) and self.ventEnableHighSpeed:
                 self.speed_state = ON  # high speed
             else:
                 self.speed_state = OFF  # lo speed
@@ -265,8 +266,9 @@ class Heater(object):
         self.state = OFF
         self.heater_off_delta = cfg.getItemValueFromConfig('heater_off_t')  # min time heater is on or off for
         self.heater_on_delta = cfg.getItemValueFromConfig('heater_on_t')  # min time heater is on or off for
-        self.prev_heater_millis = 0  # last time heater switched on or off
+        self.lastStateChangeMillis = 0  # last time heater switched on or off
         self.heater_sp_offset = cfg.getItemValueFromConfig('heater_sp_offset')
+        self.status = 0
 
     def control(self, current_temp, target_temp, d_state, current_millis):
         logger.info('==Heat ctl==')
@@ -286,18 +288,18 @@ class Heater(object):
             if current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
                 self.state = OFF
                 logger.info("...temp over sp - HEATER OFF")
-                self.prev_heater_millis = current_millis
+                self.lastStateChangeMillis = current_millis
             elif self.state == ON:  # t below tsp if time is up, so check if change the state to OFF
-                if current_millis - self.prev_heater_millis >= self.heater_on_delta:
+                if current_millis - self.lastStateChangeMillis >= self.heater_on_delta:
                     self.state = OFF
                     logger.info("...in heat auto cycle - switch HEATER OFF after pulse on")
-                    self.prev_heater_millis = current_millis
+                    self.lastStateChangeMillis = current_millis
                 else:
                    logger.info('in heat auto cycle - Heater still on - during low temp heat pulse')
-            elif current_millis - self.prev_heater_millis >= self.heater_off_delta:  # heater is off, turn on after delta
+            elif current_millis - self.lastStateChangeMillis >= self.heater_off_delta:  # heater is off, turn on after delta
                 self.state = ON
                 logger.info("...in heat auto cycle - switch HEATER ON")
-                self.prev_heater_millis = current_millis
+                self.lastStateChangeMillis = current_millis
             else:
                 logger.info("...in heat auto cycle - during heat OFF period")
         # else:
@@ -309,38 +311,45 @@ class Heater(object):
     def controlv2(self, current_temp, target_temp, d_state, current_millis):
         logger.info('==Heat ctl==')
         #calc new heater on t based on current temp gap from required temp sp
-        self.heater_on_delta = ((target_temp - current_temp) * 80 * 1000)  + cfg.getItemValueFromConfig('heater_on_t')
+        self.heater_on_delta = self.heater_on_delta + ((target_temp - current_temp) * 80 * 1000)
         logger.info('==Heat tdelta on: %s',self.heater_on_delta)
 
-        #check for heater OFF hours #todo improve this
-        #current_hour = datetime.datetime.now().hour
-        #if current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
-        if d_state == ON: #current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
 
+        if d_state == ON: #current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
             self.state = OFF
             logger.info('..d on, in heat off hours - skipping lon heatctl')
-        else:  # d off here
-            logger.info('..do heatctl')
-            if current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
+            return
+        
+        # d_state on if here
+        logger.info('..do heatctl')
+        if current_temp >= target_temp + self.heater_sp_offset:
+            #turn off and leave
+            self.state = OFF
+            logger.info('..d on, in heat off hours - skipping lon heatctl')
+            return
+        # below temp sp here
+        # check if this is start of a heat cycle - long time passed since last state change
+        if (current_millis > self.lastStateChangeMillis + self.heater_off_delta):
+            # current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
+            self.state = ON
+            logger.info("...temp below sp - HEATER ON")
+            self.lastStateChangeMillis = current_millis
+            return
+        #if here must be in a current cycle
+        if self.state == OFF:  # t below tsp, check if has not been on for currt-last_off_time
+            if current_millis - self.lastStateChangeMillis >= self.heater_on_delta:
                 self.state = OFF
-                logger.info("...temp over sp - HEATER OFF")
-                self.prev_heater_millis = current_millis
-                return
-
-            elif self.state == OFF:  # t below tsp, check if has not been on for currt-last_off_time
-                if current_millis - self.prev_heater_millis >= self.heater_on_delta:
-                    self.state = OFF
-                    logger.info("...in heat auto cycle - switch HEATER OFF after pulse on")
-                    self.prev_heater_millis = current_millis
-                else:
-                   logger.info('in heat auto cycle - Heater still on - during low temp heat pulse')
-            elif current_millis - self.prev_heater_millis >= self.heater_off_delta:  # heater is off, turn on after delta
-                self.state = ON
-                logger.info("...in heat auto cycle - switch HEATER ON")
-                self.prev_heater_millis = current_millis
+                logger.info("...in heat auto cycle - switch HEATER OFF after pulse on")
+                self.lastStateChangeMillis = current_millis
             else:
-                logger.info("...in heat auto cycle - during heat OFF period")
-        # else:
+                logger.info('in heat auto cycle - Heater still on - during low temp heat pulse')
+        elif current_millis - self.lastStateChangeMillis >= self.heater_off_delta:  # heater is off, turn on after delta
+            self.state = ON
+            logger.info("...in heat auto cycle - switch HEATER ON")
+            self.lastStateChangeMillis = current_millis
+        else:
+            logger.info("...in heat auto cycle - during heat OFF period")
+    # else:
             #print("..in d-off, no heat ctl")
         logger.info('Heater state: %s' , ('OFF' if self.state else 'ON') )
         return
