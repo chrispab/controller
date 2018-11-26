@@ -318,37 +318,41 @@ class Heater(object):
         if d_state == ON: #current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
             self.state = OFF
             logger.info('..d on, in heat off hours - skipping lon heatctl')
+            self.lastStateChangeMillis = current_millis
             return
         
-        # d_state on if here
+        # d_state OFF if here
         logger.info('..do heatctl')
         if current_temp >= target_temp + self.heater_sp_offset:
             #turn off and leave
             self.state = OFF
+            self.lastStateChangeMillis = current_millis
             logger.info('..d on, in heat off hours - skipping lon heatctl')
             return
         # below temp sp here
         # check if this is start of a heat cycle - long time passed since last state change
-        if (current_millis > self.lastStateChangeMillis + self.heater_off_delta):
+        if self.state ==OFF:
+            #if (current_millis > self.lastStateChangeMillis + self.heater_off_delta):
             # current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
             self.state = ON
             logger.info("...temp below sp - HEATER ON")
             self.lastStateChangeMillis = current_millis
             return
         #if here must be in a current cycle
-        if self.state == OFF:  # t below tsp, check if has not been on for currt-last_off_time
-            if current_millis - self.lastStateChangeMillis >= self.heater_on_delta:
+        if self.state == ON:  # t below tsp, check if has not been on for currt-last_off_time
+            if current_millis > self.lastStateChangeMillis + self.heater_on_delta:
                 self.state = OFF
                 logger.info("...in heat auto cycle - switch HEATER OFF after pulse on")
                 self.lastStateChangeMillis = current_millis
             else:
                 logger.info('in heat auto cycle - Heater still on - during low temp heat pulse')
-        elif current_millis - self.lastStateChangeMillis >= self.heater_off_delta:  # heater is off, turn on after delta
-            self.state = ON
-            logger.info("...in heat auto cycle - switch HEATER ON")
-            self.lastStateChangeMillis = current_millis
-        else:
-            logger.info("...in heat auto cycle - during heat OFF period")
+        #state OFF
+        # elif current_millis - self.lastStateChangeMillis >= self.heater_off_delta:  # heater is off, turn on after delta
+        #     self.state = ON
+        #     logger.info("...in heat auto cycle - switch HEATER ON")
+        #     self.lastStateChangeMillis = current_millis
+        # else:
+        #     logger.info("...in heat auto cycle - during heat OFF period")
     # else:
             #print("..in d-off, no heat ctl")
         logger.info('Heater state: %s' , ('OFF' if self.state else 'ON') )
