@@ -54,8 +54,10 @@ locations:
 
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
-  heater_on_t: 100000  #min time heater is on when below lo sp
-  heater_off_t: 120000  #min time heater is off for
+  # heater_on_t: 100000  #min time heater is on when below lo sp
+  # heater_off_t: 120000  #min time heater is off for
+  heater_on_t: 60000  #min time heater is on when below lo sp
+  heater_off_t: 60000  #min time heater is off for
   heater_sp_offset: 0
 
   ventOnDelta: 45000 #duration vent is on in millis - minimum mark

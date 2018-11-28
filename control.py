@@ -33,6 +33,8 @@ import asyncio
 import random
 import websockets
 import requests  # allows us to send HTML POST request to IFTTT
+import json
+
 
 MQTTBroker = "192.168.0.200"
 sub_topic = "/zone1/instructions"    # receive messages on this topic
@@ -66,6 +68,8 @@ processUptime = 0
 systemMessage = 0
 emailzone = ""
 zoneNumber = 0
+outsideTemp = 15
+
 
 
 from componentClasses import *  # components of controller board
@@ -120,21 +124,29 @@ emailObj = MyEmail()
 # !MQTT stuff - handlers etc
 def on_connect(MQTTClient, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-    logger.warning("MMMMM - MQTT CONNECTED - MMMMM")
+    logger.warning(" - MQTT CONNECTED - MMMMM")
     MQTTClient.subscribe(sub_topic)
 
 # when receiving a mqtt message do this;
-
-
 def on_message(MQTTClient, userdata, msg):
-    message = str(msg.payload)
-    print(msg.topic+" "+message)
-    # display_sensehat(message)
+    global outsideTemp
+    logger.warning(" MRMRMRMRMR- MQTT rx - MRMRMRMRMRMRMRMRMRMR")
 
+    message = str(msg.payload.decode("utf-8"))
+    logger.warning("sub message rxed : %s" % (message))
+    #logger.warning("sub message rxed : %s" % str(message.payload.decode("utf-8")) )
+    data = json.loads(message)
+    outsideTemp = data['AM2301']['Temperature']
+    logger.warning("sub message rxed TEMPERARTURE  : %s" % (outsideTemp))
+
+
+    #print(msg.topic+" "+message)
+    # display_sensehat(message)
 
 def on_publish(mosq, obj, mid):
     print("mid: " + str(mid))
 # EMQTT
+
 
 # IFTTT
 
@@ -162,11 +174,15 @@ async def control():
     global controllerMessage
     global miscMessage
     global emailzone
+    global outsideTemp
 
     MQTTClient = mqtt.Client()
     MQTTClient.on_connect = on_connect
     MQTTClient.on_message = on_message
     MQTTClient.connect(MQTTBroker, 1883, 60)
+    print("Subscribing to topic","Outside_Sensor/tele/SENSOR")
+    MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
+
     MQTTClient.loop_start()
 
     # call to systemd watchdog to hold off restart
@@ -237,7 +253,7 @@ async def control():
         ctl1.vent1.control(temperature, humidity, target_temp,
                            lightState, current_millis)
         ctl1.heater1.controlv2(temperature, target_temp,
-                             lightState, current_millis)
+                             lightState, current_millis, outsideTemp)
         ctl1.fan1.control(current_millis)
         # switch relays according to State vars
         ctl1.board1.switch_relays(

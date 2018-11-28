@@ -308,13 +308,10 @@ class Heater(object):
         return
 
 
-    def controlv2(self, current_temp, target_temp, d_state, current_millis):
+    def controlv2(self, current_temp, target_temp, d_state, current_millis, outsideTemp):
         logger.info('==Heat ctl==')
-        #calc new heater on t based on current temp gap from required temp sp
-        #self.heater_on_delta = self.heater_on_delta + ((target_temp - current_temp) * 20 * 1000)
-        #add extar time
-        self.heater_on_delta = cfg.getItemValueFromConfig('heater_on_t')+ ((target_temp - current_temp + 0.1) * 20 * 1000)
-        logger.info('==Heat tdelta on: %s',self.heater_on_delta)
+        logger.debug('OTOTOTOT outside temp OTOTOTOTO : %s', outsideTemp)
+
 
         if d_state == ON: #current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
             self.state = OFF
@@ -327,10 +324,28 @@ class Heater(object):
         if current_temp >= target_temp + self.heater_sp_offset:
             #turn off and leave
             self.state = OFF
-            #self.lastStateChangeMillis = current_millis
+            self.lastStateChangeMillis = -180000 #current_millis - 180000 # allows immediate on on next cycle if reqd
             logger.info('..d on, in heat off hours - skipping lon heatctl')
             return
 
+
+
+        #calc new heater on t based on current temp gap from required temp sp
+        #self.heater_on_delta = self.heater_on_delta + ((target_temp - current_temp) * 20 * 1000)
+        #add extar time
+        #! look at on period based on external temp
+        #extra heater time based on diff from set point per 0.1 degree diff
+        internalDiffT = int( ((target_temp - current_temp) * 15 * 10 * 1000) )
+        logger.warning('--INTERNAL DIFF extra time to add ms : %s',internalDiffT)
+        #extra  heater time based on external temp diff
+        externalDiffT = int ( (target_temp - outsideTemp) * 4 * 1000 ) # milli secs per degree diff
+        logger.warning('--EXTERNAL DIFF tdelta on to add  ms : %s',externalDiffT)
+
+        self.heater_on_delta = cfg.getItemValueFromConfig('heater_on_t') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
+        logger.warning('--     CALCULATED TOTAL deltt ON  ms : %s',self.heater_on_delta)
+
+
+        #logger.warning('==HDHDHDHDHDHDDHHD Heat tdelta on: %s',self.heater_on_delta)
         # below temp sp here
         # check if this is start of a heat cycle - long time passed since last state change
         if self.state == OFF:
