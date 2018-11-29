@@ -1,1 +1,1 @@
-VERSION = "1.61 master-trim"
+VERSION = "1.62 master: adaptive heat"

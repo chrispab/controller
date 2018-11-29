@@ -18,8 +18,6 @@ import yaml
 import datetime as dt
 import sys    # for stdout print
 import socket # to get hostname
-#import sendemail as emailMe
-#from myemail import MyEmail
 
 from Logger import Logger
 
@@ -46,7 +44,7 @@ class RadioLink(object):
         logger.info("Creating radio Link")
         self.lastHeartBeatSentMillis = 0
         self.heartBeatInterval = cfg.getItemValueFromConfig('heartBeatInterval')
-        self.radio = RF24(17, 0)
+        self.radio = RF24(17, 0)    #setup rf 24l01 radio on pins
 
         self.prev_radio_millis = 0  # last time vent state updated
         self.writingPipeAddress = cfg.getItemValueFromConfig('writingPipeAddress').encode()
@@ -264,17 +262,22 @@ class Heater(object):
     def __init__(self):
         logger.info("creating heater")
         self.state = OFF
-        self.heater_off_delta = cfg.getItemValueFromConfig('heater_off_t')  # min time heater is on or off for
-        self.heater_on_delta = cfg.getItemValueFromConfig('heater_on_t')  # min time heater is on or off for
-        self.lastStateChangeMillis = -180000  # last time heater switched on or off
+        self.heatOffMs = cfg.getItemValueFromConfig('heater_off_t')  # min time heater is on or off for
+        self.heatOnMs = cfg.getItemValueFromConfig('heater_on_t')  # min time heater is on or off for
+        self.lastStateChangeMillis = -180000  # last time heater switched on or off - enables immediate action if process restarted
+
         self.heater_sp_offset = cfg.getItemValueFromConfig('heater_sp_offset')
+
+        self.InternalTDiffMs = cfg.getItemValueFromConfig('heatInternalTDiffMs')
+        self.ExternalTDiffMs = cfg.getItemValueFromConfig('heatExternalTDiffMs')
+
         self.status = 0
 
     def control(self, current_temp, target_temp, d_state, current_millis):
         logger.info('==Heat ctl==')
         #calc new heater on t based on t gap
-        self.heater_on_delta = ((target_temp - current_temp) * 20 * 1000)  + cfg.getItemValueFromConfig('heater_on_t')
-        logger.info('==Heat tdelta on: %s',self.heater_on_delta)
+        self.heatOnMs = ((target_temp - current_temp) * 20 * 1000)  + cfg.getItemValueFromConfig('heater_on_t')
+        logger.info('==Heat tdelta on: %s',self.heatOnMs)
 
         #check for heater OFF hours #todo improve this
         #current_hour = datetime.datetime.now().hour
@@ -290,13 +293,13 @@ class Heater(object):
                 logger.info("...temp over sp - HEATER OFF")
                 self.lastStateChangeMillis = current_millis
             elif self.state == ON:  # t below tsp if time is up, so check if change the state to OFF
-                if current_millis - self.lastStateChangeMillis >= self.heater_on_delta:
+                if current_millis - self.lastStateChangeMillis >= self.heatOnMs:
                     self.state = OFF
                     logger.info("...in heat auto cycle - switch HEATER OFF after pulse on")
                     self.lastStateChangeMillis = current_millis
                 else:
                    logger.info('in heat auto cycle - Heater still on - during low temp heat pulse')
-            elif current_millis - self.lastStateChangeMillis >= self.heater_off_delta:  # heater is off, turn on after delta
+            elif current_millis - self.lastStateChangeMillis >= self.heatOffMs:  # heater is off, turn on after delta
                 self.state = ON
                 logger.info("...in heat auto cycle - switch HEATER ON")
                 self.lastStateChangeMillis = current_millis
@@ -331,25 +334,28 @@ class Heater(object):
 
 
         #calc new heater on t based on current temp gap from required temp sp
-        #self.heater_on_delta = self.heater_on_delta + ((target_temp - current_temp) * 20 * 1000)
+        #self.heatOnMs = self.heatOnMs + ((target_temp - current_temp) * 20 * 1000)
         #add extar time
         #! look at on period based on external temp
         #extra heater time based on diff from set point per 0.1 degree diff
-        internalDiffT = int( ((target_temp - current_temp) * 15 * 10 * 1000) )
+        internalDiffT = int( ((target_temp - current_temp) * 10 * self.InternalTDiffMs) )
         logger.warning('--INTERNAL DIFF extra time to add ms : %s',internalDiffT)
+       
         #extra  heater time based on external temp diff
-        externalDiffT = int ( (target_temp - outsideTemp) * 4 * 1000 ) # milli secs per degree diff
+        #do if external diff is >2 deg c
+        externalDiffT = int( (target_temp - 2 - outsideTemp) * self.ExternalTDiffMs ) # milli secs per degree diff
         logger.warning('--EXTERNAL DIFF tdelta on to add  ms : %s',externalDiffT)
 
-        self.heater_on_delta = cfg.getItemValueFromConfig('heater_on_t') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
-        logger.warning('--     CALCULATED TOTAL deltt ON  ms : %s',self.heater_on_delta)
+        self.heatOnMs = cfg.getItemValueFromConfig('heater_on_t') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
+        logger.warning('--     CALCULATED TOTAL delta ON  ms : %s',self.heatOnMs)
 
-
-        #logger.warning('==HDHDHDHDHDHDDHHD Heat tdelta on: %s',self.heater_on_delta)
+        self.heatOffMs = cfg.getItemValueFromConfig('heater_off_t') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
+        logger.warning('--     CALCULATED TOTAL HEAT OFF ms : %s',self.heatOffMs)
+        #logger.warning('==HDHDHDHDHDHDDHHD Heat tdelta on: %s',self.heatOnMs)
         # below temp sp here
         # check if this is start of a heat cycle - long time passed since last state change
         if self.state == OFF:
-            if (current_millis > (self.lastStateChangeMillis + self.heater_off_delta)):
+            if (current_millis > (self.lastStateChangeMillis + self.heatOffMs)):
             # current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
                 self.state = ON
                 logger.info("...temp below sp - HEATER ON")
@@ -357,21 +363,13 @@ class Heater(object):
                 return
         #if here must be in a current cycle
         if self.state == ON:  # t below tsp, check if has not been on for currt-last_off_time
-            if current_millis > (self.lastStateChangeMillis + self.heater_on_delta):
+            if current_millis > (self.lastStateChangeMillis + self.heatOnMs):
                 self.state = OFF
                 logger.info("...in heat auto cycle - switch HEATER OFF after pulse on")
                 self.lastStateChangeMillis = current_millis
             else:
                 logger.info('in heat auto cycle - Heater still on - during low temp heat pulse')
-        #state OFF
-        # elif current_millis - self.lastStateChangeMillis >= self.heater_off_delta:  # heater is off, turn on after delta
-        #     self.state = ON
-        #     logger.info("...in heat auto cycle - switch HEATER ON")
-        #     self.lastStateChangeMillis = current_millis
-        # else:
-        #     logger.info("...in heat auto cycle - during heat OFF period")
-    # else:
-            #print("..in d-off, no heat ctl")
+
         logger.info('Heater state: %s' , ('OFF' if self.state else 'ON') )
         return
 

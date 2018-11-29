@@ -56,11 +56,13 @@ locations:
 
   # heater_on_t: 100000  #min time heater is on when below lo sp
   # heater_off_t: 120000  #min time heater is off for
-  heater_on_t: 60000  #min time heater is on when below lo sp
-  heater_off_t: 60000  #min time heater is off for
+  heater_on_t: 1000  #min time heater is on when below lo sp
+  heater_off_t: 1000  #min time heater is off for
   heater_sp_offset: 0
+  heatInternalTDiffMs: 4000 #extra heat on time per 0.1 deg diff in internal temps
+  heatExternalTDiffMs: 4000 #extra heat on time per 1 deg diff to external temp
 
-  ventOnDelta: 45000 #duration vent is on in millis - minimum mark
+  ventOnDelta: 70000 #duration vent is on in millis - minimum mark
   ventOffDelta: 60000 #vent off duration in miili sec
   ventPulseOnDelta: 20000 #nn msecs cooling on delta
   vent_lon_sp_offset: -0.1 #offset
@@ -102,6 +104,8 @@ locationc:
   heater_on_t: 8000  #min time heater is on or off for in ms
   heater_off_t: 8000  #min time heater is on or off for
   heater_sp_offset: 0
+  heatInternalTDiffMs: 5000 #extra heat on time per 0.1 deg diff in internal temps
+  heatExternalTDiffMs: 5000 #extra heat on time per 1 deg diff to external temp
 
   ventOnDelta: 20000 #duration vent is on in millis - minimum mark
   ventOffDelta: 60000 #vent off duration in miili sec
@@ -142,6 +146,8 @@ locationg:
   heater_on_t: 6000  #min time heater is on or off for
   heater_off_t: 30000  #min time heater is on or off for
   heater_sp_offset: 0
+  heatInternalTDiffMs: 5000 #extra heat on time per 0.1 deg diff in internal temps
+  heatExternalTDiffMs: 5000 #extra heat on time per 1 deg diff to external temp
 
   ventOnDelta: 30000 #duration vent is on in millis
   ventOffDelta: 30000 #vent off duration in miili sec
