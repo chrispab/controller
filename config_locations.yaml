@@ -54,13 +54,13 @@ locations:
 
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
-  # heater_on_t: 100000  #min time heater is on when below lo sp
-  # heater_off_t: 120000  #min time heater is off for
-  heater_on_t: 1000  #min time heater is on when below lo sp
-  heater_off_t: 1000  #min time heater is off for
+  # heatOnMs: 100000  #min time heater is on when below lo sp
+  # heatOffMs: 120000  #min time heater is off for
+  heatOnMs: 1000  #min time heater is on when below lo sp
+  heatOffMs: 60000  #min time heater is off for
   heater_sp_offset: 0
-  heatInternalTDiffMs: 4000 #extra heat on time per 0.1 deg diff in internal temps
-  heatExternalTDiffMs: 4000 #extra heat on time per 1 deg diff to external temp
+  heatInternalTDiffMs: 6000 #extra heat on time per 0.1 deg diff in internal temps
+  heatExternalTDiffMs: 3000 #extra heat on time per 1 deg diff to external temp
 
   ventOnDelta: 70000 #duration vent is on in millis - minimum mark
   ventOffDelta: 60000 #vent off duration in miili sec
@@ -101,8 +101,8 @@ locationc:
 
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
-  heater_on_t: 8000  #min time heater is on or off for in ms
-  heater_off_t: 8000  #min time heater is on or off for
+  heatOnMs: 8000  #min time heater is on or off for in ms
+  heatOffMs: 8000  #min time heater is on or off for
   heater_sp_offset: 0
   heatInternalTDiffMs: 5000 #extra heat on time per 0.1 deg diff in internal temps
   heatExternalTDiffMs: 5000 #extra heat on time per 1 deg diff to external temp
@@ -143,8 +143,8 @@ locationg:
 
   min_CSV_write_interval: 60000 #interval min bet csv writes
 
-  heater_on_t: 6000  #min time heater is on or off for
-  heater_off_t: 30000  #min time heater is on or off for
+  heatOnMs: 6000  #min time heater is on or off for
+  heatOffMs: 30000  #min time heater is on or off for
   heater_sp_offset: 0
   heatInternalTDiffMs: 5000 #extra heat on time per 0.1 deg diff in internal temps
   heatExternalTDiffMs: 5000 #extra heat on time per 1 deg diff to external temp

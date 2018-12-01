@@ -262,8 +262,8 @@ class Heater(object):
     def __init__(self):
         logger.info("creating heater")
         self.state = OFF
-        self.heatOffMs = cfg.getItemValueFromConfig('heater_off_t')  # min time heater is on or off for
-        self.heatOnMs = cfg.getItemValueFromConfig('heater_on_t')  # min time heater is on or off for
+        self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs')  # min time heater is on or off for
+        self.heatOnMs = cfg.getItemValueFromConfig('heatOnMs')  # min time heater is on or off for
         self.lastStateChangeMillis = -180000  # last time heater switched on or off - enables immediate action if process restarted
 
         self.heater_sp_offset = cfg.getItemValueFromConfig('heater_sp_offset')
@@ -276,7 +276,7 @@ class Heater(object):
     def control(self, current_temp, target_temp, d_state, current_millis):
         logger.info('==Heat ctl==')
         #calc new heater on t based on t gap
-        self.heatOnMs = ((target_temp - current_temp) * 20 * 1000)  + cfg.getItemValueFromConfig('heater_on_t')
+        self.heatOnMs = ((target_temp - current_temp) * 20 * 1000)  + cfg.getItemValueFromConfig('heatOnMs')
         logger.info('==Heat tdelta on: %s',self.heatOnMs)
 
         #check for heater OFF hours #todo improve this
@@ -346,10 +346,10 @@ class Heater(object):
         externalDiffT = int( (target_temp - 2 - outsideTemp) * self.ExternalTDiffMs ) # milli secs per degree diff
         logger.warning('--EXTERNAL DIFF tdelta on to add  ms : %s',externalDiffT)
 
-        self.heatOnMs = cfg.getItemValueFromConfig('heater_on_t') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
+        self.heatOnMs = cfg.getItemValueFromConfig('heatOnMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
         logger.warning('--     CALCULATED TOTAL delta ON  ms : %s',self.heatOnMs)
 
-        self.heatOffMs = cfg.getItemValueFromConfig('heater_off_t') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
+        self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
         logger.warning('--     CALCULATED TOTAL HEAT OFF ms : %s',self.heatOffMs)
         #logger.warning('==HDHDHDHDHDHDDHHD Heat tdelta on: %s',self.heatOnMs)
         # below temp sp here
