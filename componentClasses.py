@@ -171,12 +171,18 @@ class Vent(object):
                 self.speed_state = ON  # high speed
             else:
                 self.speed_state = OFF  # lo speed
+
+        
         # loff vent/cooling
         
         #! vent off if loff - temp/humi test mod TODO fix/finalise
         if (d_state == OFF) and (current_temp < self.ventDisableTemp) and (currentHumi < self.ventDisableHumi):
             self.state = OFF
             return
+        # force hispeed if over temp
+        if current_temp > target_temp:
+            self.speed_state=ON# high speed
+            
 
         if ((d_state == OFF) and (current_temp > target_temp + self.vent_loff_sp_offset)):
             self.vent_override = ON

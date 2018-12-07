@@ -68,8 +68,9 @@ locations:
   vent_lon_sp_offset: -0.1 #offset
   vent_loff_sp_offset: 2.0 #
   ventDisableTemp: 18 #temp below which vent is disabled if loff
-  ventDisableHumi: 50 #humi below which vent is disabled if loff
+  ventDisableHumi: 45 #humi below which vent is disabled if loff
  # ventSpeedLevel: 2    #1 if vent has single speed, 2 if dual speed
+  #ventHasHighSpeed: True  #indicates if zone has dual speed vent
   ventEnableHighSpeed: False # enable high speed if available dep on vent
 
   fan_on_t: 67000  #vent on time ms
