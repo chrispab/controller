@@ -179,9 +179,14 @@ class Vent(object):
         if (d_state == OFF) and (current_temp < self.ventDisableTemp) and (currentHumi < self.ventDisableHumi):
             self.state = OFF
             return
-        # force hispeed if over temp
-        if current_temp > target_temp:
+
+        # force hispeed if over temp and lon
+        #!add some hysteresys here
+        if (current_temp > target_temp) and (d_state==ON):
             self.speed_state=ON# high speed
+        if (current_temp < target_temp - 0.1) and (d_state==ON): #attempt at hysteresis
+            self.speed_state=OFF# lo speed
+        
             
 
         if ((d_state == OFF) and (current_temp > target_temp + self.vent_loff_sp_offset)):

@@ -5,12 +5,35 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <script type="text/javascript">
+        function trimText(elementID, textLen = 2000) {
+            var len = 100;
+            var p = elementID;
+            if (p) {
+                var trunc = p.innerHTML;
+                if (trunc.length > textLen) {
+                    /* Truncate the content of the P, then go back to the end of the
+                       previous word to ensure that we don't truncate in the middle of
+                       a word */
+                    trunc = trunc.slice(trunc.length - textLen);
+                    trunc = trunc.replace(/\w+$/, '');
+                    /* Add an ellipses to the end and make it a link that expands
+                       the paragraph back to its original size */
+                    // trunc += '<a href="#" ' +
+                    //     'onclick="this.parentNode.innerHTML=' +
+                    //     'unescape(\'' + escape(p.innerHTML) + '\');return false;">' +
+                    //     '...<\/a>';
+                    p.innerHTML = trunc;
+                }
+            }
+        }
+    </script>
     <script>
         var zone1connection = new WebSocket('ws://192.168.0.151:5678/');
         //document.getElementById("mybody").scrollIntoView();
 
         zone1connection.onopen = function() {
-            zone1connection.send('Message from Browser to ESP8266 yay its Working!! ' + new Date());
+            zone1connection.send('Message from Browser to ESP8266 -- its Working!! ' + new Date());
             zone1connection.send('ping');
             // setInterval(function() {
             //     zone1connection.send('Time: ' + new Date());
@@ -40,6 +63,7 @@
             // document.getElementById("mybody").innerHTML = str;
             var element = document.getElementById("zone1body");
             // element.scrollIntoView(false);
+            trimText(element);
             element.scrollIntoView({
                 behavior: "smooth",
                 block: "end",
@@ -52,7 +76,7 @@
         //document.getElementById("mybody").scrollIntoView();
 
         zone3connection.onopen = function() {
-            zone3connection.send('Message from Browser to PI yay its Working!! ' + new Date());
+            zone3connection.send('Message from Browser to PI -- its Working!! ' + new Date());
             zone3connection.send('ping');
             // setInterval(function() {
             //     zone3connection.send('Time: ' + new Date());
@@ -71,6 +95,9 @@
             // str = str.replace(/('<br>')/g, "\n\r");
             //var x = document.getElementById("myTextarea").value;
             //document.getElementById("myTextarea").value = document.getElementById("myTextarea").value + new Date()
+            var element = document.getElementById("zone3body");
+            // element.scrollIntoView(false);
+            trimText(element);
             var message = e.data;
             //str = str.replace(/('<br>')/g, "\n\r");
             document.getElementById("zone3body").innerHTML = document.getElementById("zone3body").innerHTML +
@@ -80,8 +107,8 @@
             //document.getElementById('mybody').innerHTML = str.replace(/<br\s*[\/]?>/gi, "\n");
             // str = document.getElementById("mybody").innerHTML
             // document.getElementById("mybody").innerHTML = str;
-            var element = document.getElementById("zone3body");
-            // element.scrollIntoView(false);
+
+
             element.scrollIntoView({
                 behavior: "smooth",
                 block: "end",
@@ -105,10 +132,12 @@
         connection.onmessage = function(e) {
             console.log('Server: ', e.data);
             connection.send('Time: ' + new Date());
+            var element = document.getElementById("mybody");
+            trimText(element);
             var message = e.data;
             document.getElementById("mybody").innerHTML = document.getElementById("mybody").innerHTML + message;
             var str = document.getElementById('mybody').innerHTML;
-            var element = document.getElementById("mybody");
+
             element.scrollIntoView({
                 behavior: "smooth",
                 block: "end",
