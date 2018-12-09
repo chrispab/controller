@@ -165,12 +165,13 @@ class Vent(object):
 
     def control(self, current_temp, currentHumi, target_temp, d_state, current_millis):
         logger.info('==Vent ctl==')
-        self.speed_state = OFF  # lo speed
-        if (self.platformName == 'RaspberryPi2'):
-            if (d_state == ON) and self.ventEnableHighSpeed:
-                self.speed_state = ON  # high speed
-            else:
-                self.speed_state = OFF  # lo speed
+
+        #self.speed_state = OFF  # lo speed
+        # if (self.platformName == 'RaspberryPi2'):
+        #     if (d_state == ON) and self.ventEnableHighSpeed:
+        #         self.speed_state = ON  # high speed
+        #     else:
+        #         self.speed_state = OFF  # lo speed
 
         
         # loff vent/cooling
@@ -182,10 +183,31 @@ class Vent(object):
 
         # force hispeed if over temp and lon
         #!add some hysteresys here
-        if (current_temp > target_temp) and (d_state==ON):
-            self.speed_state=ON# high speed
-        if (current_temp < target_temp - 0.1) and (d_state==ON): #attempt at hysteresis
-            self.speed_state=OFF# lo speed
+        lowerHys = target_temp - 0.1
+        upperHys = target_temp + 0.1
+        #maybe use a dead band
+        
+        if (self.speed_state==ON):
+            if (current_temp > lowerHys):#
+                self.speed_state=ON# high speed - leave on
+            else: #(current_temp < lowerHys):
+                self.speed_state=OFF# lo speed
+        else: #speedstate is OFF
+            if (current_temp < upperHys):#
+                self.speed_state=OFF# high speed - leave on
+            else: #(current_temp > upperHys):
+                self.speed_state=ON# lo speed
+
+
+        # if (self.speed_state==ON) and (current_temp < upperHys):#
+        #     self.speed_state=ON# high speed - leave on
+
+
+
+        # if (current_temp > target_temp +0.1) and (d_state==ON):
+        #     self.speed_state=ON# high speed
+        # if (current_temp < ) and (d_state==ON): #attempt at hysteresis
+        #     self.speed_state=OFF# lo speed
         
             
 

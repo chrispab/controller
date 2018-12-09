@@ -10,20 +10,21 @@
             var len = 100;
             var p = elementID;
             if (p) {
-                var trunc = p.innerHTML;
-                if (trunc.length > textLen) {
-                    /* Truncate the content of the P, then go back to the end of the
-                       previous word to ensure that we don't truncate in the middle of
+                var targetText = p.innerHTML;
+                if (targetText.length > textLen) {
+                    /* TargetTextate the content of the P, then go back to the end of the
+                       previous word to ensure that we don't targetTextate in the middle of
                        a word */
-                    trunc = trunc.slice(trunc.length - textLen);
-                    trunc = trunc.replace(/\w+$/, '');
+                    targetText = targetText.slice(targetText.length - textLen);
+                    targetText = targetText.substring(targetText.indexOf("<br>") + 4);
+                    /*targetText = targetText.replace(/\w+$/, '');
                     /* Add an ellipses to the end and make it a link that expands
                        the paragraph back to its original size */
-                    // trunc += '<a href="#" ' +
+                    // targetText += '<a href="#" ' +
                     //     'onclick="this.parentNode.innerHTML=' +
                     //     'unescape(\'' + escape(p.innerHTML) + '\');return false;">' +
                     //     '...<\/a>';
-                    p.innerHTML = trunc;
+                    p.innerHTML = targetText;
                 }
             }
         }
@@ -133,7 +134,7 @@
             console.log('Server: ', e.data);
             connection.send('Time: ' + new Date());
             var element = document.getElementById("mybody");
-            trimText(element);
+            trimText(element, 500);
             var message = e.data;
             document.getElementById("mybody").innerHTML = document.getElementById("mybody").innerHTML + message;
             var str = document.getElementById('mybody').innerHTML;
