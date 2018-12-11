@@ -259,16 +259,16 @@ async def control():
         ctl1.board1.switch_relays(
             heaterState, ventState, fanState, ventSpeedState)
         stateChanged = ctl1.stateMonitor.checkForChanges(temperature, humidity, ventState,
-                                                         fanState, heaterState, ventSpeedState,
+                                                         fanState, heaterState, ventSpeedState, lightState,
                                                          current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
         if stateChanged:
             logger.warning("QQQQ Publishing MQTT messages...")
             MQTTClient.publish(zone+"/TemperatureStatus", temperature)
             MQTTClient.publish(zone+"/HumidityStatus", humidity)
             MQTTClient.publish(zone+"/HeaterStatus", heaterState)
-            MQTTClient.publish(zone+"/VentStatus", ventState)
+            MQTTClient.publish(zone+"/VentStatus", ventState + ventSpeedState)
             MQTTClient.publish(zone+"/FanStatus", fanState)
-            MQTTClient.publish(zone+"/VentSpeedStatus", ventSpeedState)
+            MQTTClient.publish(zone+"/VentSpeedStatus", ventState + ventSpeedState)
             MQTTClient.publish(zone+"/LightStatus", lightState)
 
             logger.debug("======== start state changed main list ======")
@@ -314,8 +314,8 @@ async def control():
             # logger.warning("======== % memory available: %s ======",mem.percent)
 
             currentStatusString = ctl1.stateMonitor.getStatusString()
-            currentStatusString = currentStatusString + \
-                ", " + str(lightState)
+            # currentStatusString = currentStatusString + \
+            #     ", " + str(lightState)
 
             logger.warning(
                 "==== DATA message to send: %s ====", currentStatusString)

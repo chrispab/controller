@@ -29,6 +29,7 @@ class Logger(object):
         self.heater_state = OFF
         self.vent_state = OFF
         self.fan_state = OFF
+        self.light_state = OFF
         self.vent_speed_state = OFF
         self.current_millis = 0
         self.current_time = 0
@@ -49,7 +50,9 @@ class Logger(object):
         statusString = self.format_time() + ": "+str(self.temperature) + \
             ", " + str(self.humidity) + ", " + str(self.heater_state) + \
             ", " + str(self.vent_state) + ", " + str(self.fan_state) + \
-            ", " + str(self.vent_speed_state) 
+            ", " + str(self.vent_speed_state) + ", " + str(self.light_state) + \
+            ", " + str(self.vent_state+self.vent_speed_state)
+
         return str(statusString)
 
     def format_time(self):
@@ -58,7 +61,7 @@ class Logger(object):
         return s[:-4]
 
     def checkForChanges(self, temperature, humidity, vent_state,
-                        fan_state, heater_state, vent_speed_state,
+                        fan_state, heater_state, vent_speed_state, light_state,
                         current_millis, current_time):
 
         self.temperature = temperature
@@ -67,6 +70,7 @@ class Logger(object):
         self.fan_state = fan_state
         self.heater_state = heater_state
         self.vent_speed_state = vent_speed_state
+        self.light_state = light_state
         self.current_millis = current_millis
         self.current_time = current_time
         self.state_changed = False

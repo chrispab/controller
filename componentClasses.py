@@ -163,7 +163,7 @@ class Vent(object):
         self.vent_override = OFF  # settings.ventOverride
         self.ventEnableHighSpeed = cfg.getItemValueFromConfig('ventEnableHighSpeed')
 
-    def control(self, current_temp, currentHumi, target_temp, d_state, current_millis):
+    def control(self, currentTemp, currentHumi, target_temp, d_state, current_millis):
         logger.info('==Vent ctl==')
 
         #self.speed_state = OFF  # lo speed
@@ -177,47 +177,50 @@ class Vent(object):
         # loff vent/cooling
         
         #! vent off if loff - temp/humi test mod TODO fix/finalise
-        if (d_state == OFF) and (current_temp < self.ventDisableTemp) and (currentHumi < self.ventDisableHumi):
+        if (d_state == OFF) and (currentTemp < self.ventDisableTemp) and (currentHumi < self.ventDisableHumi):
             self.state = OFF
+            self.speed_state= OFF
             return
 
         # force hispeed if over temp and lon
         #!add some hysteresys here
-        lowerHys = target_temp - 0.1
-        upperHys = target_temp + 0.1
-        #maybe use a dead band
-        
-        if (self.speed_state==ON):
-            if (current_temp > lowerHys):#
-                self.speed_state=ON# high speed - leave on
-            else: #(current_temp < lowerHys):
-                self.speed_state=OFF# lo speed
-        else: #speedstate is OFF
-            if (current_temp < upperHys):#
-                self.speed_state=OFF# high speed - leave on
-            else: #(current_temp > upperHys):
-                self.speed_state=ON# lo speed
+        #only for upperlon control
+        if (d_state==ON):
+            lowerHys = target_temp - 0.1
+            upperHys = target_temp + 0.2
+            #maybe use a dead band?
+            
+            if (self.speed_state==ON):
+                if (currentTemp > lowerHys):#
+                    self.speed_state=ON# high speed - leave on
+                else: #(currentTemp < lowerHys):
+                    self.speed_state=OFF# lo speed
+            else: #speedstate is OFF
+                if (currentTemp < upperHys):#
+                    self.speed_state=OFF# high speed - leave on
+                else: #(currentTemp > upperHys):
+                    self.speed_state=ON# lo speed
 
 
-        # if (self.speed_state==ON) and (current_temp < upperHys):#
+        # if (self.speed_state==ON) and (currentTemp < upperHys):#
         #     self.speed_state=ON# high speed - leave on
 
 
 
-        # if (current_temp > target_temp +0.1) and (d_state==ON):
+        # if (currentTemp > target_temp +0.1) and (d_state==ON):
         #     self.speed_state=ON# high speed
-        # if (current_temp < ) and (d_state==ON): #attempt at hysteresis
+        # if (currentTemp < ) and (d_state==ON): #attempt at hysteresis
         #     self.speed_state=OFF# lo speed
         
             
 
-        if ((d_state == OFF) and (current_temp > target_temp + self.vent_loff_sp_offset)):
+        if ((d_state == OFF) and (currentTemp > target_temp + self.vent_loff_sp_offset)):
             self.vent_override = ON
             self.state = ON
             self.prev_vent_millis = current_millis  # retrigeer time period
             logger.info("..VENT ON Loff - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
 
-        if ((d_state == ON) and (current_temp > target_temp + self.vent_lon_sp_offset)):
+        if ((d_state == ON) and (currentTemp > target_temp + self.vent_lon_sp_offset)):
             self.vent_override = ON
             self.state = ON
             self.prev_vent_millis = current_millis  # retrigeer time period
@@ -306,10 +309,10 @@ class Heater(object):
 
         self.status = 0
 
-    def control(self, current_temp, target_temp, d_state, current_millis):
+    def control(self, currentTemp, target_temp, d_state, current_millis):
         logger.info('==Heat ctl==')
         #calc new heater on t based on t gap
-        self.heatOnMs = ((target_temp - current_temp) * 20 * 1000)  + cfg.getItemValueFromConfig('heatOnMs')
+        self.heatOnMs = ((target_temp - currentTemp) * 20 * 1000)  + cfg.getItemValueFromConfig('heatOnMs')
         logger.info('==Heat tdelta on: %s',self.heatOnMs)
 
         #check for heater OFF hours #todo improve this
@@ -321,7 +324,7 @@ class Heater(object):
             logger.info('..d on, in heat off hours - skipping lon heatctl')
         else:  # d off here
             logger.info('..do heatctl')
-            if current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
+            if currentTemp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
                 self.state = OFF
                 logger.info("...temp over sp - HEATER OFF")
                 self.lastStateChangeMillis = current_millis
@@ -344,7 +347,7 @@ class Heater(object):
         return
 
 
-    def controlv2(self, current_temp, target_temp, d_state, current_millis, outsideTemp):
+    def controlv2(self, currentTemp, target_temp, d_state, current_millis, outsideTemp):
         logger.info('==Heat ctl==')
         logger.debug('OTOTOTOT outside temp OTOTOTOTO : %s', outsideTemp)
 
@@ -357,7 +360,7 @@ class Heater(object):
         
         # d_state OFF if here
         logger.info('..do heatctl')
-        if current_temp >= target_temp + self.heater_sp_offset:
+        if currentTemp >= target_temp + self.heater_sp_offset:
             #turn off and leave
             self.state = OFF
             self.lastStateChangeMillis = -180000 #current_millis - 180000 # allows immediate on on next cycle if reqd
@@ -367,11 +370,11 @@ class Heater(object):
 
 
         #calc new heater on t based on current temp gap from required temp sp
-        #self.heatOnMs = self.heatOnMs + ((target_temp - current_temp) * 20 * 1000)
+        #self.heatOnMs = self.heatOnMs + ((target_temp - currentTemp) * 20 * 1000)
         #add extar time
         #! look at on period based on external temp
         #extra heater time based on diff from set point per 0.1 degree diff
-        internalDiffT = int( ((target_temp - current_temp) * 10 * self.InternalTDiffMs) )
+        internalDiffT = int( ((target_temp - currentTemp) * 10 * self.InternalTDiffMs) )
         logger.warning('--INTERNAL DIFF extra time to add ms : %s',internalDiffT)
        
         #extra  heater time based on external temp diff
@@ -389,7 +392,7 @@ class Heater(object):
         # check if this is start of a heat cycle - long time passed since last state change
         if self.state == OFF:
             if (current_millis > (self.lastStateChangeMillis + self.heatOffMs)):
-            # current_temp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
+            # currentTemp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
                 self.state = ON
                 logger.info("...temp below sp - HEATER ON")
                 self.lastStateChangeMillis = current_millis
