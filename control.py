@@ -321,7 +321,6 @@ async def control():
                 "==== DATA message to send: %s ====", currentStatusString)
 
             if currentWSDisplayRow >= maxWSDisplayRows:
-                header = "Timestamp               T     H     H  V  F  S  L"
                 await txwebsocket(header)
                 currentWSDisplayRow = 0
             currentWSDisplayRow = currentWSDisplayRow + 1
@@ -329,6 +328,7 @@ async def control():
             await txwebsocket(currentStatusString)
             await asyncio.sleep(0)
 
+header = "Timestamp               T     H     H  V  F  S  L  VT"
 
 wsClients = set()
 
@@ -374,11 +374,11 @@ async def MyWSHandler(websocket, path):
 
     logger.warning("CCCCCC CONNECTION MADE CCCCCC")
     #now = str(datetime.datetime.now())
-    initialMessage = "websocket server connected on " + \
+    initialMessage = "websocket server connected from " + \
         cfg.getItemValueFromConfig('zoneName')
 
     await websocket.send(initialMessage)
-    header = "Timestamp               T     H     H  V  F  S  L"
+    #header = "Timestamp               T     H     H  V  F  S  L  VT"
     await websocket.send(header)
 
     # try ping socket # if response cont
