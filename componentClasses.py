@@ -385,8 +385,10 @@ class Heater(object):
         self.heatOnMs = cfg.getItemValueFromConfig('heatOnMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
         logger.warning('--     CALCULATED TOTAL delta ON  ms : %s',self.heatOnMs)
 
-        self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
-        logger.warning('--     CALCULATED TOTAL HEAT OFF ms : %s',self.heatOffMs)
+#        self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
+        #self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + internalDiffT # + externalDiffT#+ (float(outsideTemp)/50)
+        self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + (self.heatOnMs/2) 
+        logger.warning('--     CALCULATED TOTAL HEAT OFF ms  : %s',self.heatOffMs)
         #logger.warning('==HDHDHDHDHDHDDHHD Heat tdelta on: %s',self.heatOnMs)
         # below temp sp here
         # check if this is start of a heat cycle - long time passed since last state change

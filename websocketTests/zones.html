@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <script type="text/javascript">
-        function trimText(elementID, textLen = 2000) {
+        function trimText(elementID, textLen = 5000) {
             var len = 100;
             var p = elementID;
             if (p) {
@@ -134,7 +134,7 @@
             console.log('Server: ', e.data);
             connection.send('Time: ' + new Date());
             var element = document.getElementById("mybody");
-            trimText(element, 500);
+            trimText(element);
             var message = e.data;
             document.getElementById("mybody").innerHTML = document.getElementById("mybody").innerHTML + message;
             var str = document.getElementById('mybody').innerHTML;

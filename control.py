@@ -68,7 +68,7 @@ processUptime = 0
 systemMessage = 0
 emailzone = ""
 zoneNumber = 0
-outsideTemp = 15
+outsideTemp = 12
 
 
 

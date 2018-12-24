@@ -56,11 +56,11 @@ locations:
 
   # heatOnMs: 100000  #min time heater is on when below lo sp
   # heatOffMs: 120000  #min time heater is off for
-  heatOnMs: 1000  #min time heater is on when below lo sp
-  heatOffMs: 60000  #min time heater is off for
+  heatOnMs: 5000  #min time heater is on when below lo sp
+  heatOffMs: 5000  #min time heater is off for
   heater_sp_offset: 0
   heatInternalTDiffMs: 6000 #extra heat on time per 0.1 deg diff in internal temps
-  heatExternalTDiffMs: 6000 #extra heat on time per 1 deg diff to external temp
+  heatExternalTDiffMs: 7000 #extra heat on time per 1 deg diff to external temp
 
   ventOnDelta: 60000 #duration vent is on in millis - minimum mark
   ventOffDelta: 60000 #vent off duration in miili sec
@@ -68,7 +68,7 @@ locations:
   vent_lon_sp_offset: -0.1 #offset
   vent_loff_sp_offset: 2.0 #
   ventDisableTemp: 18 #temp below which vent is disabled if loff
-  ventDisableHumi: 45 #humi below which vent is disabled if loff
+  ventDisableHumi: 50 #humi below which vent is disabled if loff
  # ventSpeedLevel: 2    #1 if vent has single speed, 2 if dual speed
   #ventHasHighSpeed: True  #indicates if zone has dual speed vent
   ventEnableHighSpeed: False # enable high speed if available dep on vent
