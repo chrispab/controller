@@ -57,10 +57,10 @@ locations:
   # heatOnMs: 100000  #min time heater is on when below lo sp
   # heatOffMs: 120000  #min time heater is off for
   heatOnMs: 5000  #min time heater is on when below lo sp
-  heatOffMs: 5000  #min time heater is off for
+  heatOffMs: 10000  #min time heater is off for
   heater_sp_offset: 0
-  heatInternalTDiffMs: 6000 #extra heat on time per 0.1 deg diff in internal temps
-  heatExternalTDiffMs: 7000 #extra heat on time per 1 deg diff to external temp
+  heatInternalTDiffMs: 5000 #extra heat on time per 0.1 deg diff in internal temps
+  heatExternalTDiffMs: 5000 #extra heat on time per 1 deg diff to external temp
 
   ventOnDelta: 60000 #duration vent is on in millis - minimum mark
   ventOffDelta: 60000 #vent off duration in miili sec
