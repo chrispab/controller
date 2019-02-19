@@ -74,6 +74,8 @@ outsideTemp = 12
 
 from componentClasses import *  # components of controller board
 
+import version
+
 # ============================common code start==========================
 
 
@@ -377,6 +379,7 @@ async def MyWSHandler(websocket, path):
     initialMessage = "websocket server connected from " + \
         cfg.getItemValueFromConfig('zoneName')
 
+    initialMessage = "Version : " + VERSION
     await websocket.send(initialMessage)
     #header = "Timestamp               T     H     H  V  F  S  L  VT"
     await websocket.send(header)
