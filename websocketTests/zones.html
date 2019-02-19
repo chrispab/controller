@@ -119,7 +119,7 @@
     </script>
 
     <script>
-        var connection = new WebSocket('ws://192.168.0.12:81/', ['arduino']);
+        var connection = new WebSocket('ws://192.168.0.230:81/', ['arduino']);
         connection.onopen = function() {
             connection.send('Message from Browser to ESP8266 yay its Working!! ' + new Date());
             connection.send('ping');
