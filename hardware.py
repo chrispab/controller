@@ -145,8 +145,17 @@ class sensor(object):
             #sensor = Adafruit_DHT.DHT22
             logger.info("in RPi2 _read_sensor about to read sensor")
 
-            self.humidity, self.temperature = Adafruit_DHT.read_retry(self.sensorType, self.sensorPin, 1,0)
-            
+            #self.humidity, self.temperature = Adafruit_DHT.read_retry(self.sensorType, self.sensorPin, 1,0)
+            #store last good h and t
+            oldHumidity = self.humidity
+            oldTemperature = self.temperature
+
+            self.humidity, self.temperature = Adafruit_DHT.read(self.sensorType, self.sensorPin)
+            #Adafruit_DHT.read
+            if self.humidity is None or self.temperature is None:
+                self.humidity = oldHumidity
+                self.temperature = oldTemperature
+
         elif self.platformName == "PCDuino":
             if dht22.getth() == 0:
                 self.temperature = round(dht22.cvar.temperature, 1)
