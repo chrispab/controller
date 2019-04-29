@@ -1,1 +1,1 @@
-VERSION = "1.68 master: sensor read"
+VERSION = "1.69 master: sensor read"
