@@ -97,8 +97,8 @@ class RadioLink(object):
 
         ticks = millis()
         if ( ( (ticks) - self.lastHeartBeatSentMillis) >= self.heartBeatInterval): #ready to send
-            logger.warning('..sending heartbeat message')
-            logger.warning(self.ackMessage)
+            logger.warning('..sending heartbeat message : %s' % self.ackMessage)
+            #logger.warning(self.ackMessage)
             self.lastHeartBeatSentMillis = millis()
 
             self.radio.write(self.ackMessage.encode())

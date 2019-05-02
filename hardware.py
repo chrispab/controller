@@ -98,7 +98,7 @@ class sensor(object):
             logger.error("..ERROR TRYING TO READ SENSOR on PRIME sensor read")
             self.readErrs += 1
 
-            sleep(3) #wait before re-read
+            #sleep(3) #wait before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
             
             ##self.prevTempHumiMillis = self.currentMillis
@@ -112,7 +112,7 @@ class sensor(object):
         #cope with faulty sensor. i.e readings are both NULL
         if (self.humidity is None or self.temperature is None):
             print (self.temperature)
-            print ("FFFFFFFF Posssible faulty sensor detected - returning 0 values")
+            logger.error("FFFFFFFF Posssible faulty sensor detected - returning 0 values")
             #self.temperature = 99
             #self.humidity = 0    
             #enable safe state for controller ops
@@ -193,7 +193,7 @@ class sensor(object):
             #sleep(self.delay)
             #print("Time Gap to go : %s" %timeGap)
 
-            logger.info("** JUMPING OUT OF AQUISITION **")
+            logger.info("** JUMPING OUT OF AQUISITION -Too early to read sensor **")
             
             #restore prev sample readings
             #self.temperature = self.prevTemp  
@@ -211,10 +211,10 @@ class sensor(object):
         
         
         #repeat read until valid data or too many errorserror
-        maxSensorReadErrors = 5
+        maxSensorReadErrors = 10
         while (self.humidity is None or self.temperature is None) and self.readErrs < maxSensorReadErrors:
-            logger.error("..ERROR TRYING TO READ SENSOR on sensor read test")
             self.readErrs += 1
+            logger.error("..ERROR READing SENSOR. Errors so far : %d" %self.readErrs)
 
             #sleep(3) #wait secs before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again

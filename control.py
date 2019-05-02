@@ -132,14 +132,14 @@ def on_connect(MQTTClient, userdata, flags, rc):
 # when receiving a mqtt message do this;
 def on_message(MQTTClient, userdata, msg):
     global outsideTemp
-    logger.warning(" MRMRMRMRMR- MQTT rx - MRMRMRMRMRMRMRMRMRMR")
+    #logger.warning(" MRMRMRMRMR- MQTT rx - MRMRMRMRMRMRMRMRMRMR")
 
     message = str(msg.payload.decode("utf-8"))
-    logger.warning("sub message rxed : %s" % (message))
+    #logger.warning("subscibed message rxed from outside sensor: %s" % (message))
     #logger.warning("sub message rxed : %s" % str(message.payload.decode("utf-8")) )
     data = json.loads(message)
     outsideTemp = data['AM2301']['Temperature']
-    logger.warning("sub message rxed TEMPERARTURE  : %s" % (outsideTemp))
+    logger.warning("subscibed message rxed from outside sensor: %s" % (outsideTemp))
 
 
     #print(msg.topic+" "+message)
@@ -320,7 +320,7 @@ async def control():
             #     ", " + str(lightState)
 
             logger.warning(
-                "==== DATA message to send: %s ====", currentStatusString)
+                "DATA to send:%s", currentStatusString)
 
             if currentWSDisplayRow >= maxWSDisplayRows:
                 await txwebsocket(header)
