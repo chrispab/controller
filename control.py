@@ -71,7 +71,6 @@ zoneNumber = 0
 outsideTemp = 12
 
 
-
 from componentClasses import *  # components of controller board
 
 import version
@@ -130,6 +129,8 @@ def on_connect(MQTTClient, userdata, flags, rc):
     MQTTClient.subscribe(sub_topic)
 
 # when receiving a mqtt message do this;
+
+
 def on_message(MQTTClient, userdata, msg):
     global outsideTemp
     #logger.warning(" MRMRMRMRMR- MQTT rx - MRMRMRMRMRMRMRMRMRMR")
@@ -139,11 +140,12 @@ def on_message(MQTTClient, userdata, msg):
     #logger.warning("sub message rxed : %s" % str(message.payload.decode("utf-8")) )
     data = json.loads(message)
     outsideTemp = data['AM2301']['Temperature']
-    logger.warning("subscibed message rxed from outside sensor: %s" % (outsideTemp))
-
+    logger.warning(
+        "subscibed message rxed from outside sensor: %s" % (outsideTemp))
 
     #print(msg.topic+" "+message)
     # display_sensehat(message)
+
 
 def on_publish(mosq, obj, mid):
     print("mid: " + str(mid))
@@ -182,7 +184,7 @@ async def control():
     MQTTClient.on_connect = on_connect
     MQTTClient.on_message = on_message
     MQTTClient.connect(MQTTBroker, 1883, 60)
-    print("Subscribing to topic","Outside_Sensor/tele/SENSOR")
+    print("Subscribing to topic", "Outside_Sensor/tele/SENSOR")
     MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
 
     MQTTClient.loop_start()
@@ -231,7 +233,7 @@ async def control():
             subject = "Zone " + zoneNumber + " " + emailzone + \
                 location + " - : bad sensor reads  - PowerCycle"
             emailObj.send(subject, sensorMessage)
-            
+
         endT = time.time()
         duration = endT-startT
         # logger.error("^^^^^^^^^^  Aquisition sampletime: %s ^^^^^^^^^^^", duration)
@@ -255,7 +257,7 @@ async def control():
         ctl1.vent1.control(temperature, humidity, target_temp,
                            lightState, current_millis)
         ctl1.heater1.controlv2(temperature, target_temp,
-                             lightState, current_millis, outsideTemp)
+                               lightState, current_millis, outsideTemp)
         ctl1.fan1.control(current_millis)
         # switch relays according to State vars
         ctl1.board1.switch_relays(
@@ -270,7 +272,8 @@ async def control():
             MQTTClient.publish(zone+"/HeaterStatus", heaterState)
             MQTTClient.publish(zone+"/VentStatus", ventState + ventSpeedState)
             MQTTClient.publish(zone+"/FanStatus", fanState)
-            MQTTClient.publish(zone+"/VentSpeedStatus", ventState + ventSpeedState)
+            MQTTClient.publish(zone+"/VentSpeedStatus",
+                               ventState + ventSpeedState)
             MQTTClient.publish(zone+"/LightStatus", lightState)
 
             logger.debug("======== start state changed main list ======")
@@ -339,7 +342,7 @@ async def txwebsocket(message):
     removeMe = False
     for clientConn in wsClients:
         logger.warning("DDDD Sending DATA SENT to websocket(s)")
-        logger.warning(clientConn)
+        #logger.warning(clientConn)
         try:
             if clientConn.open:
                 await asyncio.wait([clientConn.send(message)])
@@ -389,12 +392,13 @@ async def MyWSHandler(websocket, path):
     while True:
         try:
             msg = await asyncio.wait_for(websocket.recv(), timeout=20)
-            logger.warning("SSSS RXED message is: %s ", msg)
+            #logger.warning("WS RX message : %s", msg)
+            logger.warning("WS RX message")
         except asyncio.TimeoutError:
             # No data in 20 seconds, check the connection.
             try:
                 logger.warning(
-                    "NNNN No data in 20 secs from client- checking the connection NNNN")
+                    "No data in 20 secs from client- checking connection")
                 # await unregister(websocket)
                 # break
                 pong_waiter = await websocket.ping()
@@ -409,7 +413,7 @@ async def MyWSHandler(websocket, path):
                 break
         else:
             logger.warning(
-                "RRRR msg RXED from client - still connected so do nothing")
+                "msg RXED from client - still connected do nothing")
 
         # do something with msg?
     logger.warning("DDDDD drop our of onConnect handler DDDDDD")

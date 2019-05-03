@@ -152,8 +152,8 @@ class sensor(object):
 
             self.humidity, self.temperature = Adafruit_DHT.read(self.sensorType, self.sensorPin)
             if self.humidity is None or self.temperature is None:
-            #     self.humidity = oldHumidity
-            #     self.temperature = oldTemperature
+                 self.humidity = oldHumidity
+                 self.temperature = oldTemperature
                  logger.warning("!!!! BAD SENSOR READ - USING OLD READINGS !!!!")
 
         elif self.platformName == "PCDuino":
