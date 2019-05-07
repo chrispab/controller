@@ -21,3 +21,5 @@ zone2db.db
 zone3db.db
 .Trash-1000/*
 /RF24
+/node_modules
+
