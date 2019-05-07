@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script>
-
         var zone1connection = new WebSocket('ws://192.168.0.151:5678/');
         zone1connection.onopen = function () {
             zone1connection.send('Message from Browser to ESP8266 -- its Working!! ' + new Date());

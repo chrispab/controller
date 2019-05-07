@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html>
+<meta charset="UTF-8">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <script>
+        function trimText(elementID, textLen = 5000) {
+            var p = elementID;
+            if (p) {
+                var targetText = p.innerHTML;
+                if (targetText.length > textLen) {
+                    targetText = targetText.slice(targetText.length - textLen);
+                    targetText = targetText.substring(targetText.indexOf("<br>") + 4);
+                    p.innerHTML = targetText;
+                }
+            }
+        };
 
-        var zone1connection = new WebSocket('ws://192.168.0.151:5678/');
+        var zone1connection = new WebSocket("ws://192.168.0.151:5678/");
         zone1connection.onopen = function () {
-            zone1connection.send('Message from Browser to ESP8266 -- its Working!! ' + new Date());
+            zone1connection.send("Message from Browser- Working!" + new Date());
             zone1connection.send('ping');
             zone1connection.send('Time: ' + new Date());
         };
@@ -88,120 +97,108 @@
                 inline: "nearest"
             });
         };
-
-        function trimText(elementID, textLen = 5000) {
-            var len = 100;
-            var p = elementID;
-            if (p) {
-                var targetText = p.innerHTML;
-                if (targetText.length > textLen) {
-                    targetText = targetText.slice(targetText.length - textLen);
-                    targetText = targetText.substring(targetText.indexOf("<br>") + 4);
-                    p.innerHTML = targetText;
-                }
-            }
-        }
-
     </script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: rgb(40, 66, 114);
-        }
-
-        button {
-            border: 1;
-            border-radius: 0.3rem;
-            background-color: #2d9612;
-            color: #000;
-            line-height: 2.4rem;
-            font-size: 1.2rem;
-            -webkit-transition-duration: 0.4s;
-            transition-duration: 0.4s;
-            cursor: pointer;
-        }
-
-        .shell-wrap {
-            width: 33.3%;
-            float: left;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
-            -webkit-border-radius: 3px;
-            -moz-border-radius: 3px;
-            border-radius: 3px;
-        }
-
-        .shell-top-bar {
-            width: 99%;
-            float: left;
-            text-align: center;
-            color: #3a3030;
-            padding: 10px 0;
-            margin: 0;
-            text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
-            font-size: 1em;
-            border: 1px solid #CCCCCC;
-            border-bottom: none;
-            -webkit-border-top-left-radius: 3px;
-            -webkit-border-top-right-radius: 3px;
-            -moz-border-radius-topleft: 3px;
-            -moz-border-radius-topright: 3px;
-            border-top-left-radius: 3px;
-            border-top-right-radius: 3px;
-            background: #f7f7f7;
-            /* Old browsers */
-            background: -moz-linear-gradient(top, #f7f7f7 0%, #B8B8B8 100%);
-            /* FF3.6+ */
-            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f7f7f7), color-stop(100%, #B8B8B8));
-            /* Chrome,Safari4+ */
-            background: -webkit-linear-gradient(top, #f7f7f7 0%, #B8B8B8 100%);
-            /* Chrome10+,Safari5.1+ */
-            background: -o-linear-gradient(top, #f7f7f7 0%, #B8B8B8 100%);
-            /* Opera 11.10+ */
-            background: -ms-linear-gradient(top, #f7f7f7 0%, #B8B8B8 100%);
-            /* IE10+ */
-            background: linear-gradient(to bottom, #f7f7f7 0%, #B8B8B8 100%);
-            /* W3C */
-            filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#f7f7f7', endColorstr='#B8B8B8', GradientType=0);
-            /* IE6-9 */
-        }
-
-        .shell-body {
-            scroll-behavior: smooth;
-            width: 99%;
-            height: 75vh;
-            overflow: auto;
-            margin: 0;
-            padding: 10px;
-            list-style: none;
-            white-space: pre;
-            background: #141414;
-            border-color: #B8B8B8;
-            border: 2px solid rgb(112, 201, 112);
-            border-width: 0 thin thin;
-            color: rgb(114, 212, 71);
-            font: 0.8em 'Andale Mono', Consolas, 'Courier New';
-            line-height: 1.1em;
-            -webkit-border-bottom-right-radius: 3px;
-            -webkit-border-bottom-left-radius: 3px;
-            -moz-border-radius-bottomright: 3px;
-            -moz-border-radius-bottomleft: 3px;
-            border-bottom-right-radius: 3px;
-            border-bottom-left-radius: 3px;
-        }
-
-        @media screen and (max-width:700px) {
-            .shell-wrap {
-                width: 100%;
-            }
-        }
-    </style>
 </head>
 
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: rgb(40, 66, 114);
+    }
+
+    button {
+        border: 1;
+        border-radius: 0.3rem;
+        background-color: #2d9612;
+        color: #000;
+        line-height: 2.4rem;
+        font-size: 1.2rem;
+        -webkit-transition-duration: 0.4s;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+
+    .shell-wrap {
+        width: 33.3%;
+        float: left;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+    }
+
+    .shell-top-bar {
+        width: 99%;
+        float: left;
+        text-align: center;
+        color: #3a3030;
+        padding: 10px 0;
+        margin: 0;
+        text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+        font-size: 1em;
+        border: 1px solid #CCCCCC;
+        border-bottom: none;
+        -webkit-border-top-left-radius: 3px;
+        -webkit-border-top-right-radius: 3px;
+        -moz-border-radius-topleft: 3px;
+        -moz-border-radius-topright: 3px;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+        background: #f7f7f7;
+        /* Old browsers */
+        background: -moz-linear-gradient(top, #f7f7f7 0%, #B8B8B8 100%);
+        /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f7f7f7), color-stop(100%, #B8B8B8));
+        /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top, #f7f7f7 0%, #B8B8B8 100%);
+        /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top, #f7f7f7 0%, #B8B8B8 100%);
+        /* Opera 11.10+ */
+        background: -ms-linear-gradient(top, #f7f7f7 0%, #B8B8B8 100%);
+        /* IE10+ */
+        background: linear-gradient(to bottom, #f7f7f7 0%, #B8B8B8 100%);
+        /* W3C */
+        filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#f7f7f7', endColorstr='#B8B8B8', GradientType=0);
+        /* IE6-9 */
+    }
+
+    .shell-body {
+        /* scroll-behavior: smooth; */
+        width: 99%;
+        height: 75vh;
+        overflow: auto;
+        margin: 0;
+        padding: 10px;
+        list-style: none;
+        white-space: pre;
+        background: #141414;
+        border-color: #B8B8B8;
+        border: 2px solid rgb(112, 201, 112);
+        border-width: 0 thin thin;
+        color: rgb(114, 212, 71);
+        font: 0.8em 'Andale Mono', Consolas, 'Courier New';
+        line-height: 1.1em;
+        -webkit-border-bottom-right-radius: 3px;
+        -webkit-border-bottom-left-radius: 3px;
+        -moz-border-radius-bottomright: 3px;
+        -moz-border-radius-bottomleft: 3px;
+        border-bottom-right-radius: 3px;
+        border-bottom-left-radius: 3px;
+    }
+
+    @media screen and (max-width:700px) {
+        .shell-wrap {
+            width: 100%;
+        }
+    }
+</style>
+
 <body>
+
+
     <div class="panelrow">
 
         <div class="shell-wrap">
@@ -226,7 +223,7 @@
         </div>
 
     </div>
-    <div>
-    </div>
+
+</body>
 
 </html>
