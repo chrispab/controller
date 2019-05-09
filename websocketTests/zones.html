@@ -3,18 +3,8 @@
 <meta charset="UTF-8">
 
 <head>
+    <title>Zones & Bridge Consoles</title>
     <script>
-        function trimText(elementID, textLen = 5000) {
-            var p = elementID;
-            if (p) {
-                var targetText = p.innerHTML;
-                if (targetText.length > textLen) {
-                    targetText = targetText.slice(targetText.length - textLen);
-                    targetText = targetText.substring(targetText.indexOf("<br>") + 4);
-                    p.innerHTML = targetText;
-                }
-            }
-        };
 
         var zone1connection = new WebSocket("ws://192.168.0.151:5678/");
         zone1connection.onopen = function () {
@@ -97,6 +87,19 @@
                 inline: "nearest"
             });
         };
+        function trimText(elementID) {
+            var textLen = 6000;
+            var p = elementID;
+            if (p) {
+                var targetText = p.innerHTML;
+                if (targetText.length > textLen) {
+                    targetText = targetText.slice(targetText.length - textLen);
+                    targetText = targetText.substring(targetText.indexOf('<br>') + 4);
+                    p.innerHTML = targetText;
+                }
+            }
+        };
+
     </script>
 </head>
 
@@ -131,6 +134,7 @@
     }
 
     .shell-top-bar {
+        font: 1em 'Andale Mono', Consolas, 'Courier New';
         width: 99%;
         float: left;
         text-align: center;
@@ -138,7 +142,7 @@
         padding: 10px 0;
         margin: 0;
         text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
-        font-size: 1em;
+        /* font-size: 1em; */
         border: 1px solid #CCCCCC;
         border-bottom: none;
         -webkit-border-top-left-radius: 3px;
@@ -176,9 +180,9 @@
         white-space: pre;
         background: #141414;
         border-color: #B8B8B8;
-        border: 2px solid rgb(112, 201, 112);
+        border: 2px solid rgb(151, 161, 151);
         border-width: 0 thin thin;
-        color: rgb(114, 212, 71);
+        color: rgb(107, 218, 59);
         font: 0.8em 'Andale Mono', Consolas, 'Courier New';
         line-height: 1.1em;
         -webkit-border-bottom-right-radius: 3px;
@@ -189,7 +193,7 @@
         border-bottom-left-radius: 3px;
     }
 
-    @media screen and (max-width:700px) {
+    @media screen and (max-width:600px) {
         .shell-wrap {
             width: 100%;
         }
@@ -197,8 +201,6 @@
 </style>
 
 <body>
-
-
     <div class="panelrow">
 
         <div class="shell-wrap">
