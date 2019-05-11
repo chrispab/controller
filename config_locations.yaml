@@ -37,7 +37,7 @@ common:
   
   radioChannel: 124 # chanel nrf radios operate on
   
-  heartBeatInterval: 10000 # 10 secs in msecs
+  heartBeatInterval: 20000 # 10 secs in msecs
 
   
   
