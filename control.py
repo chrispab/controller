@@ -210,7 +210,7 @@ async def control():
     # # Your IFTTT with event name, and json parameters (values)
     postIFTTT("zone_alert", zone, "--ReasoN--", "==DatA==")
 
-    maxWSDisplayRows = 10  # ! TODO FIX THIS - display issue
+    maxWSDisplayRows = 5  # ! TODO FIX THIS - display issue
     currentWSDisplayRow = 1
     while 1:
         logger.info("=main while loop=")
@@ -275,6 +275,12 @@ async def control():
             MQTTClient.publish(zone+"/VentSpeedStatus",
                                ventState + ventSpeedState)
             MQTTClient.publish(zone+"/LightStatus", lightState)
+            
+
+            ventPercent = ventState*((ventSpeedState+1)*50)
+            MQTTClient.publish(zone+"/VentPercent", ventPercent)
+
+
 
             logger.debug("======== start state changed main list ======")
             # check for alarm levels etc
@@ -333,7 +339,7 @@ async def control():
             await txwebsocket(currentStatusString)
             await asyncio.sleep(0)
 
-header = "Timestamp               T     H     H  V  F  S  L  VT"
+header = "Time      [Te]  [Hu]  H V F S L VT"
 
 wsClients = set()
 
