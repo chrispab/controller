@@ -217,6 +217,7 @@ class Vent(object):
         if ((d_state == OFF) and (currentTemp > target_temp + self.vent_loff_sp_offset)):
             self.vent_override = ON
             self.state = ON
+            #self.speed_state = ON
             self.prev_vent_millis = current_millis  # retrigeer time period
             logger.info("..VENT ON Loff - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
 
