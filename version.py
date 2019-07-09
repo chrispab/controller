@@ -1,1 +1,1 @@
-VERSION = "1.76 master: heartbeat"
+VERSION = "1.77 master: safe restart after mqtt server restart"

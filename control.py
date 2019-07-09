@@ -180,14 +180,25 @@ async def control():
     global emailzone
     global outsideTemp
 
-    MQTTClient = mqtt.Client()
+    #logger.warning("MQTT CANNOT CONNECT!!!")
+
+    print("MQTT CANNOT CONNECT!!!")    
+
+    try:
+        MQTTClient = mqtt.Client()
+    except:
+        print("MQTT CANNOT CONNECT!!!")    
+
     MQTTClient.on_connect = on_connect
     MQTTClient.on_message = on_message
-    MQTTClient.connect(MQTTBroker, 1883, 60)
+    try:
+        MQTTClient.connect(MQTTBroker, 1883, 60)
+        MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
+        MQTTClient.loop_start()
+    except:
+        print("MQTT CANNOT CONNECT!!!")    
     print("Subscribing to topic", "Outside_Sensor/tele/SENSOR")
-    MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
 
-    MQTTClient.loop_start()
 
     # call to systemd watchdog to hold off restart
     ctl1.timer1.holdOffWatchdog(0, True)
@@ -217,6 +228,11 @@ async def control():
         logger.info("current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.updateClocks()
         current_millis = ctl1.timer1.current_millis
+
+
+        # if !MQTTClient.connected:
+        #     MQTTClient.connect(MQTTBroker, 1883, 60)
+        
 
         # call to systemd watchdog to hold off restart
         ctl1.timer1.holdOffWatchdog(current_millis)

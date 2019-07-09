@@ -73,7 +73,7 @@ locations:
   #ventHasHighSpeed: True  #indicates if zone has dual speed vent
   ventEnableHighSpeed: True # enable high speed if available dep on vent
 
-  fan_on_t: 30000  #vent on time ms
+  fan_on_t: 60000  #vent on time ms
   fan_off_t: 60000 #vent off time ms
 
   emailEnabled: True
