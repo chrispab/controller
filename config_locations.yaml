@@ -41,8 +41,10 @@ common:
 
   onlyPublishMQTTOnChange: True #only publish an mqtt message if i/o channel has changed, not ALL i/o irrespictive
 
-  
-locations:
+  min_CSV_write_interval: 6000000 #interval min bet csv writes
+
+
+  locations:
 
   id: "s"
   locationDisplayName: "SHD"
@@ -53,7 +55,6 @@ locations:
   tempAlertHi: 30.0  #hi temp alert temp
   tempAlertLo: 13.0  #lo temp alert
 
-  min_CSV_write_interval: 6000000 #interval min bet csv writes
 
   # heatOnMs: 100000  #min time heater is on when below lo sp
   # heatOffMs: 120000  #min time heater is off for
@@ -101,7 +102,7 @@ locationc:
   #tempAlertHi: 30.0  #hi temp alert temp
   tempAlertLo: 14.5  #lo temp alert
 
-  min_CSV_write_interval: 60000 #interval min bet csv writes
+  #min_CSV_write_interval: 60000 #interval min bet csv writes
 
   heatOnMs: 8000  #min time heater is on or off for in ms
   heatOffMs: 8000  #min time heater is on or off for
@@ -143,7 +144,7 @@ locationg:
   tempAlertHi: 26.1  #hi temp alert temp
   tempAlertLo: 13.0  #lo temp alert
 
-  min_CSV_write_interval: 60000 #interval min bet csv writes
+  #min_CSV_write_interval: 60000 #interval min bet csv writes
 
   heatOnMs: 6000  #min time heater is on or off for
   heatOffMs: 30000  #min time heater is on or off for
