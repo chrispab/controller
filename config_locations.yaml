@@ -39,6 +39,7 @@ common:
   
   heartBeatInterval: 20000 # 10 secs in msecs
 
+  onlyPublishMQTTOnChange: True #only publish an mqtt message if i/o channel has changed, not ALL i/o irrespictive
   
   
 locations:

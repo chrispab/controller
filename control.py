@@ -281,6 +281,17 @@ async def control():
         stateChanged = ctl1.stateMonitor.checkForChanges(temperature, humidity, ventState,
                                                          fanState, heaterState, ventSpeedState, lightState,
                                                          current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
+       
+        # only send mqtt messages for the changed i/o - not all as previous message
+        onlyPublishMQTTOnChange = cfg.getItemValueFromConfig('onlyPublishMQTTOnChange')
+        if onlyPublishMQTTOnChange:
+            if ctl1.stateMonitor.checkForChangeInTemperature(temperature):
+                MQTTClient.publish(zone+"/TemperatureStatus", temperature)
+
+            if ctl1.stateMonitor.checkForChangeInHumidity(humidity):
+                MQTTClient.publish(zone+"/HumidityStatus", humidity)
+
+
         if stateChanged:
             logger.warning("QQQQ Publishing MQTT messages...")
             MQTTClient.publish(zone+"/TemperatureStatus", temperature)

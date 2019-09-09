@@ -66,6 +66,27 @@ class Logger(object):
         #return s[:-4]
         return s
 
+    def checkForChangeInTemperature(self, temperature):
+
+        self.state_changed = False
+
+        if temperature != self.previous_temperature:  # any change
+                self.state_changed = True
+        self.previous_temperature = temperature
+
+        return self.state_changed
+
+    def checkForChangeInHumidity(self, humidity):
+
+        self.state_changed = False
+
+        if humidity != self.previous_humidity:  # any change
+                self.state_changed = True
+        self.previous_humidity = humidity
+
+        return self.state_changed
+
+
     def checkForChanges(self, temperature, humidity, vent_state,
                         fan_state, heater_state, vent_speed_state, light_state,
                         current_millis, current_time):
@@ -139,7 +160,7 @@ class Logger(object):
         if self.state_changed == True:
             logger.debug("-- O/P State Change - OLD state --")
             self.dataHasChanged()  # write modded old change state(s)
-            # restore new vals
+            # restore new vals from original params
             self.vent_state = vent_state
             self.vent_speed_state = vent_speed_state
             self.heater_state = heater_state
