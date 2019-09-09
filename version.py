@@ -1,1 +1,1 @@
-VERSION = "1.78 master: safe restart after mqtt server restart"
+VERSION = "1.79 min_mqtt: mqtt min pub"

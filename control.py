@@ -278,32 +278,41 @@ async def control():
         # switch relays according to State vars
         ctl1.board1.switch_relays(
             heaterState, ventState, fanState, ventSpeedState)
-        stateChanged = ctl1.stateMonitor.checkForChanges(temperature, humidity, ventState,
-                                                         fanState, heaterState, ventSpeedState, lightState,
-                                                         current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
-       
+
         # only send mqtt messages for the changed i/o - not all as previous message
         onlyPublishMQTTOnChange = cfg.getItemValueFromConfig('onlyPublishMQTTOnChange')
         if onlyPublishMQTTOnChange:
             if ctl1.stateMonitor.checkForChangeInTemperature(temperature):
                 MQTTClient.publish(zone+"/TemperatureStatus", temperature)
-
-            if ctl1.stateMonitor.checkForChangeInHumidity(humidity):
+                logger.warning('++++++++++++++++TTTT  Temp change MQTT published TTTTT')
                 MQTTClient.publish(zone+"/HumidityStatus", humidity)
 
 
+            # if ctl1.stateMonitor.checkForChangeInHumidity(humidity):
+            #     MQTTClient.publish(zone+"/HumidityStatus", humidity)
+            #     logger.warning('++++++++++++++++ Humi change MQTT published')
+
+            if ctl1.stateMonitor.checkForChangeInFanState(fanState):
+                MQTTClient.publish(zone+"/FanStatus", fanState)
+                logger.warning('++++++++++++++++ Fan state change MQTT published')
+
+            if ctl1.stateMonitor.checkForChangeInVentState(ventState):
+                MQTTClient.publish(zone+"/VentStatus", ventState + ventSpeedState)
+                logger.warning('++++++++++++++++ Vent state change MQTT published')
+
+
+        stateChanged = ctl1.stateMonitor.checkForChanges(temperature, humidity, ventState,
+                                                         fanState, heaterState, ventSpeedState, lightState,
+                                                         current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
+       
         if stateChanged:
-            logger.warning("QQQQ Publishing MQTT messages...")
-            MQTTClient.publish(zone+"/TemperatureStatus", temperature)
-            MQTTClient.publish(zone+"/HumidityStatus", humidity)
-            MQTTClient.publish(zone+"/HeaterStatus", heaterState)
-            MQTTClient.publish(zone+"/VentStatus", ventState + ventSpeedState)
-            MQTTClient.publish(zone+"/FanStatus", fanState)
-            MQTTClient.publish(zone+"/VentSpeedStatus",
-                               ventState + ventSpeedState)
+            logger.warning(">>>>>>>>>>>>>>>>>>>>>>>QQQQ Publishing MQTT messages...")
+            #MQTTClient.publish(zone+"/TemperatureStatus", temperature)
+            #MQTTClient.publish(zone+"/HumidityStatus", humidity)
+            MQTTClient.publish(zone+"/HeaterStatus", heaterState)            
+            MQTTClient.publish(zone+"/VentSpeedStatus", ventState + ventSpeedState)
             MQTTClient.publish(zone+"/LightStatus", lightState)
             
-
             ventPercent = ventState*((ventSpeedState+1)*50)
             MQTTClient.publish(zone+"/VentPercent", ventPercent)
 

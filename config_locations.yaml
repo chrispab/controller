@@ -40,7 +40,7 @@ common:
   heartBeatInterval: 20000 # 10 secs in msecs
 
   onlyPublishMQTTOnChange: True #only publish an mqtt message if i/o channel has changed, not ALL i/o irrespictive
-  
+
   
 locations:
 
@@ -53,7 +53,7 @@ locations:
   tempAlertHi: 30.0  #hi temp alert temp
   tempAlertLo: 13.0  #lo temp alert
 
-  min_CSV_write_interval: 60000 #interval min bet csv writes
+  min_CSV_write_interval: 6000000 #interval min bet csv writes
 
   # heatOnMs: 100000  #min time heater is on when below lo sp
   # heatOffMs: 120000  #min time heater is off for
@@ -75,7 +75,7 @@ locations:
   ventEnableHighSpeed: True # enable high speed if available dep on vent
 
   fan_on_t: 60000  #vent on time ms
-  fan_off_t: 60000 #vent off time ms
+  fan_off_t: 53000 #vent off time ms
 
   emailEnabled: True
   

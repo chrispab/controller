@@ -41,8 +41,8 @@ class Logger(object):
         self.previous_vent_speed_state = OFF
         self.previous_proc_temp = 0
         self.previous_CSV_write_millis = 0
-        self.min_CSV_write_interval = cfg.getItemValueFromConfig(
-            'min_CSV_write_interval')
+        self.min_CSV_write_interval = cfg.getItemValueFromConfig('min_CSV_write_interval')
+        #self.min_CSV_write_interval = 500 #cfg.getItemValueFromConfig('min_CSV_write_interval')
 
     def getStatusString(self):
         #data = self._write_to_CSV()
@@ -86,6 +86,26 @@ class Logger(object):
 
         return self.state_changed
 
+    def checkForChangeInFanState(self, fanState):
+
+        self.state_changed = False
+
+        if fanState != self.previous_fan_state:  # any change
+                self.state_changed = True
+        self.previous_fan_state = fanState
+
+        return self.state_changed
+
+    def checkForChangeInVentState(self, ventState):
+
+        self.state_changed = False
+
+        if ventState != self.previous_vent_state:  # any change
+                self.state_changed = True
+        self.previous_vent_state = ventState
+
+        return self.state_changed
+
 
     def checkForChanges(self, temperature, humidity, vent_state,
                         fan_state, heater_state, vent_speed_state, light_state,
@@ -103,7 +123,7 @@ class Logger(object):
         self.state_changed = False
         logger.info('== Checking for changes ==')
 
-        # check each for state change and set new prewrite states
+        #check each for state change and set new prewrite states
         if self.vent_state != self.previous_vent_state:  # any change in vent
             if self.previous_vent_state == OFF:  # must be going OFF to ON
                 # write a low record immediately before hi record
