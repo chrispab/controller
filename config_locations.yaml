@@ -44,7 +44,7 @@ common:
   min_CSV_write_interval: 6000000 #interval min bet csv writes
 
 
-  locations:
+locations:
 
   id: "s"
   locationDisplayName: "SHD"
