@@ -1,1 +1,1 @@
-VERSION = "1.79 min_mqtt: mqtt min pub"
+VERSION = "1.80 min_mqtt: mqtt min pub"
