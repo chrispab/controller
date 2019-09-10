@@ -38,7 +38,9 @@ class Logger(object):
         self.previous_heater_state = OFF
         self.previous_vent_state = OFF
         self.previous_fan_state = OFF
+        self.previous_light_state = OFF
         self.previous_vent_speed_state = OFF
+        self.previous_vent_percent=0
         self.previous_proc_temp = 0
         self.previous_CSV_write_millis = 0
         self.min_CSV_write_interval = cfg.getItemValueFromConfig('min_CSV_write_interval')
@@ -105,6 +107,35 @@ class Logger(object):
         self.previous_vent_state = ventState
 
         return self.state_changed
+
+    def checkForChangeInHeaterState(self, heaterState):
+        self.state_changed = False
+        if heaterState != self.previous_heater_state:  # any change
+                self.state_changed = True
+        self.previous_heater_state = heaterState
+        return self.state_changed
+
+    def checkForChangeInVentSpeedState(self, ventSpeedState):
+        self.state_changed = False
+        if ventSpeedState != self.previous_vent_speed_state:  # any change
+                self.state_changed = True
+        self.previous_vent_speed_state = ventSpeedState
+        return self.state_changed
+
+    def checkForChangeInLightState(self, lightState):
+        self.state_changed = False
+        if lightState != self.previous_light_state:  # any change
+                self.state_changed = True
+        self.previous_light_state = lightState
+        return self.state_changed
+
+    def checkForChangeInVentPercent(self, ventPercent):
+        self.state_changed = False
+        if ventPercent != self.previous_vent_percent:  # any change
+                self.state_changed = True
+        self.previous_vent_percent = ventPercent
+        return self.state_changed
+
 
 
     def checkForChanges(self, temperature, humidity, vent_state,

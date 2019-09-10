@@ -282,24 +282,61 @@ async def control():
         # only send mqtt messages for the changed i/o - not all as previous message
         onlyPublishMQTTOnChange = cfg.getItemValueFromConfig('onlyPublishMQTTOnChange')
         if onlyPublishMQTTOnChange:
-            if ctl1.stateMonitor.checkForChangeInTemperature(temperature):
+            anyChanges = False
+
+            temperatureChanged = ctl1.stateMonitor.checkForChangeInTemperature(temperature)
+            if temperatureChanged:
                 MQTTClient.publish(zone+"/TemperatureStatus", temperature)
-                logger.warning('++++++++++++++++TTTT  Temp change MQTT published TTTTT')
                 MQTTClient.publish(zone+"/HumidityStatus", humidity)
+                logger.warning('++++++++++++++++  Temp change MQTT published temp aand humi')
+                anyChanges = True
 
-
-            # if ctl1.stateMonitor.checkForChangeInHumidity(humidity):
-            #     MQTTClient.publish(zone+"/HumidityStatus", humidity)
-            #     logger.warning('++++++++++++++++ Humi change MQTT published')
-
-            if ctl1.stateMonitor.checkForChangeInFanState(fanState):
+            fanChanged = ctl1.stateMonitor.checkForChangeInFanState(fanState)
+            if fanChanged:
                 MQTTClient.publish(zone+"/FanStatus", fanState)
                 logger.warning('++++++++++++++++ Fan state change MQTT published')
+                anyChanges= True
 
-            if ctl1.stateMonitor.checkForChangeInVentState(ventState):
+            ventStateChanged = ctl1.stateMonitor.checkForChangeInVentState(ventState)
+            if ventStateChanged:
                 MQTTClient.publish(zone+"/VentStatus", ventState + ventSpeedState)
                 logger.warning('++++++++++++++++ Vent state change MQTT published')
+                anyChanges=True
 
+            heaterStateChangeed = ctl1.stateMonitor.checkForChangeInHeaterState(heaterState)
+            if heaterStateChangeed:
+                MQTTClient.publish(zone+"/HeaterStatus", heaterState)
+                logger.warning('++++++++++++++++ Heater state change MQTT published')
+                anyChanges=True
+
+            ventSpeedChanged = ctl1.stateMonitor.checkForChangeInVentSpeedState(ventSpeedState)    
+            if ventSpeedChanged:
+                MQTTClient.publish(zone+"/VentSpeedStatus", ventState + ventSpeedState)
+                logger.warning('++++++++++++++++ Vent Speed state change MQTT published')
+                anyChanges=True
+
+            lightChanged = ctl1.stateMonitor.checkForChangeInLightState(lightState)
+            if lightChanged:
+                MQTTClient.publish(zone+"/LightStatus", lightState)
+                logger.warning('++++++++++++++++ Light state change MQTT published')
+                anyChanges=True
+
+            ventPercent = ventState*((ventSpeedState+1)*50)
+            ventPercentChanged = ctl1.stateMonitor.checkForChangeInVentPercent(ventPercent)
+            if ventPercentChanged:
+                MQTTClient.publish(zone+"/VentPercent", ventPercent)
+                logger.warning('++++++++++++++++ Vent peercent change MQTT published')
+                anyChanges=True
+                
+        if anyChanges:
+            currentStatusString = ctl1.stateMonitor.getStatusString()
+            if currentWSDisplayRow >= maxWSDisplayRows:
+                await txwebsocket(header)
+                currentWSDisplayRow = 0
+            currentWSDisplayRow = currentWSDisplayRow + 1
+
+            await txwebsocket(currentStatusString)
+            await asyncio.sleep(0)
 
         stateChanged = ctl1.stateMonitor.checkForChanges(temperature, humidity, ventState,
                                                          fanState, heaterState, ventSpeedState, lightState,
@@ -309,12 +346,12 @@ async def control():
             logger.warning(">>>>>>>>>>>>>>>>>>>>>>>QQQQ Publishing MQTT messages...")
             #MQTTClient.publish(zone+"/TemperatureStatus", temperature)
             #MQTTClient.publish(zone+"/HumidityStatus", humidity)
-            MQTTClient.publish(zone+"/HeaterStatus", heaterState)            
-            MQTTClient.publish(zone+"/VentSpeedStatus", ventState + ventSpeedState)
-            MQTTClient.publish(zone+"/LightStatus", lightState)
+            #MQTTClient.publish(zone+"/HeaterStatus", heaterState)            
+            #MQTTClient.publish(zone+"/VentSpeedStatus", ventState + ventSpeedState)
+            #MQTTClient.publish(zone+"/LightStatus", lightState)
             
-            ventPercent = ventState*((ventSpeedState+1)*50)
-            MQTTClient.publish(zone+"/VentPercent", ventPercent)
+            #ventPercent = ventState*((ventSpeedState+1)*50)
+            #MQTTClient.publish(zone+"/VentPercent", ventPercent)
 
 
 
@@ -366,14 +403,8 @@ async def control():
 
             logger.warning(
                 "DATA to send:%s", currentStatusString)
+        
 
-            if currentWSDisplayRow >= maxWSDisplayRows:
-                await txwebsocket(header)
-                currentWSDisplayRow = 0
-            currentWSDisplayRow = currentWSDisplayRow + 1
-
-            await txwebsocket(currentStatusString)
-            await asyncio.sleep(0)
 
 header = "Time      [Te]  [Hu]  H V F S L VT"
 
