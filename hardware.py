@@ -61,8 +61,8 @@ class sensor(object):
             self.sensorType = Adafruit_DHT.DHT22
             
             
-        self.humidity = 55.5
-        self.temperature = 18.0
+        self.humidity = 50.0
+        self.temperature = 21.0
         #self.prevTempHumiMillis = 0   #last time sensor read
         self.proc_temp = 0       # processed, filter temp reading
         self.currentTime = 0
@@ -85,6 +85,7 @@ class sensor(object):
         self.safeMode = True
         self.message = ""
         self.sensorMessage = ""
+        self.maxSensorReadErrors = cfg.getItemValueFromConfig('maxSensorReadErrors')
         
         
         
@@ -183,66 +184,50 @@ class sensor(object):
         self.prevTemp = self.temperature
         self.prevHumi = self.humidity
         
-        #calc if 3 seconds passed - if not then either wait or pass
-        #choose to pass to allow other processing
+        #calc if 3 seconds passed - if not then  pass to allow other processing
         timeGap = datetime.datetime.now() - self.prevReadTime
         #print("Time Gap : %s" %timeGap)
         #sleep(cfg.getItemValueFromConfig('readDelay'))
         #timeToGo = timeGap < time.delta(seconds-3)
         if (timeGap < timedelta(seconds=self.delay)):
-            #sleep(self.delay)
-            #print("Time Gap to go : %s" %timeGap)
-
             logger.info("** JUMPING OUT OF AQUISITION -Too early to read sensor **")
-            
-            #restore prev sample readings
-            #self.temperature = self.prevTemp  
-            #self.humidity = self.prevHumi
             return self.humidity, self.temperature, self.sensorMessage
 
         logger.info("** AQUIring **")
-
         time1 = datetime.datetime.now()
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
         time2 = datetime.datetime.now()
         duration = time2 - time1
         print("->-")
-        logger.debug("TTTTTT - sensor read duration : %s" % (duration))
+        logger.warning("TTTTTT - sensor read duration : %s" % (duration))
         
         
         #repeat read until valid data or too many errorserror
-        maxSensorReadErrors = 10
-        while (self.humidity is None or self.temperature is None) and self.readErrs < maxSensorReadErrors:
+        #maxSensorReadErrors = 3
+        while (self.humidity is None or self.temperature is None) and self.readErrs < self.maxSensorReadErrors:
             self.readErrs += 1
             logger.error("..ERROR READing SENSOR. Errors so far : %d" %self.readErrs)
 
-            #sleep(3) #wait secs before re-read
             self.humidity, self.temperature = self._read_sensor()    # get temp, humi again
             logger.debug("readings %s, %s" % (self.temperature, self.humidity))
 
         #when here, means readings have vALS OR ARE null
-        if self.readErrs == maxSensorReadErrors:  # powercyle if maxSensorReadErrors read errors, null READINGS
-            logger.error("..%d sensor Max read errors logged" % maxSensorReadErrors)
+        if self.readErrs == self.maxSensorReadErrors:  # powercyle if maxSensorReadErrors read errors, null READINGS
+            logger.error("..%d sensor Max read errors logged" % self.maxSensorReadErrors)
             self._power_cycle()
             logger.error("..POWER CYCLE complete during sensor read")
             logger.error("..DODGY TEMP READING")
             if cfg.getItemValueFromConfig('emailEnabled') == True:
                 zone = cfg.getItemValueFromConfig('zoneName')
                 #TODO limit emails sent 
-                self.message = 'Power cycling sensor due to too many,' + str(maxSensorReadErrors) + ', errors'
+                self.message = 'Power cycling sensor due to too many,' + str(self.maxSensorReadErrors) + ', errors'
                 try:
                     #emailMe.sendemail(zone + ': bad sensor reads ' + str(maxSensorReadErrors) + '  - PowerCycle', self.message)
                     self.sensorMessage = self.message
-                    #pass
                 except:
-
-                    logger.error("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING - too many errors %d" % maxSensorReadErrors)
-                    
-                        #emulate high temp to enable safe mode
-            
-                    
-            #self.temperature = self.prevTemp  #restore prev sample readings
-            #self.humidity = self.prevHumi
+                    logger.error("...ERROR SENDING EMAIL - POWER CYCLE - DODGY READING - too many errors %d" % self.maxSensorReadErrors)
+                                
+            #emulate high temp to enable safe mode
             self._enableSafeMode()
 
         else:#good read CRC if here
@@ -250,8 +235,8 @@ class sensor(object):
             #if self.safeMode == True	#enable safe op mode
                 print("GOOD CRC BUT enable SAFE MODE")
             #check for whacky readings compared to last - i.e reading glitch
-            elif ( abs(self.temperature - self.prevTemp) < 30) and ( (self.humidity >= 10)
-                and (self.humidity <= 100)) or (self.prevTemp == 30): #if temp diff smallish, assume good sample
+            elif ( abs(self.temperature - self.prevTemp) < 10) and ( (self.humidity >= 0)
+                and (self.humidity <= 100)) : #if temp diff smallish, assume good sample
                 #print( "..read sensor SUCCESS" )
                 logger.info("..read sensor success at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
                 
@@ -288,8 +273,8 @@ class sensor(object):
          
     def _power_cycle(self):
             logger.warning("entering power cycle")
-            if cfg.getItemValueFromConfig('platform_name') == "RPi2":
 
+            if cfg.getItemValueFromConfig('platform_name') == "RPi2":
                 GPIO.setup(self.powerPin, GPIO.OUT)  #set pin as OP
                 GPIO.output(self.powerPin, GPIO.LOW)        #set low to power off sensor
                 logger.warning("sensor power cycle - power off")

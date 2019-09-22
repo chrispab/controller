@@ -216,7 +216,7 @@ async def control():
 
     # emailMe.sendemail( zone + ' ' + location + ' - Process Started', message)
     emailObj.send("Zone " + zoneNumber + " " + emailzone +
-                  location + ' - Process Started', message)
+                  location + ' - Controller Process Started', message)
 
     # # Your IFTTT with event name, and json parameters (values)
     postIFTTT("zone_alert", zone, "--ReasoN--", "==DatA==")

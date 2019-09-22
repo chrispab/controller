@@ -480,6 +480,8 @@ class system_timer(object):
         self.start_millis = datetime.datetime.now()
         self.updateClocks()
 
+    
+    #hold off the process systemd watchdog
     def holdOffWatchdog(self, current_millis, forceWatchdogToggle=False):
 
         n = sdnotify.SystemdNotifier()
@@ -501,7 +503,7 @@ class system_timer(object):
             # toggle watchdog pin
             GPIO.output(self.watchDogPin, not GPIO.input(self.watchDogPin))
 
-            logger.debug("DDDDDDDDDD Patted the DOG  DDDDDDDDDD")
+            logger.warning("DDDDDDDDDD Patted the watch DOG  DDDDDDDDDD")
             
             logger.debug("starting : python daemon watchdog and fail test script started\n")
             

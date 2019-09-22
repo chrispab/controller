@@ -42,7 +42,7 @@ common:
   onlyPublishMQTTOnChange: True #only publish an mqtt message if i/o channel has changed, not ALL i/o irrespictive
 
   min_CSV_write_interval: 6000000 #interval min bet csv writes
-
+  maxSensorReadErrors: 3 # max number od sensor read failures/errors before exiting aquisition
 
 locations:
 
