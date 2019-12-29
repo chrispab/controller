@@ -354,10 +354,11 @@ class Heater(object):
 
 
         if d_state == ON: #current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
-            self.state = OFF
+            #self.state = OFF
             logger.info('..d on, heat off - skipping lon heatctl')
             #self.lastStateChangeMillis = current_millis
-            return
+            target_temp = 15
+            #return
         
         # d_state OFF if here
         logger.info('..do heatctl')
@@ -503,7 +504,7 @@ class system_timer(object):
             # toggle watchdog pin
             GPIO.output(self.watchDogPin, not GPIO.input(self.watchDogPin))
 
-            logger.warning("DDDDDDDDDD Patted the watch DOG  DDDDDDDDDD")
+            logger.warning("DDDDDDDDDD Patted the Systemd watch DOG  DDDDDDDDDD")
             
             logger.debug("starting : python daemon watchdog and fail test script started\n")
             
@@ -530,7 +531,7 @@ class system_timer(object):
             # toggle watchdog pin
             GPIO.output(self.watchDogPin, not GPIO.input(self.watchDogPin))
 
-            logger.warning("FORCING Pat the watchDOG")
+            logger.warning("FORCING Pat the Systemd watchDOG")
             retval = n.notify("WATCHDOG=1")
 
         return
