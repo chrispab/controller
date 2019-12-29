@@ -1,1 +1,1 @@
-VERSION = "1.85 min_mqtt: mqtt min pub"
+VERSION = "1.86 branch:min_mqtt: setup notes"
