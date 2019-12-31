@@ -1,1 +1,1 @@
-VERSION = "1.86 branch:min_mqtt: setup notes"
+VERSION = "1.87 branch:master : python 3"
