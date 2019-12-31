@@ -24,10 +24,11 @@ class DBCore(object):
 
         # check if connecting to local sqlite3 db and get its con obj otherwise get a mysql conn object
         if (hostName == '127.0.0.1'):
+            logger.warning("******* ATTEMPTING SQLITE3 CONN now *******")
             try:
-                # logger.warning("******* ATTEMPTING SQLITE CONN  *******")
+                logger.warning("******* ATTEMPTING SQLITE CONN  *******")
                 self.dbConn = lite.connect(databaseName + '.db')
-                # logger.warning("***** SQLITE3  OPEN getDBconn connected *: %s, %s SQLITE3 *****" % (hostName, databaseName))
+                logger.warning("***** SQLITE3  OPEN getDBconn connected *: %s, %s SQLITE3 *****" % (hostName, databaseName))
             # except lite.Error, e:
             except Exception as e:
                 print ("Error %s:" % e.args[0])
