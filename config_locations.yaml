@@ -37,7 +37,7 @@ common:
   
   radioChannel: 124 # chanel nrf radios operate on
   
-  heartBeatInterval: 20000 # 10 secs in msecs
+  heartBeatInterval: 10000 # 10 secs in msecs
 
   onlyPublishMQTTOnChange: True #only publish an mqtt message if i/o channel has changed, not ALL i/o irrespictive
 

@@ -1,1 +1,1 @@
-VERSION = "1.87 branch:master : python 3"
+VERSION = "1.88 branch:master : 10 sec heartbeat"
