@@ -209,6 +209,10 @@ async def control():
     zone = cfg.getItemValueFromConfig('zoneName')
     zoneNumber = cfg.getItemValueFromConfig('zoneNumber')
     location = cfg.getItemValueFromConfig('locationDisplayName')
+    mqttPublishIntervalMillis = cfg.getItemValueFromConfig('mqttPublishIntervalMillis')
+    lastMqttPublishHeartBeatMillis = ctl1.timer1.current_millis - 50000
+    ackMessage = cfg.getItemValueFromConfig('ackMessage')
+
     message = zone
     # if just booted
     if ctl1.timer1.secsSinceBoot() < 120:
@@ -278,6 +282,18 @@ async def control():
         # switch relays according to State vars
         ctl1.board1.switch_relays(
             heaterState, ventState, fanState, ventSpeedState)
+
+        # send mqtt message heartbeat, to be subscribed by the 433 gateway, which power cyles this controller
+        #useful cos supplements the rf24 link heartbeat link to the 433 hub 
+        #send every 60 secs?
+        if current_millis - lastMqttPublishHeartBeatMillis > mqttPublishIntervalMillis:
+            MQTTClient.publish(zone+"/HeartBeat", ackMessage)
+            #MQTTClient.publish(zone+"/HumidityStatus", humidity)
+            logger.warning('-> MQTT published HeartBeat')
+            lastMqttPublishHeartBeatMillis = current_millis
+            anyChanges = True             
+
+
 
         # only send mqtt messages for the changed i/o - not all as previous message
         onlyPublishMQTTOnChange = cfg.getItemValueFromConfig('onlyPublishMQTTOnChange')

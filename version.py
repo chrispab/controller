@@ -1,1 +1,1 @@
-VERSION = "1.88 branch:master : 10 sec heartbeat"
+VERSION = "1.89 branch:master : added MQTT heartbeat"
