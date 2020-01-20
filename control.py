@@ -283,15 +283,7 @@ async def control():
         ctl1.board1.switch_relays(
             heaterState, ventState, fanState, ventSpeedState)
 
-        # send mqtt message heartbeat, to be subscribed by the 433 gateway, which power cyles this controller
-        #useful cos supplements the rf24 link heartbeat link to the 433 hub 
-        #send every 60 secs?
-        if current_millis - lastMqttPublishHeartBeatMillis > mqttPublishIntervalMillis:
-            MQTTClient.publish(zone+"/HeartBeat", ackMessage)
-            #MQTTClient.publish(zone+"/HumidityStatus", humidity)
-            logger.warning('-> MQTT published HeartBeat')
-            lastMqttPublishHeartBeatMillis = current_millis
-            anyChanges = True             
+           
 
 
 
@@ -300,6 +292,16 @@ async def control():
         if onlyPublishMQTTOnChange:
             anyChanges = False
 
+            # send mqtt message heartbeat, to be subscribed by the 433 gateway, which power cyles this controller
+            #useful cos supplements the rf24 link heartbeat link to the 433 hub 
+            #send every 60 secs?
+            if current_millis - lastMqttPublishHeartBeatMillis > mqttPublishIntervalMillis:
+                MQTTClient.publish(zone+"/HeartBeat", ackMessage)
+                #MQTTClient.publish(zone+"/HumidityStatus", humidity)
+                logger.warning('-> MQTT published HeartBeat')
+                lastMqttPublishHeartBeatMillis = current_millis
+                anyChanges = True  
+                
             temperatureChanged = ctl1.stateMonitor.checkForChangeInTemperature(temperature)
             if temperatureChanged:
                 MQTTClient.publish(zone+"/TemperatureStatus", temperature)
