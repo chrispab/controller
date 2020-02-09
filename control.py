@@ -227,6 +227,27 @@ async def control():
 
     maxWSDisplayRows = 5  # ! TODO FIX THIS - display issue
     currentWSDisplayRow = 1
+
+    # ! publish all I/O to broker on start up
+    logger.warning("----+++====  SENDING INITIAL MQTT ===+++++-------")
+
+    lightState = ctl1.light.getLightState()
+    heaterState = ctl1.heater1.state
+    ventState = ctl1.vent1.state
+    fanState = ctl1.fan1.state
+    ventSpeedState = ctl1.vent1.speed_state
+    humidity, temperature, sensorMessage = ctl1.sensor1.read()
+
+    MQTTClient.publish(zone+"/HeartBeat", ackMessage)
+    MQTTClient.publish(zone+"/TemperatureStatus", temperature)
+    MQTTClient.publish(zone+"/HumidityStatus", humidity)
+    MQTTClient.publish(zone+"/FanStatus", fanState)
+    MQTTClient.publish(zone+"/VentStatus", ventState + ventSpeedState)
+    MQTTClient.publish(zone+"/HeaterStatus", heaterState)
+    MQTTClient.publish(zone+"/VentSpeedStatus", ventState + ventSpeedState)
+    MQTTClient.publish(zone+"/LightStatus", lightState)
+    #MQTTClient.publish(zone+"/VentPercent", ventPercent)
+
     while 1:
         logger.info("=main while loop=")
         logger.info("current time: %s" % (ctl1.timer1.current_time))
@@ -294,7 +315,7 @@ async def control():
 
             # send mqtt message heartbeat, to be subscribed by the 433 gateway, which power cyles this controller
             #useful cos supplements the rf24 link heartbeat link to the 433 hub 
-            #send every 60 secs?
+            #send every mqttPublishIntervalMillis
             if current_millis - lastMqttPublishHeartBeatMillis > mqttPublishIntervalMillis:
                 MQTTClient.publish(zone+"/HeartBeat", ackMessage)
                 #MQTTClient.publish(zone+"/HumidityStatus", humidity)
