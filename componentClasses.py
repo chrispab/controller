@@ -377,12 +377,14 @@ class Heater(object):
         #! look at on period based on external temp
         #extra heater time based on diff from set point per 0.1 degree diff
         internalDiffT = int( ((target_temp - currentTemp) * 10 * self.InternalTDiffMs) )
-        logger.warning('--INTERNAL DIFF extra time to add ms : %s',internalDiffT)
+        #logger.warning('--INTERNAL DIFF extra time to add ms : %s',internalDiffT)
        
         #extra  heater time based on external temp diff
         #do if external diff is >2 deg c
+        if outsideTemp is None:
+            outsideTemp = 10
         externalDiffT = int( (target_temp - 2 - outsideTemp) * self.ExternalTDiffMs ) # milli secs per degree diff
-        logger.warning('--EXTERNAL DIFF tdelta on to add  ms : %s',externalDiffT)
+        #logger.warning('--EXTERNAL DIFF tdelta on to add  ms : %s',externalDiffT)
 
         self.heatOnMs = cfg.getItemValueFromConfig('heatOnMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
         logger.warning('--     CALCULATED TOTAL delta ON  ms : %s',self.heatOnMs)
@@ -390,7 +392,7 @@ class Heater(object):
 #        self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
         #self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + internalDiffT # + externalDiffT#+ (float(outsideTemp)/50)
         self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + (self.heatOnMs/2) 
-        logger.warning('--     CALCULATED TOTAL HEAT OFF ms  : %s',self.heatOffMs)
+        #logger.warning('--     CALCULATED TOTAL HEAT OFF ms  : %s',self.heatOffMs)
         #logger.warning('==HDHDHDHDHDHDDHHD Heat tdelta on: %s',self.heatOnMs)
         # below temp sp here
         # check if this is start of a heat cycle - long time passed since last state change

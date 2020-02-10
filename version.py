@@ -1,1 +1,1 @@
-VERSION = "1.91 branch:master : pub all on startup"
+VERSION = "1.92 branch:master : ignore null outside temp"
