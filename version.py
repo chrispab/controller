@@ -1,1 +1,1 @@
-VERSION = "1.92 branch:master : ignore null outside temp"
+VERSION = "1.94 branch:master : LWT implemented"

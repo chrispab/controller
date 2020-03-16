@@ -192,7 +192,14 @@ async def control():
     MQTTClient.on_connect = on_connect
     MQTTClient.on_message = on_message
     try:
+    #    MQTTClient.will_set(zone + "/LWT", "Offline", 0, True)
+        zone = cfg.getItemValueFromConfig('zoneName')
+        MQTTClient.will_set(zone+"/LWT","Offline",0,True)
+
         MQTTClient.connect(MQTTBroker, 1883, 60)
+
+
+        
         MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
         MQTTClient.loop_start()
     except:
@@ -212,6 +219,11 @@ async def control():
     mqttPublishIntervalMillis = cfg.getItemValueFromConfig('mqttPublishIntervalMillis')
     lastMqttPublishHeartBeatMillis = ctl1.timer1.current_millis - 50000
     ackMessage = cfg.getItemValueFromConfig('ackMessage')
+
+#    MQTTClient.will_set(zone + "/LWT", "Offline", 0, True)
+    # publish(topic, payload=None, qos=0, retain=False)
+    MQTTClient.publish(zone + "/LWT", "Online", 0, True)
+
 
     message = zone
     # if just booted
