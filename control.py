@@ -330,6 +330,8 @@ async def control():
             #send every mqttPublishIntervalMillis
             if current_millis - lastMqttPublishHeartBeatMillis > mqttPublishIntervalMillis:
                 MQTTClient.publish(zone+"/HeartBeat", ackMessage)
+                MQTTClient.publish(zone + "/LWT", "Online", 0, True)
+
                 #MQTTClient.publish(zone+"/HumidityStatus", humidity)
                 logger.warning('-> MQTT published HeartBeat')
                 lastMqttPublishHeartBeatMillis = current_millis
