@@ -140,7 +140,11 @@ def on_message(MQTTClient, userdata, msg):
     #logger.warning("sub message rxed : %s" % str(message.payload.decode("utf-8")) )
     data = json.loads(message)
     outSideTempSensor = cfg.getItemValueFromConfig('outSideTempSensor')
-    outsideTemp = data[outSideTempSensor]['Temperature']
+    try:
+        outsideTemp = data[outSideTempSensor]['Temperature']
+    except:
+        logger.error("<====---- outside temp mqtt in temp error redoing payload")
+    
     logger.warning(
         "<====---- subscibed message rxed from outside sensor: %s" % (outsideTemp))
 
