@@ -139,9 +139,10 @@ def on_message(MQTTClient, userdata, msg):
     #logger.warning("subscibed message rxed from outside sensor: %s" % (message))
     #logger.warning("sub message rxed : %s" % str(message.payload.decode("utf-8")) )
     data = json.loads(message)
-    outsideTemp = data['AM2301']['Temperature']
+    outSideTempSensor = cfg.getItemValueFromConfig('outSideTempSensor')
+    outsideTemp = data[outSideTempSensor]['Temperature']
     logger.warning(
-        "subscibed message rxed from outside sensor: %s" % (outsideTemp))
+        "<====---- subscibed message rxed from outside sensor: %s" % (outsideTemp))
 
     #print(msg.topic+" "+message)
     # display_sensehat(message)
@@ -329,11 +330,13 @@ async def control():
             #useful cos supplements the rf24 link heartbeat link to the 433 hub 
             #send every mqttPublishIntervalMillis
             if current_millis - lastMqttPublishHeartBeatMillis > mqttPublishIntervalMillis:
-                MQTTClient.publish(zone+"/HeartBeat", ackMessage)
+                MQTTClient.publish(zone + "/HeartBeat", ackMessage)
                 MQTTClient.publish(zone + "/LWT", "Online", 0, True)
 
                 #MQTTClient.publish(zone+"/HumidityStatus", humidity)
-                logger.warning('-> MQTT published HeartBeat')
+                logger.warning('===---> MQTT published HeartBeat')
+                logger.warning('==-> ' + zone + "/HeartBeat:" + ackMessage)
+                logger.warning('==-> ' + zone + "/LWT:" + "Online")
                 lastMqttPublishHeartBeatMillis = current_millis
                 anyChanges = True  
                 
