@@ -199,7 +199,7 @@ async def control():
     try:
     #    MQTTClient.will_set(zone + "/LWT", "Offline", 0, True)
         zone = cfg.getItemValueFromConfig('zoneName')
-        MQTTClient.will_set(zone+"/LWT","Offline",0,True)
+        MQTTClient.will_set(zone+"/LWT","Offline",0,False)
 
         MQTTClient.connect(MQTTBroker, 1883, 60)
 
