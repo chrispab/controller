@@ -1,1 +1,1 @@
-VERSION = "1.98 master: lwt retain=falseout sensor try/except"
+VERSION = "1.99 master: lwt retain=false"
