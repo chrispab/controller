@@ -174,6 +174,25 @@ def postIFTTT(event_name, val1, val2, val3):
 
 # _IFTTT
 
+# RSSI
+interface = "wlxe091f5545119:"
+
+
+def get_rssi(iwconfigStr):
+    # Signal level is on same line as Quality data so a bit of ugly
+    # hacking needed...
+    # arrWords = iwconfigStr
+    # return
+    x = iwconfigStr.find("Quality=")  
+    lines=iwconfigStr[x:].split()
+    kval=lines[0].split("=")
+    kval2=kval[1].split("/")
+
+    # line = matching_line(cell,"Quality=")
+    # level = line.split()[0].split('/')
+    return str(int(round(float(kval2[0]) / float(kval2[1]) * 100))).rjust(3) + " %"
+    return kval2
+# _RSSI
 
 async def control():
 
@@ -266,6 +285,15 @@ async def control():
     #MQTTClient.publish(zone+"/VentPercent", ventPercent)
 
     while 1:
+
+        wifn=socket.if_nameindex()[2][1]
+        proc = subprocess.Popen(["iwconfig",wifn],stdout=subprocess.PIPE, universal_newlines=True)
+        # proc = subprocess.Popen(["iwconfig"],stdout=subprocess.PIPE, universal_newlines=True)
+        out, err = proc.communicate()
+        logger.warning(get_rssi(out))
+
+        # logger.warning(socket.if_nameindex())
+
         logger.info("=main while loop=")
         logger.info("current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.updateClocks()

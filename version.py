@@ -1,1 +1,1 @@
-VERSION = "1.99 master: lwt retain=false"
+VERSION = "2.0 master: rssi"
