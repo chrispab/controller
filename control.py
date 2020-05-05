@@ -174,7 +174,7 @@ def postIFTTT(event_name, val1, val2, val3):
 
 # _IFTTT
 
-# RSSI
+# !RSSI
 interface = "wlxe091f5545119:"
 
 
@@ -190,9 +190,10 @@ def get_rssi(iwconfigStr):
 
     # line = matching_line(cell,"Quality=")
     # level = line.split()[0].split('/')
-    return str(int(round(float(kval2[0]) / float(kval2[1]) * 100))).rjust(3) + " %"
-    return kval2
-# _RSSI
+    return str(int(round(float(kval2[0]) / float(kval2[1]) * 100))).rjust(3)
+    #  + " %"
+    # return kval2
+# !_RSSI
 
 async def control():
 
@@ -285,20 +286,21 @@ async def control():
     #MQTTClient.publish(zone+"/VentPercent", ventPercent)
 
     while 1:
-
-        wifn=socket.if_nameindex()[2][1]
-        proc = subprocess.Popen(["iwconfig",wifn],stdout=subprocess.PIPE, universal_newlines=True)
-        # proc = subprocess.Popen(["iwconfig"],stdout=subprocess.PIPE, universal_newlines=True)
-        out, err = proc.communicate()
-        logger.warning(get_rssi(out))
-
+        rssi = ""
+        try:
+            wifn=socket.if_nameindex()[2][1]
+            proc = subprocess.Popen(["iwconfig",wifn],stdout=subprocess.PIPE, universal_newlines=True)
+            out, err = proc.communicate()
+            rssi = get_rssi(out)
+            logger.warning(rssi)
+        except:
+            print("-------CANNOT get wifi RSSI info=======!!!") 
         # logger.warning(socket.if_nameindex())
-
         logger.info("=main while loop=")
         logger.info("current time: %s" % (ctl1.timer1.current_time))
         ctl1.timer1.updateClocks()
         current_millis = ctl1.timer1.current_millis
-
+         
 
         # if !MQTTClient.connected:
         #     MQTTClient.connect(MQTTBroker, 1883, 60)
@@ -362,6 +364,8 @@ async def control():
             #useful cos supplements the rf24 link heartbeat link to the 433 hub 
             #send every mqttPublishIntervalMillis
             if current_millis - lastMqttPublishHeartBeatMillis > mqttPublishIntervalMillis:
+                MQTTClient.publish(zone + "/rssi", rssi)
+                
                 MQTTClient.publish(zone + "/HeartBeat", ackMessage)
                 MQTTClient.publish(zone + "/LWT", "Online", 0, True)
 
