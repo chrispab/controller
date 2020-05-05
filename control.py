@@ -292,7 +292,7 @@ async def control():
             proc = subprocess.Popen(["iwconfig",wifn],stdout=subprocess.PIPE, universal_newlines=True)
             out, err = proc.communicate()
             rssi = get_rssi(out)
-            logger.warning(rssi)
+            # logger.warning(rssi)
         except:
             print("-------CANNOT get wifi RSSI info=======!!!") 
         # logger.warning(socket.if_nameindex())
@@ -365,7 +365,7 @@ async def control():
             #send every mqttPublishIntervalMillis
             if current_millis - lastMqttPublishHeartBeatMillis > mqttPublishIntervalMillis:
                 MQTTClient.publish(zone + "/rssi", rssi)
-                
+
                 MQTTClient.publish(zone + "/HeartBeat", ackMessage)
                 MQTTClient.publish(zone + "/LWT", "Online", 0, True)
 
