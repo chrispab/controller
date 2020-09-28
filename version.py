@@ -1,1 +1,1 @@
-VERSION = "2.1 master: rssi mqtt"
+VERSION = "2.2 master: mqtt server .100"

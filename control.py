@@ -36,7 +36,7 @@ import requests  # allows us to send HTML POST request to IFTTT
 import json
 
 
-MQTTBroker = "192.168.0.200"
+MQTTBroker = "192.168.0.100"
 sub_topic = "/zone1/instructions"    # receive messages on this topic
 pub_topic = "/zone1/data"       # send messages to this topic
 
