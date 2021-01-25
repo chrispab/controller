@@ -199,7 +199,7 @@ class sensor(object):
         time2 = datetime.datetime.now()
         duration = time2 - time1
         print("->-")
-        logger.warning("TTTTTT - sensor read duration : %s" % (duration))
+        logger.info("TTTTTT - sensor read duration : %s" % (duration))
         
         
         #repeat read until valid data or too many errorserror

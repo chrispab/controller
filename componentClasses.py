@@ -241,7 +241,7 @@ class Vent(object):
                 # iftime is up, so change the state to ON
                 if current_millis - self.prev_vent_millis >= self.vent_off_delta:
                     self.state = ON
-                    logger.info("..VENT ON cycle period start")
+                    logger.warn("VVVVVVVVVVVV..VENT ON cycle period start")
                     self.prev_vent_millis = current_millis
                 else:
                     logger.info('..Vent off - during cycle OFF period')
@@ -251,7 +251,7 @@ class Vent(object):
                 # time up, change state to OFF
                 if (current_millis - self.prev_vent_millis) >= self.vent_on_delta:
                     self.state = OFF
-                    logger.info("..VENT OFF cycle period start")
+                    logger.warn("VVVVVVVVVVVVV..VENT OFF cycle period start")
                     self.prev_vent_millis = current_millis
                 else:
                     logger.info('..Vent on - during cycle ON period')
@@ -387,7 +387,7 @@ class Heater(object):
         #logger.warning('--EXTERNAL DIFF tdelta on to add  ms : %s',externalDiffT)
 
         self.heatOnMs = cfg.getItemValueFromConfig('heatOnMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
-        logger.warning('--     CALCULATED TOTAL delta ON  ms : %s',self.heatOnMs)
+        logger.info('--     CALCULATED TOTAL delta ON  ms : %s',self.heatOnMs)
 
 #        self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
         #self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + internalDiffT # + externalDiffT#+ (float(outsideTemp)/50)
@@ -426,28 +426,14 @@ class Light(object):
     def getLightState(self ):
 
         #new ldr based routine test
-        #print("hi")
         count = RCtime(cfg.getItemValueFromConfig('RCPin')) # Measure timing using GPIO4
-        #print count
 
         if ( count > 1000):
-            #sys.stdout.write("OFF")
-            #sys.stdout.flush()
             lightState = OFF
-
-            #print("OFF")
         else:
-            #sys.stdout.write("ON")
-            #sys.stdout.flush()
-            #print("ON")
             lightState = ON
 
-        #sys.stdout.write(str(count))
-        #sys.stdout.flush()
-
         self.d_state = lightState
-
-
         return self.d_state
         
         
@@ -506,7 +492,7 @@ class system_timer(object):
             # toggle watchdog pin
             GPIO.output(self.watchDogPin, not GPIO.input(self.watchDogPin))
 
-            logger.warning("DDDDDDDDDD Patted the Systemd watch DOG  DDDDDDDDDD")
+            logger.info("DDDDDDDDDD Patted the Systemd watch DOG  DDDDDDDDDD")
             
             logger.debug("starting : python daemon watchdog and fail test script started\n")
             

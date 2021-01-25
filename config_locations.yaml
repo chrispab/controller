@@ -37,7 +37,7 @@ common:
   
   radioChannel: 124 # chanel nrf radios operate on
   
-  heartBeatInterval: 30000 # 10 secs in msecs
+  heartBeatInterval: 30000 #  in msecs
 
   onlyPublishMQTTOnChange: True #only publish an mqtt message if i/o channel has changed, not ALL i/o irrespictive
 
@@ -52,7 +52,7 @@ locations:
   locationDisplayName: "SHD"
 
   tempSPLOn: 22.5   #
-  tempSPLOff: 15.0 #
+  tempSPLOff: 14.5 #
 
   tempAlertHi: 30.0  #hi temp alert temp
   tempAlertLo: 13.0  #lo temp alert
@@ -66,8 +66,8 @@ locations:
   heatInternalTDiffMs: 5000 #extra heat on time per 0.1 deg diff in internal temps
   heatExternalTDiffMs: 5000 #extra heat on time per 1 deg diff to external temp
 
-  ventOnDelta: 20000 #duration vent is on in millis - minimum mark
-  ventOffDelta: 60000 #vent off duration in miili sec
+  ventOnDelta: 10000 #duration vent is on in millis - minimum mark
+  ventOffDelta: 80000 #vent off duration in miili sec
   ventPulseOnDelta: 20000 #nn msecs cooling on delta
   vent_lon_sp_offset: -0.1 #offset
   vent_loff_sp_offset: 1.0 #
