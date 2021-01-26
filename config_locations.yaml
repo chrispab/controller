@@ -78,7 +78,7 @@ locations:
   ventEnableHighSpeed: True # enable high speed if available dep on vent
 
   fan_on_t: 60000  #vent on time ms
-  fan_off_t: 53000 #vent off time ms
+  fan_off_t: 60000 #vent off time ms
 
   emailEnabled: True
   
@@ -154,8 +154,8 @@ locationg:
   heatInternalTDiffMs: 5000 #extra heat on time per 0.1 deg diff in internal temps
   heatExternalTDiffMs: 5000 #extra heat on time per 1 deg diff to external temp
 
-  ventOnDelta: 30000 #duration vent is on in millis
-  ventOffDelta: 30000 #vent off duration in miili sec
+  ventOnDelta: 10000 #duration vent is on in millis
+  ventOffDelta: 60000 #vent off duration in miili sec
   ventPulseOnDelta: 30000 #60 secs cooling on delta
   vent_lon_sp_offset: 0.0 #offset
   vent_loff_sp_offset: 2.0 #

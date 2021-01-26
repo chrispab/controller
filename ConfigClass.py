@@ -41,7 +41,7 @@ class Config(object):
         f = open(fileStr)
         configZones = yaml.safe_load(f)
         logger.warning("== Reading config Zone settings from yaml file ==")
-        logger.warning(yaml.dump(configZones))
+        # logger.warning(yaml.dump(configZones))
         f.close()        
 
         # now get common data and specific data for locations
@@ -50,11 +50,13 @@ class Config(object):
         f = open(fileStr)
         configLocations = yaml.safe_load(f)
         logger.warning("== Reading config Location settings from yaml file ==")
-        logger.warning(yaml.dump(configLocations))
+        # logger.warning(yaml.dump(configLocations))
         f.close()  
         
-        for section in configLocations:
-            print(section)
+        # for section in configLocations:
+        #     print(section)
+
+
         #print(configLocations['location1'])
         #print(configLocations['location2'])                
         
@@ -79,32 +81,32 @@ class Config(object):
         newCfg = {}
         #add common section items to new config obj
         for item in configLocations['common']:
-            print(item)
-            print(configLocations['common'][item])
+            # print(item)
+            # print(configLocations['common'][item])
             newCfg[item] = configLocations['common'][item] # put in new dict
             
         #add location items to new config obj use location.code
         locSection = 'location' + location.code
         for item in configLocations[locSection]:
-            print(item)
-            print(configLocations[locSection][item])
+            # print(item)
+            # print(configLocations[locSection][item])
             newCfg[item] = configLocations[locSection][item] # put in new dict
                         
         #add zone items to new config obj use location.zone
         locSection = location.zoneName
         for item in configZones[locSection]:
-            print(item)
-            print(configZones[locSection][item])
+            # print(item)
+            # print(configZones[locSection][item])
             newCfg[item] = configZones[locSection][item] # put in new dict
                         
         
-        for item in newCfg:
-            print(item)
-            print(newCfg[item])
+        # for item in newCfg:
+        #     print(item)
+        #     print(newCfg[item])
             #newCfg[item] = configZones[locSection][item] # put in new dict                
         
         
-        print(newCfg)
+        # print(newCfg)
 
         
         
@@ -119,7 +121,7 @@ class Config(object):
             self.setConfigItemInLocalDB( 'tempSPLOff', self.config['tempSPLOff'])
             self.setConfigItemInLocalDB( 'processUptime', self.config['processUptime'])
             self.setConfigItemInLocalDB( 'systemMessage', self.config['systemMessage'])        
-#            self.updateCentralConfigTable()
+        #            self.updateCentralConfigTable()
         except:
             logger.error("????? bad writeConfigToLocalDB exception thrown ???")
             e = sys.exc_info()[0]
@@ -255,6 +257,11 @@ class Config(object):
         value = self.config[item]
         return value
         
+    def setItemValueToConfig(self, item, value):
+        self.config[item] = value
+        # return value
+        return
+
 
     def writeConfigToFile(self, config):
         fileStr = os.path.abspath("config_new.yaml")

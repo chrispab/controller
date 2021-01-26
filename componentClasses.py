@@ -165,7 +165,8 @@ class Vent(object):
 
     def control(self, currentTemp, currentHumi, target_temp, d_state, current_millis):
         logger.info('==Vent ctl==')
-
+        self.vent_on_delta = cfg.getItemValueFromConfig('ventOnDelta')  # vent on time
+        self.vent_off_delta = cfg.getItemValueFromConfig('ventOffDelta')  # vent off time
         #self.speed_state = OFF  # lo speed
         # if (self.platformName == 'RaspberryPi2'):
         #     if (d_state == ON) and self.ventEnableHighSpeed:
@@ -389,7 +390,7 @@ class Heater(object):
         self.heatOnMs = cfg.getItemValueFromConfig('heatOnMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
         logger.info('--     CALCULATED TOTAL delta ON  ms : %s',self.heatOnMs)
 
-#        self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
+    #        self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
         #self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + internalDiffT # + externalDiffT#+ (float(outsideTemp)/50)
         self.heatOffMs = cfg.getItemValueFromConfig('heatOffMs') + (self.heatOnMs/2) 
         #logger.warning('--     CALCULATED TOTAL HEAT OFF ms  : %s',self.heatOffMs)

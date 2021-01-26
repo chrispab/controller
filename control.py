@@ -129,15 +129,16 @@ def on_connect(MQTTClient, userdata, flags, rc):
     MQTTClient.subscribe(sub_topic)
 
 # when receiving a mqtt message do this;
-
-
 def on_message(MQTTClient, userdata, msg):
     global outsideTemp
+
+    zone = cfg.getItemValueFromConfig('zoneName')
+
     #logger.warning(" MRMRMRMRMR- MQTT rx - MRMRMRMRMRMRMRMRMRMR")
 
     message = str(msg.payload.decode("utf-8"))
-    #logger.warning("subscibed message rxed from outside sensor: %s" % (message))
-    #logger.warning("sub message rxed : %s" % str(message.payload.decode("utf-8")) )
+    logger.warning("subscibed message rxed : %s" % (message))
+    # logger.warning("sub message rxed : %s" % str(message.payload.decode("utf-8")) )
     data = json.loads(message)
     outSideTempSensor = cfg.getItemValueFromConfig('outSideTempSensor')
     try:
@@ -148,9 +149,17 @@ def on_message(MQTTClient, userdata, msg):
     logger.warning(
         "<====---- subscibed message rxed from outside sensor: %s" % (outsideTemp))
 
-    #print(msg.topic+" "+message)
-    # display_sensehat(message)
+    logger.warning(msg.topic+" :: "+message)
+    logger.warning(zone + "/vent_on_delta/set!!!" +  " ::: " + msg.topic+" :: "+message)
 
+    # display_sensehat(message)
+    if msg.topic == (zone + "/vent_on_delta/set"):
+        cfg.setItemValueToConfig('ventOnDelta', int(msg.payload))  # vent on time
+        logger.warning( zone + "/vent_on_delta/set!!!")
+
+    if msg.topic == ( zone + "/vent_off_delta/set"):
+        cfg.setItemValueToConfig('ventOffDelta', int(msg.payload))  # vent on time
+        logger.warning( zone + "/vent_off_delta/set!!!")
 
 def on_publish(mosq, obj, mid):
     print("mid: " + str(mid))
@@ -226,6 +235,9 @@ async def control():
 
         
         MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
+        MQTTClient.subscribe(zone+"/vent_off_delta/set")
+        MQTTClient.subscribe(zone+"/vent_on_delta/set")
+
         MQTTClient.loop_start()
     except:
         print("MQTT CANNOT CONNECT!!!")    
@@ -513,7 +525,7 @@ async def txwebsocket(message):
                 await asyncio.wait([clientConn.send(message)])
                 # await clientConn.send(message)
 
-                logger.warning("EEEE message sent to wdClient EEEE")
+                logger.info("EEEE message sent to ws Client EEEE")
             else:  # websockets.ConnectionClosed:
                 logger.warning("UUUU1 unregging a wsconn UUUU")
                 removeMe = clientConn
