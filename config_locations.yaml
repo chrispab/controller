@@ -154,8 +154,8 @@ locationg:
   heatInternalTDiffMs: 5000 #extra heat on time per 0.1 deg diff in internal temps
   heatExternalTDiffMs: 5000 #extra heat on time per 1 deg diff to external temp
 
-  ventOnDelta: 10000 #duration vent is on in millis
-  ventOffDelta: 60000 #vent off duration in miili sec
+  ventOnDelta: 10000 #duration vent is on in millis - minimum mark
+  ventOffDelta: 80000 #vent off duration in miili sec
   ventPulseOnDelta: 30000 #60 secs cooling on delta
   vent_lon_sp_offset: 0.0 #offset
   vent_loff_sp_offset: 2.0 #
@@ -163,8 +163,8 @@ locationg:
   ventDisableHumi: 65 #humi below which vent is disabled if loff
   ventEnableHighSpeed: False # enable high speed if available dep on vent
 
-  fan_on_t: 23000  #vent on time
-  fan_off_t: 50000 #vent off time
+  fan_on_t: 15000  #vent on time
+  fan_off_t: 60000 #vent off time
 
   emailEnabled: True
   quietMode: True
