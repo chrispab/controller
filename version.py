@@ -1,1 +1,1 @@
-VERSION = "2.6 master: vent mod"
+VERSION = "2.7 master: vent mod"
