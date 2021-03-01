@@ -154,11 +154,11 @@ def on_message(MQTTClient, userdata, msg):
 
     # display_sensehat(message)
     if msg.topic == (zone + "/vent_on_delta/set"):
-        cfg.setItemValueToConfig('ventOnDelta', int(msg.payload))  # vent on time
+        cfg.setItemValueToConfig('ventOnDelta', int(msg.payload)*1000)  # vent on timerxed in secs, convert to ms
         logger.warning( zone + "/vent_on_delta/set!!!")
 
     if msg.topic == ( zone + "/vent_off_delta/set"):
-        cfg.setItemValueToConfig('ventOffDelta', int(msg.payload))  # vent on time
+        cfg.setItemValueToConfig('ventOffDelta', int(msg.payload)*1000)  # vent on time
         logger.warning( zone + "/vent_off_delta/set!!!")
 
 def on_publish(mosq, obj, mid):
