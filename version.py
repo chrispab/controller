@@ -1,1 +1,1 @@
-VERSION = "2.9 master: trim rssi payload"
+VERSION = "2.10 master: trim rssi payload"

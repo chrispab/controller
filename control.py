@@ -402,11 +402,30 @@ async def control():
                 logger.warning('++++++++++++++++ Fan state change MQTT published')
                 anyChanges= True
 
+
+            #publish vent data
             ventStateChanged = ctl1.stateMonitor.checkForChangeInVentState(ventState)
             if ventStateChanged:
-                MQTTClient.publish(zone+"/VentStatus", ventState + ventSpeedState)
+                MQTTClient.publish(zone+"/VentStatus", ventState )
                 logger.warning('++++++++++++++++ Vent state change MQTT published')
+                MQTTClient.publish(zone+"/VentValue", ventState + ventSpeedState)
+                logger.warning('++++++++++++++++ Vent value 0,1,2 change MQTT published')                
                 anyChanges=True
+
+            ventSpeedChanged = ctl1.stateMonitor.checkForChangeInVentSpeedState(ventSpeedState)    
+            if ventSpeedChanged:
+                MQTTClient.publish(zone+"/VentSpeedStatus", ventSpeedState)
+                logger.warning('++++++++++++++++ Vent Speed state change MQTT published')
+                anyChanges=True  
+
+            ventPercent = ventState*((ventSpeedState+1)*50)
+            ventPercentChanged = ctl1.stateMonitor.checkForChangeInVentPercent(ventPercent)
+            if ventPercentChanged:
+                MQTTClient.publish(zone+"/VentPercent", ventPercent)
+                logger.warning('++++++++++++++++ Vent percent change MQTT published')
+                anyChanges=True
+
+
 
             heaterStateChangeed = ctl1.stateMonitor.checkForChangeInHeaterState(heaterState)
             if heaterStateChangeed:
@@ -414,11 +433,7 @@ async def control():
                 logger.warning('++++++++++++++++ Heater state change MQTT published')
                 anyChanges=True
 
-            ventSpeedChanged = ctl1.stateMonitor.checkForChangeInVentSpeedState(ventSpeedState)    
-            if ventSpeedChanged:
-                MQTTClient.publish(zone+"/VentSpeedStatus", ventState + ventSpeedState)
-                logger.warning('++++++++++++++++ Vent Speed state change MQTT published')
-                anyChanges=True
+
 
             lightChanged = ctl1.stateMonitor.checkForChangeInLightState(lightState)
             if lightChanged:
@@ -426,12 +441,7 @@ async def control():
                 logger.warning('++++++++++++++++ Light state change MQTT published')
                 anyChanges=True
 
-            ventPercent = ventState*((ventSpeedState+1)*50)
-            ventPercentChanged = ctl1.stateMonitor.checkForChangeInVentPercent(ventPercent)
-            if ventPercentChanged:
-                MQTTClient.publish(zone+"/VentPercent", ventPercent)
-                logger.warning('++++++++++++++++ Vent peercent change MQTT published')
-                anyChanges=True
+
                 
         if anyChanges:
             currentStatusString = ctl1.stateMonitor.getStatusString()
