@@ -1,1 +1,1 @@
-VERSION = "2.8 master: vent delta mqtt in secs"
+VERSION = "2.9 master: trim rssi payload"

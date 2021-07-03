@@ -154,7 +154,7 @@ def on_message(MQTTClient, userdata, msg):
 
     # display_sensehat(message)
     if msg.topic == (zone + "/vent_on_delta/set"):
-        cfg.setItemValueToConfig('ventOnDelta', int(msg.payload)*1000)  # vent on timerxed in secs, convert to ms
+        cfg.setItemValueToConfig('ventOnDelta', int(msg.payload)*1000)  # vent on time rxed in secs, convert to ms - used in code
         logger.warning( zone + "/vent_on_delta/set!!!")
 
     if msg.topic == ( zone + "/vent_off_delta/set"):
@@ -304,6 +304,7 @@ async def control():
             proc = subprocess.Popen(["iwconfig",wifn],stdout=subprocess.PIPE, universal_newlines=True)
             out, err = proc.communicate()
             rssi = get_rssi(out)
+            rssi=rssi.strip()
             # logger.warning(rssi)
         except:
             print("-------CANNOT get wifi RSSI info=======!!!") 
