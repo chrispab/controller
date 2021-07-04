@@ -291,9 +291,13 @@ async def control():
     MQTTClient.publish(zone+"/TemperatureStatus", temperature)
     MQTTClient.publish(zone+"/HumidityStatus", humidity)
     MQTTClient.publish(zone+"/FanStatus", fanState)
-    MQTTClient.publish(zone+"/VentStatus", ventState + ventSpeedState)
+    MQTTClient.publish(zone+"/VentStatus", ventState)
     MQTTClient.publish(zone+"/HeaterStatus", heaterState)
-    MQTTClient.publish(zone+"/VentSpeedStatus", ventState + ventSpeedState)
+    MQTTClient.publish(zone+"/VentSpeedStatus", ventSpeedState)
+    MQTTClient.publish(zone+"/VentValue", ventState + ventSpeedState)
+    ventPercent = ventState*((ventSpeedState+1)*50)
+    MQTTClient.publish(zone+"/VentPercent", ventPercent)
+
     MQTTClient.publish(zone+"/LightStatus", lightState)
     #MQTTClient.publish(zone+"/VentPercent", ventPercent)
 
@@ -382,7 +386,6 @@ async def control():
                 MQTTClient.publish(zone + "/HeartBeat", ackMessage)
                 MQTTClient.publish(zone + "/LWT", "Online", 0, True)
 
-                #MQTTClient.publish(zone+"/HumidityStatus", humidity)
                 logger.warning('===---> MQTT published HeartBeat')
                 logger.warning('==-> ' + zone + "/HeartBeat:" + ackMessage)
                 logger.warning('==-> ' + zone + "/LWT:" + "Online")
@@ -399,7 +402,10 @@ async def control():
             fanChanged = ctl1.stateMonitor.checkForChangeInFanState(fanState)
             if fanChanged:
                 MQTTClient.publish(zone+"/FanStatus", fanState)
+                logger.warning('++++++++++++++++================================')
                 logger.warning('++++++++++++++++ Fan state change MQTT published')
+                logger.warning(fanState)
+                logger.warning('++++++++++++++++================================')
                 anyChanges= True
 
 

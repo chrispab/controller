@@ -97,6 +97,7 @@ class Logger(object):
         self.previous_fan_state = fanState
 
         return self.state_changed
+        
 
     def checkForChangeInVentState(self, ventState):
 
