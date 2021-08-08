@@ -150,16 +150,16 @@ def on_message(MQTTClient, userdata, msg):
         "<====---- subscibed message rxed from outside sensor: %s" % (outsideTemp))
 
     logger.warning(msg.topic+" :: "+message)
-    logger.warning(zone + "/vent_on_delta/set!!!" +  " ::: " + msg.topic+" :: "+message)
+    logger.warning(zone + "/vent_on_delta_secs/set!!!" +  " ::: " + msg.topic+" :: "+message)
 
     # display_sensehat(message)
-    if msg.topic == (zone + "/vent_on_delta/set"):
+    if msg.topic == (zone + "/vent_on_delta_secs/set"):
         cfg.setItemValueToConfig('ventOnDelta', int(msg.payload)*1000)  # vent on time rxed in secs, convert to ms - used in code
-        logger.warning( zone + "/vent_on_delta/set!!!")
+        logger.warning( zone + "/vent_on_delta_secs/set!!!")
 
-    if msg.topic == ( zone + "/vent_off_delta/set"):
+    if msg.topic == ( zone + "/vent_off_delta_secs/set"):
         cfg.setItemValueToConfig('ventOffDelta', int(msg.payload)*1000)  # vent on time
-        logger.warning( zone + "/vent_off_delta/set!!!")
+        logger.warning( zone + "/vent_off_delta_secs/set!!!")
 
 def on_publish(mosq, obj, mid):
     print("mid: " + str(mid))
@@ -204,15 +204,17 @@ def get_rssi(iwconfigStr):
     # return kval2
 # !_RSSI
 
+
+#
 async def control():
 
-    global systemUpTime
-    global processUptime
-    global systemMessage
-    global controllerMessage
-    global miscMessage
+    # global systemUpTime
+    # global processUptime
+    # global systemMessage
+    # global controllerMessage
+    # global miscMessage
     global emailzone
-    global outsideTemp
+    # global outsideTemp
 
     #logger.warning("MQTT CANNOT CONNECT!!!")
 
@@ -235,8 +237,8 @@ async def control():
 
         
         MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
-        MQTTClient.subscribe(zone+"/vent_off_delta/set")
-        MQTTClient.subscribe(zone+"/vent_on_delta/set")
+        MQTTClient.subscribe(zone+"/vent_off_delta_secs/set")
+        MQTTClient.subscribe(zone+"/vent_on_delta_secs/set")
 
         MQTTClient.loop_start()
     except:
@@ -254,7 +256,10 @@ async def control():
     zoneNumber = cfg.getItemValueFromConfig('zoneNumber')
     location = cfg.getItemValueFromConfig('locationDisplayName')
     mqttPublishIntervalMillis = cfg.getItemValueFromConfig('mqttPublishIntervalMillis')
+    mqttPublishTeleIntervalMillis = cfg.getItemValueFromConfig('mqttPublishTeleIntervalMillis')
     lastMqttPublishHeartBeatMillis = ctl1.timer1.current_millis - 50000
+    lastMqttPublishTeleMillis = ctl1.timer1.current_millis - 100000
+
     ackMessage = cfg.getItemValueFromConfig('ackMessage')
 
 #    MQTTClient.will_set(zone + "/LWT", "Offline", 0, True)
@@ -376,6 +381,21 @@ async def control():
         onlyPublishMQTTOnChange = cfg.getItemValueFromConfig('onlyPublishMQTTOnChange')
         if onlyPublishMQTTOnChange:
             anyChanges = False
+
+            #! send telemetry periodically
+            if current_millis - lastMqttPublishTeleMillis > mqttPublishTeleIntervalMillis:
+                # MQTTClient.publish(zone + "/rssi", rssi)
+
+                MQTTClient.publish(zone + "/vent_on_delta_secs", int(cfg.getItemValueFromConfig('ventOnDelta')/1000) )
+                MQTTClient.publish(zone + "/vent_off_delta_secs", int(cfg.getItemValueFromConfig('ventOffDelta')/1000) )
+                # MQTTClient.publish(zone + "/LWT", "Online", 0, True)
+
+                logger.warning('===---> MQTT publish TELE')
+                logger.warning('==-> ' + zone + "/vent_on_delta_secs : " + str(int(cfg.getItemValueFromConfig('ventOnDelta')/1000))) 
+                logger.warning('==-> ' + zone + "/vent_off_delta_secs : " + str(int(cfg.getItemValueFromConfig('ventOffDelta')/1000)))
+                # logger.warning('==-> ' + zone + "/LWT:" + "Online")
+                lastMqttPublishTeleMillis = current_millis
+                # anyChanges = True 
 
             # send mqtt message heartbeat, to be subscribed by the 433 gateway, which power cyles this controller
             #useful cos supplements the rf24 link heartbeat link to the 433 hub 

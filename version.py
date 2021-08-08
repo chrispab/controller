@@ -1,1 +1,1 @@
-VERSION = "2.11 master: switch payloads"
+VERSION = "3.1b refactor: vent delta secs"
