@@ -1,1 +1,1 @@
-VERSION = "3.1b refactor: vent delta secs"
+VERSION = "3.4b refactor: ws display"
