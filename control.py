@@ -162,6 +162,7 @@ def on_message(MQTTClient, userdata, msg):
         cfg.setItemValueToConfig('ventOffDelta', int(
             msg.payload)*1000)  # vent on time
         logger.warning(zone + "/vent_off_delta_secs/set!!!")
+        cfg.writeConfigToFile()
 
 
 def on_publish(mosq, obj, mid):
@@ -529,16 +530,16 @@ async def control():
             end_time = time.time()
             processUptime = end_time - start_time
             processUptime = str(timedelta(seconds=int(processUptime)))
-            cfg.setConfigItemInLocalDB('processUptime', processUptime)
+            # cfg.setConfigItemInLocalDB('processUptime', processUptime)
             systemUpTime = ctl1.timer1.getSystemUpTimeFromProc()
-            cfg.setConfigItemInLocalDB('systemUpTime', systemUpTime)
-            cfg.setConfigItemInLocalDB('miscMessage', location)
-            cfg.setConfigItemInLocalDB('systemMessage', systemMessage)
+            # cfg.setConfigItemInLocalDB('systemUpTime', systemUpTime)
+            # cfg.setConfigItemInLocalDB('miscMessage', location)
+            # cfg.setConfigItemInLocalDB('systemMessage', systemMessage)
             ipAddress = get_ip_address()
-            cfg.setConfigItemInLocalDB('controllerMessage', "V: " + VERSION + ", IP: " + "<a href=" +
-                                       "https://" + ipAddress + ":10000" + ' target="_blank"' + ">" + ipAddress + "</a>")
-            cfg.setConfigItemInLocalDB('lightState', int(lightState))
-            execAndTimeFunc(cfg.updateCentralConfigTable)
+            # cfg.setConfigItemInLocalDB('controllerMessage', "V: " + VERSION + ", IP: " + "<a href=" +
+            #                            "https://" + ipAddress + ":10000" + ' target="_blank"' + ">" + ipAddress + "</a>")
+            # cfg.setConfigItemInLocalDB('lightState', int(lightState))
+            # execAndTimeFunc(cfg.updateCentralConfigTable)
 
             logger.info("======== process uptime: %s ======", processUptime)
             mem = psutil.virtual_memory()
