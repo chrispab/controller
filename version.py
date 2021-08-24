@@ -1,1 +1,1 @@
-VERSION = "2.11 master: switch payloads"
+VERSION = "3.5b refactor: save custom config"

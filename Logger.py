@@ -1,3 +1,6 @@
+from support import round_time as round_time
+from DatabaseObject import db  # singleton global
+from ConfigObject import cfg  # singleton global
 import logging
 import csv
 import datetime
@@ -6,10 +9,6 @@ import time
 
 logger = logging.getLogger(__name__)
 
-from ConfigObject import cfg  # singleton global
-from DatabaseObject import db  # singleton global
-
-from support import round_time as round_time
 
 OFF = cfg.getItemValueFromConfig('RelayOff')  # state for relay OFF
 ON = cfg.getItemValueFromConfig('RelayOn')  # state for on
@@ -40,32 +39,46 @@ class Logger(object):
         self.previous_fan_state = OFF
         self.previous_light_state = OFF
         self.previous_vent_speed_state = OFF
-        self.previous_vent_percent=0
+        self.previous_vent_percent = 0
         self.previous_proc_temp = 0
         self.previous_CSV_write_millis = 0
-        self.min_CSV_write_interval = cfg.getItemValueFromConfig('min_CSV_write_interval')
-        #self.min_CSV_write_interval = 500 #cfg.getItemValueFromConfig('min_CSV_write_interval')
+        self.min_CSV_write_interval = cfg.getItemValueFromConfig(
+            'min_CSV_write_interval')
+        # self.min_CSV_write_interval = 500 #cfg.getItemValueFromConfig('min_CSV_write_interval')
 
-    def getStatusString(self):
+
+###
+#  "Time      [Te]  [Hu]  H V F S L VT"
+
+
+    def getDisplayHeaderString(self):
+        return "Time ---- [Te]--[Hu]--L-H-F-V-S-VT"
+
+###
+# build a string with values for the main controlled/monitored values for use in web socket display op
+# example string:
+# Time - HH.MM.SS, Temperature - NN.N, Humidity - NN.N %, Light - 0/1, Heat - 0/1, Fan - 0/1, Vent - 0/1, VentSpeed - 0/1, VentTotal 0/1/2
+#  "17:02:01  20.4  64.1  0 1 1 1 0 2"
+    def getDisplayStatusString(self):
         #data = self._write_to_CSV()
         sep = " "
-        statusString = self.format_time()+ sep\
+        statusString = self.format_time() + sep\
             + sep + str(self.temperature)\
             + sep + sep + str(self.humidity)\
-            + sep + sep + str(self.heater_state)\
-            + sep + str(self.vent_state)\
+            + sep + sep + str(self.light_state)\
+            + sep + str(self.heater_state)\
             + sep + str(self.fan_state)\
+            + sep + str(self.vent_state)\
             + sep + str(self.vent_speed_state)\
-            + sep + str(self.light_state)\
             + sep + str(self.vent_state+self.vent_speed_state)
-
         return str(statusString)
 
+# covert date time to fixed length format string for display
     def format_time(self):
         t = datetime.datetime.now()
         #s = t.strftime('%Y-%m-%d %H:%M:%S.%f')
         s = t.strftime('%H:%M:%S')
-        #return s[:-4]
+        # return s[:-4]
         return s
 
     def checkForChangeInTemperature(self, temperature):
@@ -73,7 +86,7 @@ class Logger(object):
         self.state_changed = False
 
         if temperature != self.previous_temperature:  # any change
-                self.state_changed = True
+            self.state_changed = True
         self.previous_temperature = temperature
 
         return self.state_changed
@@ -83,7 +96,7 @@ class Logger(object):
         self.state_changed = False
 
         if humidity != self.previous_humidity:  # any change
-                self.state_changed = True
+            self.state_changed = True
         self.previous_humidity = humidity
 
         return self.state_changed
@@ -93,18 +106,17 @@ class Logger(object):
         self.state_changed = False
 
         if fanState != self.previous_fan_state:  # any change
-                self.state_changed = True
+            self.state_changed = True
         self.previous_fan_state = fanState
 
         return self.state_changed
-        
 
     def checkForChangeInVentState(self, ventState):
 
         self.state_changed = False
 
         if ventState != self.previous_vent_state:  # any change
-                self.state_changed = True
+            self.state_changed = True
         self.previous_vent_state = ventState
 
         return self.state_changed
@@ -112,32 +124,30 @@ class Logger(object):
     def checkForChangeInHeaterState(self, heaterState):
         self.state_changed = False
         if heaterState != self.previous_heater_state:  # any change
-                self.state_changed = True
+            self.state_changed = True
         self.previous_heater_state = heaterState
         return self.state_changed
 
     def checkForChangeInVentSpeedState(self, ventSpeedState):
         self.state_changed = False
         if ventSpeedState != self.previous_vent_speed_state:  # any change
-                self.state_changed = True
+            self.state_changed = True
         self.previous_vent_speed_state = ventSpeedState
         return self.state_changed
 
     def checkForChangeInLightState(self, lightState):
         self.state_changed = False
         if lightState != self.previous_light_state:  # any change
-                self.state_changed = True
+            self.state_changed = True
         self.previous_light_state = lightState
         return self.state_changed
 
     def checkForChangeInVentPercent(self, ventPercent):
         self.state_changed = False
         if ventPercent != self.previous_vent_percent:  # any change
-                self.state_changed = True
+            self.state_changed = True
         self.previous_vent_percent = ventPercent
         return self.state_changed
-
-
 
     def checkForChanges(self, temperature, humidity, vent_state,
                         fan_state, heater_state, vent_speed_state, light_state,
@@ -155,7 +165,7 @@ class Logger(object):
         self.state_changed = False
         logger.info('== Checking for changes ==')
 
-        #check each for state change and set new prewrite states
+        # check each for state change and set new prewrite states
         if self.vent_state != self.previous_vent_state:  # any change in vent
             if self.previous_vent_state == OFF:  # must be going OFF to ON
                 # write a low record immediately before hi record
