@@ -53,7 +53,7 @@ tempSPLOn: 22.5
 ventDisableHumi: 50
 ventDisableTemp: 15
 ventEnableHighSpeed: true
-ventOffDelta: 90000
+ventOffDelta: 60000
 ventOnDelta: 300000
 ventPulseOnDelta: 20000
 ventRelay: 26

@@ -97,7 +97,7 @@ class RadioLink(object):
 
         ticks = millis()
         if ( ( (ticks) - self.lastHeartBeatSentMillis) >= self.heartBeatInterval): #ready to send
-            logger.warning('..sending heartbeat message : %s' % self.ackMessage)
+            logger.warning('..sending RF24 radio heartbeat message : %s' % self.ackMessage)
             #logger.warning(self.ackMessage)
             self.lastHeartBeatSentMillis = millis()
 
@@ -257,9 +257,6 @@ class Vent(object):
                 else:
                     logger.info('..Vent on - during cycle ON period')
         return
-
-
-
 
 class Fan(object):
 
