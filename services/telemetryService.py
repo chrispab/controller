@@ -1,23 +1,104 @@
+import subprocess
+import socket
+from ConfigObject import cfg  # singleton global
 import logging
 logger = logging.getLogger(__name__)
 
-from ConfigObject import cfg # singleton global
 OFF = cfg.getItemValueFromConfig('RelayOff')  # state for relay OFF
 ON = cfg.getItemValueFromConfig('RelayOn')  # state for on
-import socket
-import subprocess
 
 
 class TelemetryService(object):
 
     def __init__(self):
         logger.info("Creating TelemetryService")
-        self.zoneName = cfg.getItemValueFromConfig('zoneName')  # e.g Zone1, Zone3
+        self.zoneName = cfg.getItemValueFromConfig(
+            'zoneName')  # e.g Zone1, Zone3
         self.lastMqttPublishTeleMillis = 0
-        self.mqttPublishTeleIntervalMillis = cfg.getItemValueFromConfig('mqttPublishTeleIntervalMillis')
+        self.mqttPublishTeleIntervalMillis = cfg.getItemValueFromConfig(
+            'mqttPublishTeleIntervalMillis')
         self.lastMqttPublishHeartBeatMillis = 0
-        self.mqttPublishIntervalMillis = cfg.getItemValueFromConfig('mqttPublishIntervalMillis')
+        self.mqttPublishIntervalMillis = cfg.getItemValueFromConfig(
+            'mqttPublishIntervalMillis')
         self.ackMessage = cfg.getItemValueFromConfig('ackMessage')
+
+    def pubMQTTReadings(self, MQTTClient, ctl1, humidity, temperature, lightState, heaterState, fanState, ventState, ventSpeedState):
+       # only send mqtt messages for the changed i/o - not all as previous message
+        onlyPublishMQTTOnChange = cfg.getItemValueFromConfig(
+            'onlyPublishMQTTOnChange')
+        anyChanges = False
+
+        if onlyPublishMQTTOnChange:
+            temperatureChanged = ctl1.stateMonitor.checkForChangeInTemperature(
+                temperature)
+            if temperatureChanged:
+                MQTTClient.publish(
+                    self.zoneName+"/TemperatureStatus", temperature)
+                MQTTClient.publish(self.zoneName+"/HumidityStatus", humidity)
+                logger.warning(
+                    '++++++++++++++++  Temp change MQTT published temp aand humi')
+                anyChanges = True
+
+            fanChanged = ctl1.stateMonitor.checkForChangeInFanState(fanState)
+            if fanChanged:
+                MQTTClient.publish(self.zoneName+"/FanStatus", fanState)
+                # logger.warning(
+                #     '++++++++++++++++================================')
+                # logger.warning(
+                #     '++++++++++++++++ Fan state change MQTT published')
+                # logger.warning(fanState)
+                # logger.warning(
+                #     '++++++++++++++++================================')
+                anyChanges = True
+
+            # publish vent data
+            ventStateChanged = ctl1.stateMonitor.checkForChangeInVentState(
+                ventState)
+            if ventStateChanged:
+                MQTTClient.publish(self.zoneName+"/VentStatus", ventState)
+                logger.warning(
+                    '++++++++++++++++ Vent state change MQTT published')
+                MQTTClient.publish(self.zoneName+"/VentValue",
+                                   ventState + ventSpeedState)
+                logger.warning(
+                    '++++++++++++++++ Vent value 0,1,2 change MQTT published')
+                anyChanges = True
+
+            ventSpeedChanged = ctl1.stateMonitor.checkForChangeInVentSpeedState(
+                ventSpeedState)
+            if ventSpeedChanged:
+                MQTTClient.publish(
+                    self.zoneName+"/VentSpeedStatus", ventSpeedState)
+                logger.warning(
+                    '++++++++++++++++ Vent Speed state change MQTT published')
+                anyChanges = True
+
+            ventPercent = ventState*((ventSpeedState+1)*50)
+            ventPercentChanged = ctl1.stateMonitor.checkForChangeInVentPercent(
+                ventPercent)
+            if ventPercentChanged:
+                MQTTClient.publish(self.zoneName+"/VentPercent", ventPercent)
+                logger.warning(
+                    '++++++++++++++++ Vent percent change MQTT published')
+                anyChanges = True
+
+            heaterStateChangeed = ctl1.stateMonitor.checkForChangeInHeaterState(
+                heaterState)
+            if heaterStateChangeed:
+                MQTTClient.publish(self.zoneName+"/HeaterStatus", heaterState)
+                logger.warning(
+                    '++++++++++++++++ Heater state change MQTT published')
+                anyChanges = True
+
+            lightChanged = ctl1.stateMonitor.checkForChangeInLightState(
+                lightState)
+            if lightChanged:
+                MQTTClient.publish(self.zoneName+"/LightStatus", lightState)
+                logger.warning(
+                    '++++++++++++++++ Light state change MQTT published')
+                anyChanges = True
+
+            return anyChanges  # return if changes or not are detected
 
     # send mqtt message heartbeat, to be subscribed by the 433 gateway, which power cyles this controller
     # useful cos supplements the rf24 link heartbeat link to the 433 hub
@@ -29,15 +110,15 @@ class TelemetryService(object):
             MQTTClient.publish(self.zoneName + "/HeartBeat", self.ackMessage)
 
             logger.warning('===---> MQTT published HeartBeat')
-            logger.warning('===---> ' + self.zoneName + "/HeartBeat:" + self.ackMessage)
+            logger.warning('===---> ' + self.zoneName +
+                           "/HeartBeat:" + self.ackMessage)
             logger.warning('===---> ' + self.zoneName + "/LWT:" + "Online")
             self.lastMqttPublishHeartBeatMillis = current_millis
             # anyChanges = True
 
-
-            
     #! send telemetry periodically
     # long intervasl mqtt messages of low priority, e.g rssi, online, ventOn/Off Deltas etc
+
     def pubMQTTTele(self, current_millis, MQTTClient):
         logger.info('==  publish MQTT Telemetry  ==')
 
@@ -45,14 +126,14 @@ class TelemetryService(object):
             logger.warning('---> publish MQTT TELE info')
 
             MQTTClient.publish(self.zoneName + "/vent_on_delta_secs",
-                                int(cfg.getItemValueFromConfig('ventOnDelta')/1000))
+                               int(cfg.getItemValueFromConfig('ventOnDelta')/1000))
             MQTTClient.publish(self.zoneName + "/vent_off_delta_secs",
-                                int(cfg.getItemValueFromConfig('ventOffDelta')/1000))
+                               int(cfg.getItemValueFromConfig('ventOffDelta')/1000))
 
             logger.warning('===---> ' + self.zoneName + "/vent_on_delta_secs : " +
-                            str(int(cfg.getItemValueFromConfig('ventOnDelta')/1000)))
+                           str(int(cfg.getItemValueFromConfig('ventOnDelta')/1000)))
             logger.warning('===---> ' + self.zoneName + "/vent_off_delta_secs : " +
-                            str(int(cfg.getItemValueFromConfig('ventOffDelta')/1000)))
+                           str(int(cfg.getItemValueFromConfig('ventOffDelta')/1000)))
             # logger.warning('==-> ' + zone + "/LWT:" + "Online")
 
             MQTTClient.publish(self.zoneName + "/rssi", self.getRSSI())
@@ -60,7 +141,10 @@ class TelemetryService(object):
             self.lastMqttPublishTeleMillis = current_millis
             # anyChanges = True
 
+
+#! support routines
     # get rssi
+
     def getRSSI(self):
         rssi = ""
         try:
@@ -77,7 +161,6 @@ class TelemetryService(object):
 
 # !RSSI
     # interface = "wlxe091f5545119:"
-
 
     def derive_rssi(self, iwconfigStr):
         # Signal level is on same line as Quality data so a bit of ugly

@@ -1,1 +1,1 @@
-VERSION = "3.8 refactor: tele pub"
+VERSION = "3.11 refactor: messaging service"
