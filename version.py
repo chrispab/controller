@@ -1,1 +1,1 @@
-VERSION = "3.5b refactor: save custom config"
+VERSION = "3.11 refactor: messaging service"
