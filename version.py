@@ -1,1 +1,1 @@
-VERSION = "3.11 refactor: messaging service"
+VERSION = "3.12 master: merged refactor"
