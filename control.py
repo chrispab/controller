@@ -130,20 +130,24 @@ MessageService = MessageService()
 def on_connect(MQTTClient, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     logger.warning(" - MQTT CONNECTED - MMMMM")
-    MQTTClient.subscribe(sub_topic)
+    # MQTTClient.subscribe(sub_topic)
 
 # when receiving a mqtt message do this;
-
-
 def on_message(MQTTClient, userdata, msg):
+
     global outsideTemp
 
+
+    message = str(msg.payload.decode("utf-8"))    
+    logger.warning("MMMMMM: subscibed message rxed topic : %s" % (msg.topic))    
+    logger.warning("MMMMMM: subscibed message rxed payload : %s" % (message))    
+    # logger.warning("subscribed message rxed : %s" % str(message)) )
+
     zoneName = cfg.getItemValueFromConfig('zoneName')
+    logger.warning("MMMMMM: subscibed message rxedm, zone name used : %s" % (zoneName))    
 
     #logger.warning(" MRMRMRMRMR- MQTT rx - MRMRMRMRMRMRMRMRMRMR")
 
-    message = str(msg.payload.decode("utf-8"))
-    logger.warning("subscibed message rxed : %s" % (message))
     # logger.warning("sub message rxed : %s" % str(message.payload.decode("utf-8")) )
     data = json.loads(message)
     outSideTempSensor = cfg.getItemValueFromConfig('outSideTempSensor')
@@ -338,80 +342,6 @@ async def control():
 
         anyChanges = teleService.pubMQTTReadings(MQTTClient, ctl1, humidity, temperature, lightState, heaterState, fanState, ventState, ventSpeedState)
         # # only send mqtt messages for the changed i/o - not all as previous message
-        # onlyPublishMQTTOnChange = cfg.getItemValueFromConfig(
-        #     'onlyPublishMQTTOnChange')
-        # if onlyPublishMQTTOnChange:
-        #     anyChanges = False
-
-        #     temperatureChanged = ctl1.stateMonitor.checkForChangeInTemperature(
-        #         temperature)
-        #     if temperatureChanged:
-        #         MQTTClient.publish(zoneName+"/TemperatureStatus", temperature)
-        #         MQTTClient.publish(zoneName+"/HumidityStatus", humidity)
-        #         logger.warning(
-        #             '++++++++++++++++  Temp change MQTT published temp aand humi')
-        #         anyChanges = True
-
-        #     fanChanged = ctl1.stateMonitor.checkForChangeInFanState(fanState)
-        #     if fanChanged:
-        #         MQTTClient.publish(zoneName+"/FanStatus", fanState)
-        #         # logger.warning(
-        #         #     '++++++++++++++++================================')
-        #         # logger.warning(
-        #         #     '++++++++++++++++ Fan state change MQTT published')
-        #         # logger.warning(fanState)
-        #         # logger.warning(
-        #         #     '++++++++++++++++================================')
-        #         anyChanges = True
-
-        #     # publish vent data
-        #     ventStateChanged = ctl1.stateMonitor.checkForChangeInVentState(
-        #         ventState)
-        #     if ventStateChanged:
-        #         MQTTClient.publish(zoneName+"/VentStatus", ventState)
-        #         logger.warning(
-        #             '++++++++++++++++ Vent state change MQTT published')
-        #         MQTTClient.publish(zoneName+"/VentValue",
-        #                            ventState + ventSpeedState)
-        #         logger.warning(
-        #             '++++++++++++++++ Vent value 0,1,2 change MQTT published')
-        #         anyChanges = True
-
-        #     ventSpeedChanged = ctl1.stateMonitor.checkForChangeInVentSpeedState(
-        #         ventSpeedState)
-        #     if ventSpeedChanged:
-        #         MQTTClient.publish(zoneName+"/VentSpeedStatus", ventSpeedState)
-        #         logger.warning(
-        #             '++++++++++++++++ Vent Speed state change MQTT published')
-        #         anyChanges = True
-
-        #     ventPercent = ventState*((ventSpeedState+1)*50)
-        #     ventPercentChanged = ctl1.stateMonitor.checkForChangeInVentPercent(
-        #         ventPercent)
-        #     if ventPercentChanged:
-        #         MQTTClient.publish(zoneName+"/VentPercent", ventPercent)
-        #         logger.warning(
-        #             '++++++++++++++++ Vent percent change MQTT published')
-        #         anyChanges = True
-
-        #     heaterStateChangeed = ctl1.stateMonitor.checkForChangeInHeaterState(
-        #         heaterState)
-        #     if heaterStateChangeed:
-        #         MQTTClient.publish(zoneName+"/HeaterStatus", heaterState)
-        #         logger.warning(
-        #             '++++++++++++++++ Heater state change MQTT published')
-        #         anyChanges = True
-
-        #     lightChanged = ctl1.stateMonitor.checkForChangeInLightState(
-        #         lightState)
-        #     if lightChanged:
-        #         MQTTClient.publish(zoneName+"/LightStatus", lightState)
-        #         logger.warning(
-        #             '++++++++++++++++ Light state change MQTT published')
-        #         anyChanges = True
-
-
-
 
         if anyChanges:
             currentStatusString = ctl1.stateMonitor.getDisplayStatusString()
