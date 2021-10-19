@@ -169,6 +169,7 @@ def on_message(MQTTClient, userdata, msg):
         # vent on time rxed in secs, convert to ms - used in code
         cfg.setItemValueToConfig('ventOnDelta', int(msg.payload)*1000)
         logger.warning(zoneName + "/vent_on_delta_secs/set!!!")
+        cfg.writeConfigToFile()
 
     if msg.topic == (zoneName + "/vent_off_delta_secs/set"):
         cfg.setItemValueToConfig('ventOffDelta', int(

@@ -54,7 +54,7 @@ ventDisableHumi: 50
 ventDisableTemp: 15
 ventEnableHighSpeed: true
 ventOffDelta: 60000
-ventOnDelta: 300000
+ventOnDelta: 50000
 ventPulseOnDelta: 20000
 ventRelay: 26
 vent_loff_sp_offset: 1.0

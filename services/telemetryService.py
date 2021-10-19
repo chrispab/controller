@@ -3,6 +3,7 @@ import socket
 from ConfigObject import cfg  # singleton global
 import logging
 logger = logging.getLogger(__name__)
+from version import VERSION
 
 OFF = cfg.getItemValueFromConfig('RelayOff')  # state for relay OFF
 ON = cfg.getItemValueFromConfig('RelayOn')  # state for on
@@ -14,7 +15,7 @@ class TelemetryService(object):
         logger.info("Creating TelemetryService")
         self.zoneName = cfg.getItemValueFromConfig(
             'zoneName')  # e.g Zone1, Zone3
-        self.lastMqttPublishTeleMillis = 0
+        self.lastMqttPublishTeleMillis = -1 # -1 to indicate not yet valid ms
         self.mqttPublishTeleIntervalMillis = cfg.getItemValueFromConfig(
             'mqttPublishTeleIntervalMillis')
         self.lastMqttPublishHeartBeatMillis = 0
@@ -122,7 +123,9 @@ class TelemetryService(object):
     def pubMQTTTele(self, current_millis, MQTTClient):
         logger.info('==  publish MQTT Telemetry  ==')
 
-        if current_millis - self.lastMqttPublishTeleMillis > self.mqttPublishTeleIntervalMillis:
+        #check for first run
+            
+        if (current_millis - self.lastMqttPublishTeleMillis > self.mqttPublishTeleIntervalMillis) or (self.lastMqttPublishTeleMillis == -1):
             logger.warning('---> publish MQTT TELE info')
 
             MQTTClient.publish(self.zoneName + "/vent_on_delta_secs",
@@ -130,11 +133,15 @@ class TelemetryService(object):
             MQTTClient.publish(self.zoneName + "/vent_off_delta_secs",
                                int(cfg.getItemValueFromConfig('ventOffDelta')/1000))
 
+            MQTTClient.publish(self.zoneName + "/version", VERSION)
+
+
             logger.warning('===---> ' + self.zoneName + "/vent_on_delta_secs : " +
                            str(int(cfg.getItemValueFromConfig('ventOnDelta')/1000)))
             logger.warning('===---> ' + self.zoneName + "/vent_off_delta_secs : " +
                            str(int(cfg.getItemValueFromConfig('ventOffDelta')/1000)))
             # logger.warning('==-> ' + zone + "/LWT:" + "Online")
+            logger.warning('===---> ' + self.zoneName + "/version : " + VERSION)
 
             MQTTClient.publish(self.zoneName + "/rssi", self.getRSSI())
             MQTTClient.publish(self.zoneName + "/LWT", "Online", 0, True)
