@@ -2,6 +2,8 @@
 # control.py
 # control for HVAC controller
 
+from services.MessageService import MessageService
+from services.telemetryService import TelemetryService
 from aiohttp import web
 import version
 from componentClasses import *  # components of controller board
@@ -48,13 +50,11 @@ logging.basicConfig(level=logging.WARNING)
 # ===================general imports=====================================
 
 #! import services
-from services.telemetryService import TelemetryService
-from services.MessageService import MessageService
 
 
 MQTTBroker = "192.168.0.100"
-sub_topic = "/zone1/instructions"    # receive messages on this topic
-pub_topic = "/zone1/data"       # send messages to this topic
+# sub_topic = "/zone1/instructions"    # receive messages on this topic
+# pub_topic = "/zone1/data"       # send messages to this topic
 
 
 logger = logging.getLogger(__name__)
@@ -131,6 +131,11 @@ def on_connect(MQTTClient, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     logger.warning(" - MQTT CONNECTED - MMMMM")
     # MQTTClient.subscribe(sub_topic)
+    zoneName = cfg.getItemValueFromConfig('zoneName')
+
+    MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
+    MQTTClient.subscribe(zoneName+"/vent_off_delta_secs/set")
+    MQTTClient.subscribe(zoneName+"/vent_on_delta_secs/set")
 
 # when receiving a mqtt message do this;
 def on_message(MQTTClient, userdata, msg):
@@ -146,7 +151,7 @@ def on_message(MQTTClient, userdata, msg):
     zoneName = cfg.getItemValueFromConfig('zoneName')
     logger.warning("MMMMMM: subscibed message rxedm, zone name used : %s" % (zoneName))    
 
-    #logger.warning(" MRMRMRMRMR- MQTT rx - MRMRMRMRMRMRMRMRMRMR")
+    # logger.warning(" MRMRMRMRMR- MQTT rx - MRMRMRMRMRMRMRMRMRMR")
 
     # logger.warning("sub message rxed : %s" % str(message.payload.decode("utf-8")) )
     data = json.loads(message)
@@ -195,7 +200,7 @@ async def control():
     global emailzone
     # global outsideTemp
 
-    #logger.warning("MQTT CANNOT CONNECT!!!")
+    # logger.warning("MQTT CANNOT CONNECT!!!")
 
     # print("MQTT CANNOT CONNECT!!!")
 
@@ -213,9 +218,9 @@ async def control():
 
         MQTTClient.connect(MQTTBroker, 1883, 60)
 
-        MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
-        MQTTClient.subscribe(zoneName+"/vent_off_delta_secs/set")
-        MQTTClient.subscribe(zoneName+"/vent_on_delta_secs/set")
+        # MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
+        # MQTTClient.subscribe(zoneName+"/vent_off_delta_secs/set")
+        # MQTTClient.subscribe(zoneName+"/vent_on_delta_secs/set")
 
         MQTTClient.loop_start()
     except:
@@ -280,7 +285,7 @@ async def control():
     MQTTClient.publish(zoneName+"/VentPercent", ventPercent)
 
     MQTTClient.publish(zoneName+"/LightStatus", lightState)
-    #MQTTClient.publish(zoneName+"/VentPercent", ventPercent)
+    # MQTTClient.publish(zoneName+"/VentPercent", ventPercent)
 
     while 1:
         logger.info("=main while loop=")
@@ -368,7 +373,7 @@ async def control():
             MessageService.alertAbnormalTemps(temperature) # alert if abnormal temps
 
             location = cfg.getItemValueFromConfig('locationDisplayName')
-            #logger.debug("Location : %s" % (location))
+            # logger.debug("Location : %s" % (location))
 
             # end_time = time.time()
             # processUptime = end_time - start_time
@@ -444,13 +449,13 @@ async def MyWSHandler(websocket, path):
     wsClients.add(websocket)
 
     logger.warning("CCCCCC CONNECTION MADE CCCCCC")
-    #now = str(datetime.datetime.now())
+    # now = str(datetime.datetime.now())
     initialMessage = "websocket server connected from " + \
         cfg.getItemValueFromConfig('zoneName')
 
     initialMessage = "Version : " + VERSION
     await websocket.send(initialMessage)
-    #header = "Timestamp               T     H     H  V  F  S  L  VT"
+    # header = "Timestamp               T     H     H  V  F  S  L  VT"
     await websocket.send(ctl1.stateMonitor.getDisplayHeaderString())
 
     # try ping socket # if response cont
@@ -458,7 +463,7 @@ async def MyWSHandler(websocket, path):
     while True:
         try:
             msg = await asyncio.wait_for(websocket.recv(), timeout=20)
-            #logger.warning("WS RX message : %s", msg)
+            # logger.warning("WS RX message : %s", msg)
             logger.warning("WS RX message")
         except asyncio.TimeoutError:
             # No data in 20 seconds, check the connection.
@@ -487,7 +492,7 @@ async def MyWSHandler(websocket, path):
 
 async def main():
     start_server = websockets.serve(MyWSHandler, '', 5678)
-    #mywebapp= web.run_app(app)
+    # mywebapp= web.run_app(app)
 
     server = web.Server(serveConsolePage)
     await asyncio.get_event_loop().create_server(server, "", 8081)
