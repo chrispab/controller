@@ -133,6 +133,10 @@ class TelemetryService(object):
             MQTTClient.publish(self.zoneName + "/vent_off_delta_secs",
                                int(cfg.getItemValueFromConfig('ventOffDelta')/1000))
 
+            MQTTClient.publish(self.zoneName + "/low_setpoint",cfg.getItemValueFromConfig('tempSPLOff'))
+            MQTTClient.publish(self.zoneName + "/high_setpoint",cfg.getItemValueFromConfig('tempSPLOn'))
+
+            
             MQTTClient.publish(self.zoneName + "/version", VERSION)
 
 

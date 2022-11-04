@@ -1,0 +1,3 @@
+cd controller/
+sudo systemctl restart zone_controller.service
+sudo journalctl --follow -u zone_controller.service

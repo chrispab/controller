@@ -136,6 +136,8 @@ def on_connect(MQTTClient, userdata, flags, rc):
     MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
     MQTTClient.subscribe(zoneName+"/vent_off_delta_secs/set")
     MQTTClient.subscribe(zoneName+"/vent_on_delta_secs/set")
+    MQTTClient.subscribe(zoneName+"/low_setpoint/set")
+    MQTTClient.subscribe(zoneName+"/high_setpoint/set")
 
 # when receiving a mqtt message do this;
 def on_message(MQTTClient, userdata, msg):
@@ -169,7 +171,7 @@ def on_message(MQTTClient, userdata, msg):
     logger.warning(zoneName + "/vent_on_delta_secs/set!!!" +
                    " ::: " + msg.topic+" :: "+message)
 
-    # display_sensehat(message)
+    # vent deltas
     if msg.topic == (zoneName + "/vent_on_delta_secs/set"):
         # vent on time rxed in secs, convert to ms - used in code
         cfg.setItemValueToConfig('ventOnDelta', int(msg.payload)*1000)
@@ -180,6 +182,17 @@ def on_message(MQTTClient, userdata, msg):
         cfg.setItemValueToConfig('ventOffDelta', int(
             msg.payload)*1000)  # vent on time
         logger.warning(zoneName + "/vent_off_delta_secs/set!!!")
+        cfg.writeConfigToFile()
+    
+    # setpoints
+    if msg.topic == (zoneName + "/low_setpoint/set"):
+        cfg.setItemValueToConfig('tempSPLOff', float(msg.payload))
+        logger.warning(zoneName + "/low_setpoint/set!!!")
+        cfg.writeConfigToFile()
+
+    if msg.topic == (zoneName + "/high_setpoint/set"):
+        cfg.setItemValueToConfig('tempSPLOn', float(msg.payload))  # vent on time
+        logger.warning(zoneName + "/high_setpoint/set!!!")
         cfg.writeConfigToFile()
 
 

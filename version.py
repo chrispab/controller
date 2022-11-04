@@ -1,1 +1,1 @@
-VERSION = "3.16 main: v off delt set subscribe"
+VERSION = "3.17 main: low hi temp set mqtt"
