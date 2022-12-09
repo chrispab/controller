@@ -1,1 +1,1 @@
-VERSION = "3.17 main: low hi temp set mqtt"
+VERSION = "3.18 main: improve heating"

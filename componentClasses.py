@@ -307,39 +307,62 @@ class Heater(object):
         self.ExternalTDiffMs = cfg.getItemValueFromConfig('heatExternalTDiffMs')
 
         self.status = 0
+        self.heatingCycleState = 'INACTIVE'
 
     def control(self, currentTemp, target_temp, d_state, current_millis):
         logger.info('==Heat ctl==')
         #calc new heater on t based on t gap
-        self.heatOnMs = ((target_temp - currentTemp) * 20 * 1000)  + cfg.getItemValueFromConfig('heatOnMs')
+        # self.heatOnMs = ((target_temp - currentTemp) * 20 * 1000)  + cfg.getItemValueFromConfig('heatOnMs')
         logger.info('==Heat tdelta on: %s',self.heatOnMs)
 
         #check for heater OFF hours #todo improve this
         #current_hour = datetime.datetime.now().hour
         #if current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
         if d_state == ON: #current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
-
             self.state = OFF
             logger.info('..d on, in heat off hours - skipping lon heatctl')
         else:  # d off here
-            logger.info('..do heatctl')
-            if currentTemp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
-                self.state = OFF
-                logger.info("...temp over sp - HEATER OFF")
-                self.lastStateChangeMillis = current_millis
-            elif self.state == ON:  # t below tsp if time is up, so check if change the state to OFF
-                if current_millis - self.lastStateChangeMillis >= self.heatOnMs:
-                    self.state = OFF
-                    logger.info("...in heat auto cycle - switch HEATER OFF after pulse on")
+            logger.info('..light off..do heatctl')
+
+            # just trigger a defined ON period - force it to complete
+            #then force a defined OFF period - force it to complete
+            # is a on or off pulse active?
+            if currentTemp < target_temp + self.heater_sp_offset:
+                if self.heatingCycleState == 'INACTIVE':
+                    # start a cycle - ON first
+                    self.heatingCycleState == 'ON'
+                    # init ON state timer
                     self.lastStateChangeMillis = current_millis
-                else:
-                   logger.info('in heat auto cycle - Heater still on - during low temp heat pulse')
-            elif current_millis - self.lastStateChangeMillis >= self.heatOffMs:  # heater is off, turn on after delta
-                self.state = ON
-                logger.info("...in heat auto cycle - switch HEATER ON")
-                self.lastStateChangeMillis = current_millis
-            else:
-                logger.info("...in heat auto cycle - during heat OFF period")
+                    self.state = ON             
+            if self.heatingCycleState == 'ON':
+                if current_millis - self.lastStateChangeMillis >= self.heatOnMs:# end of on bit
+                    self.heatingCycleState == 'OFF'
+                    self.state = OFF
+                    self.lastStateChangeMillis = current_millis
+            if self.heatingCycleState == 'OFF':
+                if current_millis - self.lastStateChangeMillis >= self.heatOffMs:# end of on bit
+                    self.heatingCycleState == 'INACTIVE'
+                    # self.state = OFF
+                    # self.lastStateChangeMillis = current_millis
+
+            # if currentTemp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
+            #     self.state = OFF
+            #     logger.info("...temp over sp - HEATER OFF")
+            #     self.lastStateChangeMillis = current_millis
+            # elif self.state == ON:  # t below tsp if time is up, so check if change the state to OFF
+            #     if current_millis - self.lastStateChangeMillis >= self.heatOnMs:
+            #         self.state = OFF
+            #         logger.info("...in heat auto cycle - switch HEATER OFF after pulse on")
+            #         self.lastStateChangeMillis = current_millis
+            #     else:
+            #        logger.info('in heat auto cycle - Heater still on - during low temp heat pulse')
+            # elif current_millis - self.lastStateChangeMillis >= self.heatOffMs:  # heater is off, turn on after delta
+            #     self.state = ON
+            #     logger.info("...in heat auto cycle - switch HEATER ON")
+            #     self.lastStateChangeMillis = current_millis
+            # else:
+            #     logger.info("...in heat auto cycle - during heat OFF period")
+
         # else:
             #print("..in d-off, no heat ctl")
         logger.info('Heater state: %s' , ('OFF' if self.state else 'ON') )
