@@ -62,8 +62,8 @@ locations:
 
   # heatOnMs: 100000  #min time heater is on when below lo sp
   # heatOffMs: 120000  #min time heater is off for
-  heatOnMs: 5000  #min time heater is on when below lo sp
-  heatOffMs: 10000  #min time heater is off for
+  heatOnMs: 30000  #min time heater is on when below lo sp
+  heatOffMs: 120000  #min time heater is off for
   heater_sp_offset: 0
   heatInternalTDiffMs: 5000 #extra heat on time per 0.1 deg diff in internal temps
   heatExternalTDiffMs: 5000 #extra heat on time per 1 deg diff to external temp
@@ -150,8 +150,8 @@ locationg:
 
   #min_CSV_write_interval: 60000 #interval min bet csv writes
 
-  heatOnMs: 6000  #min time heater is on or off for
-  heatOffMs: 30000  #min time heater is on or off for
+  heatOnMs: 30000  #min time heater is on when below lo sp
+  heatOffMs: 120000  #min time heater is off for
   heater_sp_offset: 0
   heatInternalTDiffMs: 5000 #extra heat on time per 0.1 deg diff in internal temps
   heatExternalTDiffMs: 5000 #extra heat on time per 1 deg diff to external temp

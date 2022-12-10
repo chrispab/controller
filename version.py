@@ -1,1 +1,1 @@
-VERSION = "3.18 main: improve heating"
+VERSION = "3.19 main: heating control change"

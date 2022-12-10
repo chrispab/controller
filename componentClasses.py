@@ -323,7 +323,7 @@ class Heater(object):
             # logger.warning('..d on, in heat off hours - skipping lon heatctl')
         else:  # d off here
             # logger.warning('..light off..do heatctl')
-            logger.warning('self.heatingCycleState: %s' , (self.heatingCycleState) )
+            # logger.warning('self.heatingCycleState: %s' , (self.heatingCycleState) )
             if currentTemp >= (target_temp + self.heater_sp_offset):
                 if self.heatingCycleState == 'INACTIVE':
                     self.state = OFF
@@ -337,19 +337,19 @@ class Heater(object):
                     # init ON state timer
                     self.lastStateChangeMillis = current_millis
                     self.state = ON             
-                    logger.warning("...temp low - INACTIVE - HEATER ON")
+                    logger.warning("..........temp low - currently INACTIVE - TURN HEATing cycle state ON")
 
             if self.heatingCycleState == 'ON':
                 if (current_millis - self.lastStateChangeMillis) >= self.heatOnMs:
                     self.heatingCycleState = 'OFF'
                     self.state = OFF
                     self.lastStateChangeMillis = current_millis
-                    logger.warning("...temp low - ON - HEATER OFF")
+                    logger.warning(".......... - currently ON - TURN HEATing cycle state OFF")
 
             if self.heatingCycleState == 'OFF':
                 if (current_millis - self.lastStateChangeMillis) >= self.heatOffMs:
                     self.heatingCycleState = 'INACTIVE'
-                    logger.warning("...temp low - OFF - HEATER INACTIVE")
+                    logger.warning(".......... - currently OFF - MAKE HEATing cycle state INACTIVE")
                     self.state = OFF
                     self.lastStateChangeMillis = current_millis
 
@@ -373,7 +373,7 @@ class Heater(object):
 
         # else:
             #print("..in d-off, no heat ctl")
-        logger.warning('Heater state: %s' , ('ON' if self.state else 'OFF') )
+        # logger.warning('Heater state: %s' , ('ON' if self.state else 'OFF') )
         # logger.warning('Heater state: %s' , (self.state) )
 
         return
