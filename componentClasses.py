@@ -310,40 +310,48 @@ class Heater(object):
         self.heatingCycleState = 'INACTIVE'
 
     def control(self, currentTemp, target_temp, d_state, current_millis):
-        logger.info('==Heat ctl==')
+        # logger.warning('==Heat ctl==')
         #calc new heater on t based on t gap
         # self.heatOnMs = ((target_temp - currentTemp) * 20 * 1000)  + cfg.getItemValueFromConfig('heatOnMs')
-        logger.info('==Heat tdelta on: %s',self.heatOnMs)
+        # logger.warning('==Heat tdelta on: %s',self.heatOnMs)
 
         #check for heater OFF hours #todo improve this
         #current_hour = datetime.datetime.now().hour
         #if current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
         if d_state == ON: #current_hour in cfg.getItemValueFromConfig('heat_off_hours'):  # l on and not hh:xx pm
             self.state = OFF
-            logger.info('..d on, in heat off hours - skipping lon heatctl')
+            # logger.warning('..d on, in heat off hours - skipping lon heatctl')
         else:  # d off here
-            logger.info('..light off..do heatctl')
-
+            # logger.warning('..light off..do heatctl')
+            logger.warning('self.heatingCycleState: %s' , (self.heatingCycleState) )
+            if currentTemp >= (target_temp + self.heater_sp_offset):
+                if self.heatingCycleState == 'INACTIVE':
+                    self.state = OFF
             # just trigger a defined ON period - force it to complete
             #then force a defined OFF period - force it to complete
             # is a on or off pulse active?
-            if currentTemp < target_temp + self.heater_sp_offset:
+            if currentTemp < (target_temp + self.heater_sp_offset):
                 if self.heatingCycleState == 'INACTIVE':
                     # start a cycle - ON first
-                    self.heatingCycleState == 'ON'
+                    self.heatingCycleState = 'ON'
                     # init ON state timer
                     self.lastStateChangeMillis = current_millis
                     self.state = ON             
+                    logger.warning("...temp low - INACTIVE - HEATER ON")
+
             if self.heatingCycleState == 'ON':
-                if current_millis - self.lastStateChangeMillis >= self.heatOnMs:# end of on bit
-                    self.heatingCycleState == 'OFF'
+                if (current_millis - self.lastStateChangeMillis) >= self.heatOnMs:
+                    self.heatingCycleState = 'OFF'
                     self.state = OFF
                     self.lastStateChangeMillis = current_millis
+                    logger.warning("...temp low - ON - HEATER OFF")
+
             if self.heatingCycleState == 'OFF':
-                if current_millis - self.lastStateChangeMillis >= self.heatOffMs:# end of on bit
-                    self.heatingCycleState == 'INACTIVE'
-                    # self.state = OFF
-                    # self.lastStateChangeMillis = current_millis
+                if (current_millis - self.lastStateChangeMillis) >= self.heatOffMs:
+                    self.heatingCycleState = 'INACTIVE'
+                    logger.warning("...temp low - OFF - HEATER INACTIVE")
+                    self.state = OFF
+                    self.lastStateChangeMillis = current_millis
 
             # if currentTemp >= target_temp + self.heater_sp_offset:  # if over temp immediately turn off
             #     self.state = OFF
@@ -365,7 +373,9 @@ class Heater(object):
 
         # else:
             #print("..in d-off, no heat ctl")
-        logger.info('Heater state: %s' , ('OFF' if self.state else 'ON') )
+        logger.warning('Heater state: %s' , ('ON' if self.state else 'OFF') )
+        # logger.warning('Heater state: %s' , (self.state) )
+
         return
 
 

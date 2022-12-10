@@ -21,8 +21,8 @@ hardware: RaspberryPi2
 heartBeatInterval: 30000
 heatExternalTDiffMs: 5000
 heatInternalTDiffMs: 5000
-heatOffMs: 120000
-heatOnMs: 15000
+heatOffMs: 90000
+heatOnMs: 45000
 heaterRelay: 5
 heater_sp_offset: 0
 id: s
