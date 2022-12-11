@@ -357,8 +357,8 @@ async def control():
         #                        lightState, current_millis, outsideTemp)
 
         ctl1.heater1.control(temperature, target_temp,
-                               lightState, current_millis)
-
+                               lightState, current_millis, outsideTemp)
+# 
 
         ctl1.fan1.control(current_millis)
         # switch relays according to State vars

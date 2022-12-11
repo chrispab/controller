@@ -309,7 +309,7 @@ class Heater(object):
         self.status = 0
         self.heatingCycleState = 'INACTIVE'
 
-    def control(self, currentTemp, target_temp, d_state, current_millis):
+    def control(self, currentTemp, target_temp, d_state, current_millis, outsideTemp):
         # logger.warning('==Heat ctl==')
         #calc new heater on t based on t gap
         # self.heatOnMs = ((target_temp - currentTemp) * 20 * 1000)  + cfg.getItemValueFromConfig('heatOnMs')
@@ -332,12 +332,32 @@ class Heater(object):
             # is a on or off pulse active?
             if currentTemp < (target_temp + self.heater_sp_offset):
                 if self.heatingCycleState == 'INACTIVE':
+            #! look at on period based on external temp
+                    #extra heater time based on diff from set point per 0.1 degree diff
+                    # internalDiffT = int( ((target_temp - currentTemp) * 10 * self.InternalTDiffMs) )
+                    #logger.warning('--INTERNAL DIFF extra time to add ms : %s',internalDiffT)
+                
+                    #extra  heater time based on external temp diff
+                    #do if external diff is >2 deg c
+                    if outsideTemp is None:
+                        outsideTemp = 10
+                    # externalDiffT = int( (target_temp - 2 - outsideTemp) * self.ExternalTDiffMs ) # milli secs per degree diff
+                    externalDiffT = int( (target_temp - outsideTemp) * self.ExternalTDiffMs ) # milli secs per degree diff
+
+                    #logger.warning('--EXTERNAL DIFF tdelta on to add  ms : %s',externalDiffT)
+
+                    # self.heatOnMs = cfg.getItemValueFromConfig('heatOnMs') + internalDiffT + externalDiffT#+ (float(outsideTemp)/50)
+                    self.heatOnMs = cfg.getItemValueFromConfig('heatOnMs') + externalDiffT#+ (float(outsideTemp)/50)
+
+                    logger.warning('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>    CALCULATED TOTAL delta ON  ms : %s',self.heatOnMs)
+            
                     # start a cycle - ON first
                     self.heatingCycleState = 'ON'
                     # init ON state timer
                     self.lastStateChangeMillis = current_millis
                     self.state = ON             
                     logger.warning("..........temp low - currently INACTIVE - TURN HEATing cycle state ON")
+
 
             if self.heatingCycleState == 'ON':
                 if (current_millis - self.lastStateChangeMillis) >= self.heatOnMs:

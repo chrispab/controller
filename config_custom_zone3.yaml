@@ -19,8 +19,8 @@ fan_off_t: 60000
 fan_on_t: 60000
 hardware: RaspberryPi2
 heartBeatInterval: 30000
-heatExternalTDiffMs: 5000
-heatInternalTDiffMs: 5000
+heatExternalTDiffMs: 600
+heatInternalTDiffMs: 1000
 heatOffMs: 120000
 heatOnMs: 30000
 heaterRelay: 5
@@ -48,13 +48,13 @@ systemMessage: system message
 systemUpTime: 00:00:00
 tempAlertHi: 30.0
 tempAlertLo: 13.0
-tempSPLOff: 13.6
+tempSPLOff: 13.5
 tempSPLOn: 23.2
 ventDisableHumi: 65
 ventDisableTemp: 21
 ventEnableHighSpeed: true
-ventOffDelta: 420000
-ventOnDelta: 15000
+ventOffDelta: 200000
+ventOnDelta: 50000
 ventPulseOnDelta: 20000
 ventRelay: 26
 vent_loff_sp_offset: 1.0
