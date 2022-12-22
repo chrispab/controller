@@ -140,18 +140,20 @@ def on_connect(MQTTClient, userdata, flags, rc):
     MQTTClient.subscribe(zoneName+"/high_setpoint/set")
 
 # when receiving a mqtt message do this;
+
+
 def on_message(MQTTClient, userdata, msg):
 
     global outsideTemp
 
-
-    message = str(msg.payload.decode("utf-8"))    
-    logger.warning("MMMMMM: subscibed message rxed topic : %s" % (msg.topic))    
-    logger.warning("MMMMMM: subscibed message rxed payload : %s" % (message))    
+    message = str(msg.payload.decode("utf-8"))
+    logger.warning("MMMMMM: subscibed message rxed topic : %s" % (msg.topic))
+    logger.warning("MMMMMM: subscibed message rxed payload : %s" % (message))
     # logger.warning("subscribed message rxed : %s" % str(message)) )
 
     zoneName = cfg.getItemValueFromConfig('zoneName')
-    logger.warning("MMMMMM: subscibed message rxedm, zone name used : %s" % (zoneName))    
+    logger.warning(
+        "MMMMMM: subscibed message rxedm, zone name used : %s" % (zoneName))
 
     # logger.warning(" MRMRMRMRMR- MQTT rx - MRMRMRMRMRMRMRMRMRMR")
 
@@ -183,7 +185,7 @@ def on_message(MQTTClient, userdata, msg):
             msg.payload)*1000)  # vent on time
         logger.warning(zoneName + "/vent_off_delta_secs/set!!!")
         cfg.writeConfigToFile()
-    
+
     # setpoints
     if msg.topic == (zoneName + "/low_setpoint/set"):
         cfg.setItemValueToConfig('tempSPLOff', float(msg.payload))
@@ -191,7 +193,8 @@ def on_message(MQTTClient, userdata, msg):
         cfg.writeConfigToFile()
 
     if msg.topic == (zoneName + "/high_setpoint/set"):
-        cfg.setItemValueToConfig('tempSPLOn', float(msg.payload))  # vent on time
+        cfg.setItemValueToConfig(
+            'tempSPLOn', float(msg.payload))  # vent on time
         logger.warning(zoneName + "/high_setpoint/set!!!")
         cfg.writeConfigToFile()
 
@@ -199,7 +202,6 @@ def on_message(MQTTClient, userdata, msg):
 def on_publish(mosq, obj, mid):
     print("mid: " + str(mid))
 # EMQTT
-
 
 
 #
@@ -280,9 +282,9 @@ async def control():
     logger.warning("----+++====  SENDING INITIAL MQTT ===+++++-------")
 
     lightState = ctl1.light.getLightState()
-    heaterState = ctl1.heater1.state
-    ventState = ctl1.vent1.state
-    fanState = ctl1.fan1.state
+    heaterState = ctl1.heater1.heaterState
+    ventState = ctl1.vent1.ventState
+    fanState = ctl1.fan1.fanState
     ventSpeedState = ctl1.vent1.speed_state
     humidity, temperature, sensorMessage = ctl1.sensor1.read()
 
@@ -335,9 +337,9 @@ async def control():
 
         # get all current states
         lightState = ctl1.light.getLightState()
-        heaterState = ctl1.heater1.state
-        ventState = ctl1.vent1.state
-        fanState = ctl1.fan1.state
+        heaterState = ctl1.heater1.heaterState
+        ventState = ctl1.vent1.ventState
+        fanState = ctl1.fan1.fanState
         ventSpeedState = ctl1.vent1.speed_state
 
         if lightState == ON:
@@ -352,21 +354,20 @@ async def control():
         ctl1.vent1.control(temperature, humidity, target_temp,
                            lightState, current_millis)
 
-
         # ctl1.heater1.controlv2(temperature, target_temp,
         #                        lightState, current_millis, outsideTemp)
 
         ctl1.heater1.control(temperature, target_temp,
-                               lightState, current_millis, outsideTemp)
-# 
+                             lightState, current_millis, outsideTemp)
+#
 
         ctl1.fan1.control(current_millis)
         # switch relays according to State vars
         ctl1.board1.switch_relays(
             heaterState, ventState, fanState, ventSpeedState)
 
-
-        anyChanges = teleService.pubMQTTReadings(MQTTClient, ctl1, humidity, temperature, lightState, heaterState, fanState, ventState, ventSpeedState)
+        anyChanges = teleService.pubMQTTReadings(
+            MQTTClient, ctl1, humidity, temperature, lightState, heaterState, fanState, ventState, ventSpeedState)
         # # only send mqtt messages for the changed i/o - not all as previous message
 
         if anyChanges:
@@ -387,10 +388,10 @@ async def control():
             logger.warning(
                 ">>>>>>>>>>>>>>>>>>>>>>>QQQQ Publishing MQTT messages...")
 
-
             logger.debug("======== start state changed main list ======")
             # check for alarm levels etc
-            MessageService.alertAbnormalTemps(temperature) # alert if abnormal temps
+            MessageService.alertAbnormalTemps(
+                temperature)  # alert if abnormal temps
 
             location = cfg.getItemValueFromConfig('locationDisplayName')
             # logger.debug("Location : %s" % (location))

@@ -48,10 +48,10 @@ systemMessage: system message
 systemUpTime: 00:00:00
 tempAlertHi: 30.0
 tempAlertLo: 13.0
-tempSPLOff: 13.5
+tempSPLOff: 13.4
 tempSPLOn: 23.2
-ventDisableHumi: 65
-ventDisableTemp: 21
+ventDisableHumi: 50
+ventDisableTemp: 19
 ventEnableHighSpeed: true
 ventOffDelta: 200000
 ventOnDelta: 50000
