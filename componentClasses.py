@@ -164,12 +164,29 @@ class Vent(object):
         self.ventEnableHighSpeed = cfg.getItemValueFromConfig(
             'ventEnableHighSpeed')
 
+        self.ventDark_status = 'inactive'
+        # self.ventDark_onDelta = cfg.getItemValueFromConfig(
+        #     'ventDark_onDelta')  # vent on time
+        # self.ventDark_offDelta = cfg.getItemValueFromConfig(
+        #     'ventDark_offDelta')  # vent on time
+        self.ventDarkOnDelta = cfg.getItemValueFromConfig(
+            'ventDarkOnDelta')  # vent on time
+        self.ventDarkOffDelta = cfg.getItemValueFromConfig(
+            'ventDarkOffDelta')  # vent on time
+        self.ventDark_ON_startTime = 0
+        self.ventDark_OFF_startTime = 0
+
     def control(self, currentTemp, currentHumi, target_temp, lightState, current_millis):
         logger.info('==Vent ctl==')
+        # refresh in case changed while running
         self.vent_on_delta = cfg.getItemValueFromConfig(
             'ventOnDelta')  # vent on time
         self.vent_off_delta = cfg.getItemValueFromConfig(
             'ventOffDelta')  # vent off time
+        self.ventDarkOnDelta = cfg.getItemValueFromConfig(
+            'ventDarkOnDelta')  # vent on time
+        self.ventDarkOffDelta = cfg.getItemValueFromConfig(
+            'ventDarkOffDelta')  # vent on time
         # self.speed_state = OFF  # lo speed
         # if (self.platformName == 'RaspberryPi2'):
         #     if (lightState == ON) and self.ventEnableHighSpeed:
@@ -179,12 +196,54 @@ class Vent(object):
 
         # loff vent/cooling
 
+        # if light off - do a minimal vent routine
+        if (lightState == OFF):
+            # self.ventState = OFF
+            # self.speed_state = OFF
+            if (self.ventDark_status == 'inactive'):
+                logger.warn('lets start the vent dark ON period')
+                # lets start the vent dark ON period
+                self.ventDark_status = ON
+                self.ventState = ON
+                self.speed_state = OFF
+                # set time it was switched ON
+                self.ventDark_ON_startTime = current_millis
+                return
+
+            # if at end of ON period
+            if ((self.ventDark_status == ON) and (current_millis > (self.ventDark_ON_startTime + self.ventDarkOnDelta))):
+                logger.warn('# now at end of ON cylce')
+                # now at end of ON cylce
+                # enable off period
+                self.ventDark_status = OFF
+                self.ventState = OFF
+                self.speed_state = OFF
+                # set time it was switched ON
+                self.ventDark_OFF_startTime = current_millis
+                return
+
+            # if at end of OFF period
+            if ((self.ventDark_status == OFF) and (current_millis > (self.ventDark_OFF_startTime + self.ventDarkOffDelta))):
+                logger.warn('now at end of OFF cylce')
+                # now at end of OFF cylce
+                # so - enable ON period
+                self.ventDark_status = ON
+                self.ventState = ON
+                self.speed_state = OFF
+                # set time it was switched ON
+                self.ventDark_ON_startTime = current_millis
+                return
+            return
+        else:  # mark light off period as inactive
+            logger.info('turn off all vent - in dark off settings')
+            self.ventDark_status = 'inactive'
+
         #! vent off if loff - temp/humi test mod TODO fix/finalise
         # and (currentHumi < self.ventDisableHumi):
-        if (lightState == OFF) and (currentTemp < self.ventDisableTemp):
-            self.ventState = OFF
-            self.speed_state = OFF
-            return
+        # if (lightState == OFF) and (currentTemp < self.ventDisableTemp):
+        #     self.ventState = OFF
+        #     self.speed_state = OFF
+        #     return
 
         # force hispeed if over temp and lon
         #!add some hysteresys here
@@ -213,13 +272,13 @@ class Vent(object):
         # if (currentTemp < ) and (lightState==ON): #attempt at hysteresis
         #     self.speed_state=OFF# lo speed
 
-        if ((lightState == OFF) and (currentTemp > target_temp + self.vent_loff_sp_offset)):
-            self.vent_override = ON
-            self.ventState = ON
-            #self.speed_state = ON
-            self.prev_vent_millis = current_millis  # retrigeer time period
-            logger.info(
-                "..VENT ON Loff - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
+        # if ((lightState == OFF) and (currentTemp > target_temp + self.vent_loff_sp_offset)):
+        #     self.vent_override = ON
+        #     self.ventState = ON
+        #     #self.speed_state = ON
+        #     self.prev_vent_millis = current_millis  # retrigeer time period
+        #     logger.info(
+        #         "..VENT ON Loff - HI TEMP OVERRIDE - (Re)Triggering cooling pulse")
 
         if ((lightState == ON) and (currentTemp > target_temp + self.vent_lon_sp_offset)):
             self.vent_override = ON

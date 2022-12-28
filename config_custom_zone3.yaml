@@ -50,6 +50,8 @@ tempAlertHi: 30.0
 tempAlertLo: 13.0
 tempSPLOff: 13.4
 tempSPLOn: 23.2
+ventDarkOnDelta: 20000
+ventDarkOffDelta: 500000
 ventDisableHumi: 50
 ventDisableTemp: 19
 ventEnableHighSpeed: true
