@@ -120,7 +120,7 @@ class TelemetryService(object):
     #! send telemetry periodically
     # long intervasl mqtt messages of low priority, e.g rssi, online, ventOn/Off Deltas etc
 
-    def pubMQTTTele(self, current_millis, MQTTClient):
+    def pubMQTTTele(self, current_millis, MQTTClient, ctl1):
         logger.info('==  publish MQTT Telemetry  ==')
 
         #check for first run
@@ -136,7 +136,9 @@ class TelemetryService(object):
             MQTTClient.publish(self.zoneName + "/low_setpoint",cfg.getItemValueFromConfig('tempSPLOff'))
             MQTTClient.publish(self.zoneName + "/high_setpoint",cfg.getItemValueFromConfig('tempSPLOn'))
 
-            
+            lightState = ctl1.light.getLightState()
+            MQTTClient.publish(self.zoneName+"/LightStatus", lightState)
+            logger.warning('===---> ' + self.zoneName + "/LightStatus : " )
             MQTTClient.publish(self.zoneName + "/version", VERSION)
 
 

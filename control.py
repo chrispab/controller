@@ -309,7 +309,7 @@ async def control():
         current_millis = ctl1.timer1.current_millis
 
         #! send telemetry periodically
-        teleService.pubMQTTTele(current_millis, MQTTClient)
+        teleService.pubMQTTTele(current_millis, MQTTClient, ctl1)
         teleService.pubMQTTHeartBeat(current_millis, MQTTClient)
 
         # if !MQTTClient.connected:
