@@ -136,6 +136,8 @@ def on_connect(MQTTClient, userdata, flags, rc):
     MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
     MQTTClient.subscribe(zoneName+"/vent_off_delta_secs/set")
     MQTTClient.subscribe(zoneName+"/vent_on_delta_secs/set")
+    MQTTClient.subscribe(zoneName+"/vent_off_delta_dark_secs/set")
+    MQTTClient.subscribe(zoneName+"/vent_on_delta_dark_secs/set")
     MQTTClient.subscribe(zoneName+"/low_setpoint/set")
     MQTTClient.subscribe(zoneName+"/high_setpoint/set")
 

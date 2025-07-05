@@ -1,1 +1,1 @@
-VERSION = "3.23 main: light state  tele"
+VERSION = "3.24 main: dark mode vent updates"
