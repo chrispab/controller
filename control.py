@@ -139,9 +139,8 @@ def on_connect(MQTTClient, userdata, flags, rc):
     MQTTClient.subscribe(zoneName+"/low_setpoint/set")
     MQTTClient.subscribe(zoneName+"/high_setpoint/set")
 
+
 # when receiving a mqtt message do this;
-
-
 def on_message(MQTTClient, userdata, msg):
 
     global outsideTemp
@@ -173,7 +172,7 @@ def on_message(MQTTClient, userdata, msg):
     logger.warning(zoneName + "/vent_on_delta_secs/set!!!" +
                    " ::: " + msg.topic+" :: "+message)
 
-    # vent deltas
+    # vent deltas when light on
     if msg.topic == (zoneName + "/vent_on_delta_secs/set"):
         # vent on time rxed in secs, convert to ms - used in code
         cfg.setItemValueToConfig('ventOnDelta', int(msg.payload)*1000)
@@ -185,6 +184,19 @@ def on_message(MQTTClient, userdata, msg):
             msg.payload)*1000)  # vent on time
         logger.warning(zoneName + "/vent_off_delta_secs/set!!!")
         cfg.writeConfigToFile()
+
+    # add vent dark deltas
+    # vent deltas when light off
+    if msg.topic == (zoneName + "/vent_off_delta_dark_secs/set"):
+        cfg.setItemValueToConfig('ventDarkOffDelta', int(msg.payload)*1000)
+        logger.warning(zoneName + "/vent_off_delta_dark_secs/set!!!")
+        cfg.writeConfigToFile()
+
+    if msg.topic == (zoneName + "/vent_on_delta_dark_secs/set"):
+        cfg.setItemValueToConfig('ventDarkOnDelta', int(msg.payload)*1000)
+        logger.warning(zoneName + "/vent_on_delta_dark_secs/set!!!")
+        cfg.writeConfigToFile()
+
 
     # setpoints
     if msg.topic == (zoneName + "/low_setpoint/set"):

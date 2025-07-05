@@ -187,21 +187,14 @@ class Vent(object):
             'ventDarkOnDelta')  # vent on time
         self.ventDarkOffDelta = cfg.getItemValueFromConfig(
             'ventDarkOffDelta')  # vent on time
-        # self.speed_state = OFF  # lo speed
-        # if (self.platformName == 'RaspberryPi2'):
-        #     if (lightState == ON) and self.ventEnableHighSpeed:
-        #         self.speed_state = ON  # high speed
-        #     else:
-        #         self.speed_state = OFF  # lo speed
 
         # loff vent/cooling
-
         # if light off - do a minimal vent routine
         if (lightState == OFF):
             # self.ventState = OFF
             # self.speed_state = OFF
             if (self.ventDark_status == 'inactive'):
-                logger.warn('lets start the vent dark ON period')
+                logger.warning('--- lets start the vent dark ON period')
                 # lets start the vent dark ON period
                 self.ventDark_status = ON
                 self.ventState = ON
@@ -212,7 +205,7 @@ class Vent(object):
 
             # if at end of ON period
             if ((self.ventDark_status == ON) and (current_millis > (self.ventDark_ON_startTime + self.ventDarkOnDelta))):
-                logger.warn('# now at end of ON cylce')
+                logger.warning('--- now at end of ON cylce')
                 # now at end of ON cylce
                 # enable off period
                 self.ventDark_status = OFF
@@ -224,7 +217,7 @@ class Vent(object):
 
             # if at end of OFF period
             if ((self.ventDark_status == OFF) and (current_millis > (self.ventDark_OFF_startTime + self.ventDarkOffDelta))):
-                logger.warn('now at end of OFF cylce')
+                logger.warning('--- now at end of OFF cylce')
                 # now at end of OFF cylce
                 # so - enable ON period
                 self.ventDark_status = ON
@@ -235,7 +228,7 @@ class Vent(object):
                 return
             return
         else:  # mark light off period as inactive
-            logger.info('turn off all vent - in dark off settings')
+            logger.info('--- turn off all vent - in dark off settings')
             self.ventDark_status = 'inactive'
 
         #! vent off if loff - temp/humi test mod TODO fix/finalise
