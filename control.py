@@ -126,7 +126,7 @@ emailObj = MyEmail()
 teleService = TelemetryService()
 MessageService = MessageService()
 
-
+ # MQTTClient.subscribe
 def on_connect(MQTTClient, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     logger.warning(" - MQTT CONNECTED - MMMMM")
