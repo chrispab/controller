@@ -40,13 +40,14 @@ import logging
 # logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
 # logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 #
-logging.basicConfig(level=logging.WARNING)
 # logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 # logging.basicConfig(format='[%(filename)s:%(lineno)s - %(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 # logging.basicConfig(format='[%(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.WARNING)
 # logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s',filename='myenvctl.log', filemode='w', level=logging.DEBUG)
 # logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 # logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
+# logging.basicConfig(level=logging.INFO)  # set to INFO for normal operation, DEBUG for debug
 
 # ===================general imports=====================================
 

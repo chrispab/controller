@@ -310,6 +310,29 @@ class Logger(object):
         current_millis,
         current_time,
     ):
+        """
+        Checks for changes in environmental and device states, updates internal state,
+        and triggers database updates if changes are detected or if a minimum interval has passed.
+
+        Args:
+            temperature (float): The current temperature reading.
+            humidity (float): The current humidity reading.
+            vent_state (Any): The current state of the vent.
+            fan_state (Any): The current state of the fan.
+            heater_state (Any): The current state of the heater.
+            vent_speed_state (Any): The current speed/state of the vent.
+            light_state (Any): The current state of the light.
+            current_millis (int): The current time in milliseconds.
+            current_time (Any): The current time (format depends on implementation).
+
+        Returns:
+            bool: True if a significant state change was detected or a periodic update was triggered, False otherwise.
+
+        Side Effects:
+            - Updates internal state variables to reflect the latest readings.
+            - Calls `dataHasChangedUpdateDb()` to persist changes if necessary.
+            - Logs state changes and periodic updates.
+        """
         # Capture previous states
         old_states = {
             "temperature": self.temperature,
@@ -390,6 +413,22 @@ class Logger(object):
 
 
     def dataHasChangedUpdateDb(self):
+        """
+        Handles the process of updating local and remote databases when data readings have changed.
+
+        This method performs the following actions:
+            - Logs a warning indicating that readings have changed and databases are being updated.
+            - Writes the current data to a CSV file (twice).
+            - Writes the collected sample data to the local database.
+            - Updates the central database and logs the duration of this operation.
+
+        Note:
+            The method currently returns immediately and does not execute its logic.
+            The reason for writing to CSV twice is unclear and may be intentional or a bug.
+
+        Returns:
+            None
+        """
         return
         # Log that readings have changed and databases are being updated
         logger.warning("Readings have changed - updating local and remote dbs")
@@ -409,6 +448,20 @@ class Logger(object):
         # return
 
     def _write_to_CSV(self):
+        """
+        Prepares a list of sensor and actuator state data for CSV logging.
+
+        The data includes:
+            - Current timestamp (rounded to milliseconds)
+            - Temperature reading
+            - Humidity reading
+            - Heater state (0 for OFF, 1 for ON)
+            - Vent state (0 for OFF, 1 for ON with low speed, 2 for ON with high speed)
+            - Fan state (0 for OFF, 1 for ON)
+
+        Returns:
+            list: A list containing the formatted data for CSV writing.
+        """
 
         logger.info("=== _write_to_CSV data record ===")
         data = ["time", "temp", "humi", "heaterstate", "ventstate", "fanstate"]

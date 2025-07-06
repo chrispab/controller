@@ -37,6 +37,28 @@ class TelemetryService(object):
         ventState,
         ventSpeedState,
     ):
+        """
+        Publishes MQTT messages for zone telemetry readings, but only for values that have changed.
+
+        This method checks for changes in various telemetry readings (temperature, humidity, fan state, vent state, vent speed, vent percent, heater state, and light state)
+        using the provided controller's state monitor. If a change is detected in any of these readings, the corresponding MQTT message is published to the appropriate topic.
+        The method returns a boolean indicating whether any changes were detected and published.
+
+        Args:
+            MQTTClient: The MQTT client instance used to publish messages.
+            ctl1: The controller instance containing the state monitor for change detection.
+            humidity (float): The current humidity reading.
+            temperature (float): The current temperature reading.
+            lightState (int): The current state of the light.
+            heaterState (int): The current state of the heater.
+            fanState (int): The current state of the fan.
+            ventState (int): The current state of the vent.
+            ventSpeedState (int): The current speed state of the vent.
+
+        Returns:
+            bool: True if any telemetry readings changed and were published, False otherwise.
+        """
+        logger.info("==  publish MQTT Readings  ==")
         # only send mqtt messages for the changed i/o - not all as previous message
         onlyPublishMQTTOnChange = cfg.getItemValueFromConfig("onlyPublishMQTTOnChange")
         anyChanges = False
@@ -48,9 +70,7 @@ class TelemetryService(object):
             if temperatureChanged:
                 MQTTClient.publish(self.zoneName + "/TemperatureStatus", temperature)
                 MQTTClient.publish(self.zoneName + "/HumidityStatus", humidity)
-                logger.warning(
-                    "++++++++++++++++  Temp change MQTT published temp aand humi"
-                )
+                logger.debug("Temp change MQTT published temp and humi")
                 anyChanges = True
 
             fanChanged = ctl1.stateMonitor.checkForChangeInFanState(fanState)
@@ -125,15 +145,15 @@ class TelemetryService(object):
 
             MQTTClient.publish(self.zoneName + "/HeartBeat", self.ackMessage)
 
-            logger.warning("===---> MQTT published HeartBeat")
-            logger.warning("===---> " + self.zoneName + "/HeartBeat:" + self.ackMessage)
-            logger.warning("===---> " + self.zoneName + "/LWT:" + "Online")
+            logger.warning(self.zoneName + " MQTT published HeartBeat")
+            logger.warning(self.zoneName + "/HeartBeat:" + self.ackMessage)
+            logger.warning(self.zoneName + "/LWT:" + "Online")
             self.lastMqttPublishHeartBeatMillis = current_millis
             # anyChanges = True
 
+
     #! send telemetry periodically
     # long intervasl mqtt messages of low priority, e.g rssi, online, ventOn/Off Deltas etc
-
     def pubMQTTTele(self, current_millis, MQTTClient, ctl1):
         logger.info("==  publish MQTT Telemetry  ==")
 
