@@ -50,6 +50,7 @@ logging.basicConfig(level=logging.WARNING)
 # ===================general imports=====================================
 
 #! import services
+from websocket_handler import WebSocketManager
 
 
 MQTTBroker = "192.168.0.100"
@@ -187,7 +188,6 @@ def on_message(MQTTClient, userdata, msg):
         logger.warning(zoneName + "/vent_off_delta_secs/set!!!")
         cfg.writeConfigToFile()
 
-    # add vent dark deltas
     # vent deltas when light off
     if msg.topic == (zoneName + "/vent_off_delta_dark_secs/set"):
         cfg.setItemValueToConfig('ventDarkOffDelta', int(msg.payload)*1000)
@@ -221,17 +221,7 @@ def on_publish(mosq, obj, mid):
 #
 async def control():
 
-    # global systemUpTime
-    # global processUptime
-    # global systemMessage
-    # global controllerMessage
-    # global miscMessage
     global emailzone
-    # global outsideTemp
-
-    # logger.warning("MQTT CANNOT CONNECT!!!")
-
-    # print("MQTT CANNOT CONNECT!!!")
 
     try:
         MQTTClient = mqtt.Client()
@@ -246,10 +236,6 @@ async def control():
         MQTTClient.will_set(zoneName+"/LWT", "Offline", 0, False)
 
         MQTTClient.connect(MQTTBroker, 1883, 60)
-
-        # MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
-        # MQTTClient.subscribe(zoneName+"/vent_off_delta_secs/set")
-        # MQTTClient.subscribe(zoneName+"/vent_on_delta_secs/set")
 
         MQTTClient.loop_start()
     except:
@@ -286,8 +272,6 @@ async def control():
     emailObj.send("Zone " + zoneNumber + " " + emailzone +
                   location + ' - Controller Process Started', message)
 
-    # # Your IFTTT with event name, and json parameters (values)
-    # postIFTTT("zone_alert", zoneName, "--ReasoN--", "==DatA==")
 
     maxWSDisplayRows = 5  # ! TODO FIX THIS - display issue
     currentWSDisplayRow = 1
@@ -325,9 +309,6 @@ async def control():
         #! send telemetry periodically
         teleService.pubMQTTTele(current_millis, MQTTClient, ctl1)
         teleService.pubMQTTHeartBeat(current_millis, MQTTClient)
-
-        # if !MQTTClient.connected:
-        #     MQTTClient.connect(MQTTBroker, 1883, 60)
 
         # call to systemd watchdog to hold off restart
         ctl1.timer1.holdOffWatchdog(current_millis)
@@ -441,103 +422,115 @@ async def control():
                 "DATA to send:%s", currentStatusString)
 
 
-wsClients = set()
-
+# wsClients = set()
+ws_manager = WebSocketManager()
 
 async def txwebsocket(message):
-    removeMe = False
-    for clientConn in wsClients:
-        logger.warning("DDDD Sending DATA SENT to websocket(s)")
-        # logger.warning(clientConn)
-        try:
-            if clientConn.open:
-                await asyncio.wait([clientConn.send(message)])
-                # await clientConn.send(message)
+    await ws_manager.broadcast(message)
 
-                logger.info("EEEE message sent to ws Client EEEE")
-            else:  # websockets.ConnectionClosed:
-                logger.warning("UUUU1 unregging a wsconn UUUU")
-                removeMe = clientConn
-                # await unregister(clientConn)
-                # wsClients.remove(clientConn)
-        except:
-            logger.warning("UUUU2 unregging a wsconn UUUU")
-            # await unregister(clientConn)
-            removeMe = clientConn
+# Remove old wsClients, txwebsocket, register, unregister, MyWSHandler
 
-    # if wsocket marked for removal
-    if removeMe:
-        wsClients.remove(removeMe)
-        # await unregister(clientConn)
-    return
+# async def txwebsocket(message):
+#     removeMe = False
+#     for clientConn in wsClients:
+#         logger.warning("DDDD Sending DATA SENT to websocket(s)")
+#         # logger.warning(clientConn)
+#         try:
+#             if clientConn.open:
+#                 await asyncio.wait([clientConn.send(message)])
+#                 # await clientConn.send(message)
 
+#                 logger.info("EEEE message sent to ws Client EEEE")
+#             else:  # websockets.ConnectionClosed:
+#                 logger.warning("UUUU1 unregging a wsconn UUUU")
+#                 removeMe = clientConn
+#                 # await unregister(clientConn)
+#                 # wsClients.remove(clientConn)
+#         except:
+#             logger.warning("UUUU2 unregging a wsconn UUUU")
+#             # await unregister(clientConn)
+#             removeMe = clientConn
 
-async def register(websocket):
-    wsClients.add(websocket)
-
-
-async def unregister(websocket):
-    wsClients.remove(websocket)
+#     # if wsocket marked for removal
+#     if removeMe:
+#         wsClients.remove(removeMe)
+#         # await unregister(clientConn)
+#     return
 
 
-async def MyWSHandler(websocket, path):
-    wsClients.add(websocket)
+# async def register(websocket):
+#     wsClients.add(websocket)
 
-    logger.warning("CCCCCC CONNECTION MADE CCCCCC")
-    # now = str(datetime.datetime.now())
-    initialMessage = "websocket server connected from " + \
-        cfg.getItemValueFromConfig('zoneName')
 
-    initialMessage = "Version : " + VERSION
-    await websocket.send(initialMessage)
-    # header = "Timestamp               T     H     H  V  F  S  L  VT"
-    await websocket.send(ctl1.stateMonitor.getDisplayHeaderString())
+# async def unregister(websocket):
+#     wsClients.remove(websocket)
 
-    # try ping socket # if response cont
-    # if no response remove websocket from set
-    while True:
-        try:
-            msg = await asyncio.wait_for(websocket.recv(), timeout=20)
-            # logger.warning("WS RX message : %s", msg)
-            logger.warning("WS RX message")
-        except asyncio.TimeoutError:
-            # No data in 20 seconds, check the connection.
-            try:
-                logger.warning(
-                    "No data in 20 secs from client- checking connection")
-                # await unregister(websocket)
-                # break
-                pong_waiter = await websocket.ping()
-                await asyncio.wait_for(pong_waiter, timeout=10)
-                logger.warning("PPPPP ping rxed - client aliveb PPPP")
-            except:  # asyncio.TimeoutError:
-                # No response to ping in 10 seconds, disconnect.
-                logger.warning(
-                    "RRRR no ping response - Remove dead client websocet RRRR")
 
-                await unregister(websocket)
-                break
-        else:
-            logger.warning(
-                "msg RXED from client - still connected do nothing")
+# async def MyWSHandler(websocket, path):
+#     wsClients.add(websocket)
 
-        # do something with msg?
-    logger.warning("DDDDD drop our of onConnect handler DDDDDD")
+#     logger.warning("CCCCCC CONNECTION MADE CCCCCC")
+#     # now = str(datetime.datetime.now())
+#     initialMessage = "websocket server connected from " + \
+#         cfg.getItemValueFromConfig('zoneName')
+
+#     initialMessage = "Version : " + VERSION
+#     await websocket.send(initialMessage)
+#     # header = "Timestamp               T     H     H  V  F  S  L  VT"
+#     await websocket.send(ctl1.stateMonitor.getDisplayHeaderString())
+
+#     # try ping socket # if response cont
+#     # if no response remove websocket from set
+#     while True:
+#         try:
+#             msg = await asyncio.wait_for(websocket.recv(), timeout=20)
+#             # logger.warning("WS RX message : %s", msg)
+#             logger.warning("WS RX message")
+#         except asyncio.TimeoutError:
+#             # No data in 20 seconds, check the connection.
+#             try:
+#                 logger.warning(
+#                     "No data in 20 secs from client- checking connection")
+#                 # await unregister(websocket)
+#                 # break
+#                 pong_waiter = await websocket.ping()
+#                 await asyncio.wait_for(pong_waiter, timeout=10)
+#                 logger.warning("PPPPP ping rxed - client aliveb PPPP")
+#             except:  # asyncio.TimeoutError:
+#                 # No response to ping in 10 seconds, disconnect.
+#                 logger.warning(
+#                     "RRRR no ping response - Remove dead client websocet RRRR")
+
+#                 await unregister(websocket)
+#                 break
+#         else:
+#             logger.warning(
+#                 "msg RXED from client - still connected do nothing")
+
+#         # do something with msg?
+#     logger.warning("DDDDD drop our of onConnect handler DDDDDD")
 
 
 async def main():
-    start_server = websockets.serve(MyWSHandler, '', 5678)
+    import websockets
+    start_server = websockets.serve(
+        lambda ws, path: ws_manager.handler(ws, path, ctl1, cfg, VERSION), '', 5678
+    )
+    # start_server = websockets.serve(MyWSHandler, '', 5678)
     # mywebapp= web.run_app(app)
 
     server = web.Server(serveConsolePage)
     await asyncio.get_event_loop().create_server(server, "", 8081)
-    print("======= Serving on http://127.0.0.1:8080/ ======")
+    print("======= Serving on http://127.0.0.1:8081/ ======")
     # pause here for very long time by serving HTTP requests and
     # waiting for keyboard interruption
     # await asyncio.sleep(100*3600)
 
+    # tasks = [control(), start_server]
+    # # web.run_app(app)
+    # await asyncio.gather(*tasks)
+
     tasks = [control(), start_server]
-    # web.run_app(app)
     await asyncio.gather(*tasks)
 
 
