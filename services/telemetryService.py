@@ -132,6 +132,11 @@ class TelemetryService(object):
                                int(cfg.getItemValueFromConfig('ventOnDelta')/1000))
             MQTTClient.publish(self.zoneName + "/vent_off_delta_secs",
                                int(cfg.getItemValueFromConfig('ventOffDelta')/1000))
+            # repeat for vent_on_delta_dark_secs and vent_off_delta_dark_secs
+            MQTTClient.publish(self.zoneName + "/vent_on_delta_dark_secs",
+                               int(cfg.getItemValueFromConfig('ventDarkOnDelta')/1000))
+            MQTTClient.publish(self.zoneName + "/vent_off_delta_dark_secs",
+                               int(cfg.getItemValueFromConfig('ventDarkOffDelta')/1000))
 
             MQTTClient.publish(self.zoneName + "/low_setpoint",cfg.getItemValueFromConfig('tempSPLOff'))
             MQTTClient.publish(self.zoneName + "/high_setpoint",cfg.getItemValueFromConfig('tempSPLOn'))
@@ -146,6 +151,13 @@ class TelemetryService(object):
                            str(int(cfg.getItemValueFromConfig('ventOnDelta')/1000)))
             logger.warning('===---> ' + self.zoneName + "/vent_off_delta_secs : " +
                            str(int(cfg.getItemValueFromConfig('ventOffDelta')/1000)))
+            
+            logger.warning('===---> ' + self.zoneName + "/vent_on_delta_dark_secs : " +
+                           str(int(cfg.getItemValueFromConfig('ventDarkOnDelta')/1000)))
+            logger.warning('===---> ' + self.zoneName + "/vent_off_delta_dark_secs : " +
+                           str(int(cfg.getItemValueFromConfig('ventDarkOffDelta')/1000)))
+
+
             # logger.warning('==-> ' + zone + "/LWT:" + "Online")
             logger.warning('===---> ' + self.zoneName + "/version : " + VERSION)
 

@@ -1,1 +1,1 @@
-VERSION = "3.24 main: dark mode vent updates"
+VERSION = "3.25 refactor1: refactor websockets"

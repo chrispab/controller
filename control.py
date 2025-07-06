@@ -25,7 +25,7 @@ import asyncio
 import paho.mqtt.publish as publish
 import paho.mqtt.client as mqtt
 import socket  # to get hostname
-import sys    # for stdout print
+import sys  # for stdout print
 import datetime as dt
 import yaml
 from datetime import timedelta
@@ -34,6 +34,7 @@ import datetime
 import csv
 from version import VERSION
 import logging
+
 # logger options
 ###############
 # logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
@@ -64,10 +65,10 @@ logger = logging.getLogger(__name__)
 # my singleton objects
 
 
-OFF = cfg.getItemValueFromConfig('RelayOff')  # state for relay OFF
-ON = cfg.getItemValueFromConfig('RelayOn')  # state for on
+OFF = cfg.getItemValueFromConfig("RelayOff")  # state for relay OFF
+ON = cfg.getItemValueFromConfig("RelayOn")  # state for on
 
-path = cfg.getItemValueFromConfig('dataPath')
+path = cfg.getItemValueFromConfig("dataPath")
 
 processUptime = 0
 systemMessage = 0
@@ -96,8 +97,7 @@ def execAndTimeFunc(func):
     func()
     time2 = datetime.datetime.now()
     duration = time2 - time1
-    logger.debug("execute and time a function: %s, duration: %s" %
-                 (func, duration))
+    logger.debug("execute and time a function: %s, duration: %s" % (func, duration))
 
 
 class Controller(object):
@@ -127,20 +127,21 @@ emailObj = MyEmail()
 teleService = TelemetryService()
 MessageService = MessageService()
 
- # MQTTClient.subscribe
+
+# MQTTClient.subscribe
 def on_connect(MQTTClient, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
+    print("Connected with result code " + str(rc))
     logger.warning(" - MQTT CONNECTED - MMMMM")
     # MQTTClient.subscribe(sub_topic)
-    zoneName = cfg.getItemValueFromConfig('zoneName')
+    zoneName = cfg.getItemValueFromConfig("zoneName")
 
     MQTTClient.subscribe("Outside_Sensor/tele/SENSOR")
-    MQTTClient.subscribe(zoneName+"/vent_off_delta_secs/set")
-    MQTTClient.subscribe(zoneName+"/vent_on_delta_secs/set")
-    MQTTClient.subscribe(zoneName+"/vent_off_delta_dark_secs/set")
-    MQTTClient.subscribe(zoneName+"/vent_on_delta_dark_secs/set")
-    MQTTClient.subscribe(zoneName+"/low_setpoint/set")
-    MQTTClient.subscribe(zoneName+"/high_setpoint/set")
+    MQTTClient.subscribe(zoneName + "/vent_off_delta_secs/set")
+    MQTTClient.subscribe(zoneName + "/vent_on_delta_secs/set")
+    MQTTClient.subscribe(zoneName + "/vent_off_delta_dark_secs/set")
+    MQTTClient.subscribe(zoneName + "/vent_on_delta_dark_secs/set")
+    MQTTClient.subscribe(zoneName + "/low_setpoint/set")
+    MQTTClient.subscribe(zoneName + "/high_setpoint/set")
 
 
 # when receiving a mqtt message do this;
@@ -153,68 +154,69 @@ def on_message(MQTTClient, userdata, msg):
     logger.warning("MMMMMM: subscibed message rxed payload : %s" % (message))
     # logger.warning("subscribed message rxed : %s" % str(message)) )
 
-    zoneName = cfg.getItemValueFromConfig('zoneName')
-    logger.warning(
-        "MMMMMM: subscibed message rxedm, zone name used : %s" % (zoneName))
+    zoneName = cfg.getItemValueFromConfig("zoneName")
+    logger.warning("MMMMMM: subscibed message rxedm, zone name used : %s" % (zoneName))
 
     # logger.warning(" MRMRMRMRMR- MQTT rx - MRMRMRMRMRMRMRMRMRMR")
 
     # logger.warning("sub message rxed : %s" % str(message.payload.decode("utf-8")) )
     data = json.loads(message)
-    outSideTempSensor = cfg.getItemValueFromConfig('outSideTempSensor')
+    outSideTempSensor = cfg.getItemValueFromConfig("outSideTempSensor")
     try:
-        outsideTemp = data[outSideTempSensor]['Temperature']
+        outsideTemp = data[outSideTempSensor]["Temperature"]
     except:
-        logger.error(
-            "<====---- outside temp mqtt in temp error redoing payload")
+        logger.error("<====---- outside temp mqtt in temp error redoing payload")
 
     logger.warning(
-        "<====---- subscibed message rxed from outside sensor: %s" % (outsideTemp))
+        "<====---- subscibed message rxed from outside sensor: %s" % (outsideTemp)
+    )
 
-    logger.warning(msg.topic+" :: "+message)
-    logger.warning(zoneName + "/vent_on_delta_secs/set!!!" +
-                   " ::: " + msg.topic+" :: "+message)
+    logger.warning(msg.topic + " :: " + message)
+    logger.warning(
+        zoneName + "/vent_on_delta_secs/set!!!" + " ::: " + msg.topic + " :: " + message
+    )
 
     # vent deltas when light on
     if msg.topic == (zoneName + "/vent_on_delta_secs/set"):
         # vent on time rxed in secs, convert to ms - used in code
-        cfg.setItemValueToConfig('ventOnDelta', int(msg.payload)*1000)
+        cfg.setItemValueToConfig("ventOnDelta", int(msg.payload) * 1000)
         logger.warning(zoneName + "/vent_on_delta_secs/set!!!")
         cfg.writeConfigToFile()
 
     if msg.topic == (zoneName + "/vent_off_delta_secs/set"):
-        cfg.setItemValueToConfig('ventOffDelta', int(
-            msg.payload)*1000)  # vent on time
+        cfg.setItemValueToConfig(
+            "ventOffDelta", int(msg.payload) * 1000
+        )  # vent on time
         logger.warning(zoneName + "/vent_off_delta_secs/set!!!")
         cfg.writeConfigToFile()
 
     # vent deltas when light off
     if msg.topic == (zoneName + "/vent_off_delta_dark_secs/set"):
-        cfg.setItemValueToConfig('ventDarkOffDelta', int(msg.payload)*1000)
+        cfg.setItemValueToConfig("ventDarkOffDelta", int(msg.payload) * 1000)
         logger.warning(zoneName + "/vent_off_delta_dark_secs/set!!!")
         cfg.writeConfigToFile()
 
     if msg.topic == (zoneName + "/vent_on_delta_dark_secs/set"):
-        cfg.setItemValueToConfig('ventDarkOnDelta', int(msg.payload)*1000)
+        cfg.setItemValueToConfig("ventDarkOnDelta", int(msg.payload) * 1000)
         logger.warning(zoneName + "/vent_on_delta_dark_secs/set!!!")
         cfg.writeConfigToFile()
 
-
     # setpoints
     if msg.topic == (zoneName + "/low_setpoint/set"):
-        cfg.setItemValueToConfig('tempSPLOff', float(msg.payload))
+        cfg.setItemValueToConfig("tempSPLOff", float(msg.payload))
         logger.warning(zoneName + "/low_setpoint/set!!!")
         cfg.writeConfigToFile()
 
     if msg.topic == (zoneName + "/high_setpoint/set"):
-        cfg.setItemValueToConfig(
-            'tempSPLOn', float(msg.payload))  # vent on time
+        cfg.setItemValueToConfig("tempSPLOn", float(msg.payload))  # vent on time
         logger.warning(zoneName + "/high_setpoint/set!!!")
         cfg.writeConfigToFile()
 
 
 def on_publish(mosq, obj, mid):
     print("mid: " + str(mid))
+
+
 # EMQTT
 
 
@@ -232,8 +234,8 @@ async def control():
     MQTTClient.on_message = on_message
     try:
         #    MQTTClient.will_set(zoneName + "/LWT", "Offline", 0, True)
-        zoneName = cfg.getItemValueFromConfig('zoneName')
-        MQTTClient.will_set(zoneName+"/LWT", "Offline", 0, False)
+        zoneName = cfg.getItemValueFromConfig("zoneName")
+        MQTTClient.will_set(zoneName + "/LWT", "Offline", 0, False)
 
         MQTTClient.connect(MQTTBroker, 1883, 60)
 
@@ -248,30 +250,35 @@ async def control():
     # start_time = time.time()
     humidity, temperature, sensorMessage = ctl1.sensor1.read()
 
-    zoneName = cfg.getItemValueFromConfig('zoneName')
-    zoneNumber = cfg.getItemValueFromConfig('zoneNumber')
-    location = cfg.getItemValueFromConfig('locationDisplayName')
-    mqttPublishIntervalMillis = cfg.getItemValueFromConfig(
-        'mqttPublishIntervalMillis')
+    zoneName = cfg.getItemValueFromConfig("zoneName")
+    zoneNumber = cfg.getItemValueFromConfig("zoneNumber")
+    location = cfg.getItemValueFromConfig("locationDisplayName")
+    mqttPublishIntervalMillis = cfg.getItemValueFromConfig("mqttPublishIntervalMillis")
     # mqttPublishTeleIntervalMillis = cfg.getItemValueFromConfig('mqttPublishTeleIntervalMillis')
     lastMqttPublishHeartBeatMillis = ctl1.timer1.current_millis - 50000
     # lastMqttPublishTeleMillis = ctl1.timer1.current_millis - 100000
 
-    ackMessage = cfg.getItemValueFromConfig('ackMessage')
+    ackMessage = cfg.getItemValueFromConfig("ackMessage")
 
-#    MQTTClient.will_set(zoneName + "/LWT", "Offline", 0, True)
+    #    MQTTClient.will_set(zoneName + "/LWT", "Offline", 0, True)
     # publish(topic, payload=None, qos=0, retain=False)
     MQTTClient.publish(zoneName + "/LWT", "Online", 0, True)
 
     message = zoneName
     # if just booted
     if ctl1.timer1.secsSinceBoot() < 120:
-        emailzone = "Zone " + zoneNumber + ' REBOOTED '
+        emailzone = "Zone " + zoneNumber + " REBOOTED "
 
     # emailMe.sendemail( zoneName + ' ' + location + ' - Process Started', message)
-    emailObj.send("Zone " + zoneNumber + " " + emailzone +
-                  location + ' - Controller Process Started', message)
-
+    emailObj.send(
+        "Zone "
+        + zoneNumber
+        + " "
+        + emailzone
+        + location
+        + " - Controller Process Started",
+        message,
+    )
 
     maxWSDisplayRows = 5  # ! TODO FIX THIS - display issue
     currentWSDisplayRow = 1
@@ -286,18 +293,18 @@ async def control():
     ventSpeedState = ctl1.vent1.speed_state
     humidity, temperature, sensorMessage = ctl1.sensor1.read()
 
-    MQTTClient.publish(zoneName+"/HeartBeat", ackMessage)
-    MQTTClient.publish(zoneName+"/TemperatureStatus", temperature)
-    MQTTClient.publish(zoneName+"/HumidityStatus", humidity)
-    MQTTClient.publish(zoneName+"/FanStatus", fanState)
-    MQTTClient.publish(zoneName+"/VentStatus", ventState)
-    MQTTClient.publish(zoneName+"/HeaterStatus", heaterState)
-    MQTTClient.publish(zoneName+"/VentSpeedStatus", ventSpeedState)
-    MQTTClient.publish(zoneName+"/VentValue", ventState + ventSpeedState)
-    ventPercent = ventState*((ventSpeedState+1)*50)
-    MQTTClient.publish(zoneName+"/VentPercent", ventPercent)
+    MQTTClient.publish(zoneName + "/HeartBeat", ackMessage)
+    MQTTClient.publish(zoneName + "/TemperatureStatus", temperature)
+    MQTTClient.publish(zoneName + "/HumidityStatus", humidity)
+    MQTTClient.publish(zoneName + "/FanStatus", fanState)
+    MQTTClient.publish(zoneName + "/VentStatus", ventState)
+    MQTTClient.publish(zoneName + "/HeaterStatus", heaterState)
+    MQTTClient.publish(zoneName + "/VentSpeedStatus", ventSpeedState)
+    MQTTClient.publish(zoneName + "/VentValue", ventState + ventSpeedState)
+    ventPercent = ventState * ((ventSpeedState + 1) * 50)
+    MQTTClient.publish(zoneName + "/VentPercent", ventPercent)
 
-    MQTTClient.publish(zoneName+"/LightStatus", lightState)
+    MQTTClient.publish(zoneName + "/LightStatus", lightState)
     # MQTTClient.publish(zoneName+"/VentPercent", ventPercent)
 
     while 1:
@@ -323,8 +330,14 @@ async def control():
 
         humidity, temperature, sensorMessage = ctl1.sensor1.read()
         if sensorMessage:
-            subject = "Zone " + zoneNumber + " " + emailzone + \
-                location + " - : bad sensor reads  - PowerCycle"
+            subject = (
+                "Zone "
+                + zoneNumber
+                + " "
+                + emailzone
+                + location
+                + " - : bad sensor reads  - PowerCycle"
+            )
             emailObj.send(subject, sensorMessage)
 
         # endT = time.time()
@@ -338,33 +351,43 @@ async def control():
         ventSpeedState = ctl1.vent1.speed_state
 
         if lightState == ON:
-            logger.info('=LOn=')
-            target_temp = cfg.getItemValueFromConfig('tempSPLOn')
+            logger.info("=LOn=")
+            target_temp = cfg.getItemValueFromConfig("tempSPLOn")
         else:  # off
-            logger.info('=LOff=')
-            target_temp = cfg.getItemValueFromConfig('tempSPLOff')
+            logger.info("=LOff=")
+            target_temp = cfg.getItemValueFromConfig("tempSPLOff")
         logger.debug(target_temp)
 
         ctl1.fan1.control(current_millis)
-        ctl1.vent1.control(temperature, humidity, target_temp,
-                           lightState, current_millis)
+        ctl1.vent1.control(
+            temperature, humidity, target_temp, lightState, current_millis
+        )
 
         # ctl1.heater1.controlv2(temperature, target_temp,
         #                        lightState, current_millis, outsideTemp)
 
-        ctl1.heater1.control(temperature, target_temp,
-                             lightState, current_millis, outsideTemp)
-#
+        ctl1.heater1.control(
+            temperature, target_temp, lightState, current_millis, outsideTemp
+        )
+        #
 
         ctl1.fan1.control(current_millis)
         # switch relays according to State vars
-        ctl1.board1.switch_relays(
-            heaterState, ventState, fanState, ventSpeedState)
+        ctl1.board1.switch_relays(heaterState, ventState, fanState, ventSpeedState)
 
         anyChanges = teleService.pubMQTTReadings(
-            MQTTClient, ctl1, humidity, temperature, lightState, heaterState, fanState, ventState, ventSpeedState)
-        # # only send mqtt messages for the changed i/o - not all as previous message
+            MQTTClient,
+            ctl1,
+            humidity,
+            temperature,
+            lightState,
+            heaterState,
+            fanState,
+            ventState,
+            ventSpeedState,
+        )
 
+        # # only send mqtt messages for the changed i/o - not all as previous message
         if anyChanges:
             currentStatusString = ctl1.stateMonitor.getDisplayStatusString()
             if currentWSDisplayRow >= maxWSDisplayRows:
@@ -372,23 +395,35 @@ async def control():
                 currentWSDisplayRow = 0
             currentWSDisplayRow = currentWSDisplayRow + 1
 
+            logger.warning("XXXXXX  DATA to send:%s", currentStatusString)
+            logger.warning("XXXXXX  values temperature: %s, humidity: %s,  light: %s, heater: %s, fan: %s, vent: %s, ventSpeed: %s", humidity, temperature, lightState, heaterState, fanState, ventState, ventSpeedState)
+            
+
+
+            # logger.warning("
             await txwebsocket(currentStatusString)
             await asyncio.sleep(0)
 
-        stateChanged = ctl1.stateMonitor.checkForChanges(temperature, humidity, ventState,
-                                                         fanState, heaterState, ventSpeedState, lightState,
-                                                         current_millis, ctl1.timer1.current_time)  # write to csv/db etc if any state changes
+        stateChanged = ctl1.stateMonitor.checkForChanges(
+            temperature,
+            humidity,
+            ventState,
+            fanState,
+            heaterState,
+            ventSpeedState,
+            lightState,
+            current_millis,
+            ctl1.timer1.current_time,
+        )  # write to csv/db etc if any state changes
 
         if stateChanged:
-            logger.warning(
-                ">>>>>>>>>>>>>>>>>>>>>>>QQQQ Publishing MQTT messages...")
+            logger.warning(">>>>>>>>>>>>>>>>>>>>>>>QQQQ Publishing MQTT messages...")
 
             logger.debug("======== start state changed main list ======")
             # check for alarm levels etc
-            MessageService.alertAbnormalTemps(
-                temperature)  # alert if abnormal temps
+            MessageService.alertAbnormalTemps(temperature)  # alert if abnormal temps
 
-            location = cfg.getItemValueFromConfig('locationDisplayName')
+            location = cfg.getItemValueFromConfig("locationDisplayName")
             # logger.debug("Location : %s" % (location))
 
             # end_time = time.time()
@@ -410,23 +445,26 @@ async def control():
             # logger.warning("MMMMMM total memory       : %s MMMMMM",mem.total)
 
             # logger.warning("MMMMMM memory available   : %s MMMMMM",mem.available)
-            logger.debug("MMMMMM memory pc.available: %0.2f MMMMMM",
-                         ((float(mem.available)/float(mem.total)))*100)
+            logger.debug(
+                "MMMMMM memory pc.available: %0.2f MMMMMM",
+                ((float(mem.available) / float(mem.total))) * 100,
+            )
             # logger.warning("======== % memory available: %s ======",mem.percent)
 
             currentStatusString = ctl1.stateMonitor.getDisplayStatusString()
             # currentStatusString = currentStatusString + \
             #     ", " + str(lightState)
 
-            logger.warning(
-                "DATA to send:%s", currentStatusString)
+            logger.warning("DATA to send:%s", currentStatusString)
 
 
 # wsClients = set()
 ws_manager = WebSocketManager()
 
+
 async def txwebsocket(message):
     await ws_manager.broadcast(message)
+
 
 # Remove old wsClients, txwebsocket, register, unregister, MyWSHandler
 
@@ -513,8 +551,9 @@ async def txwebsocket(message):
 
 async def main():
     import websockets
+
     start_server = websockets.serve(
-        lambda ws, path: ws_manager.handler(ws, path, ctl1, cfg, VERSION), '', 5678
+        lambda ws, path: ws_manager.handler(ws, path, ctl1, cfg, VERSION), "", 5678
     )
     # start_server = websockets.serve(MyWSHandler, '', 5678)
     # mywebapp= web.run_app(app)
@@ -539,11 +578,11 @@ async def main():
 
 async def serveConsolePage(request):
     # return web.Response(text="serveConsolePage, world")
-    return web.FileResponse('websocketTests/zones.html')
+    return web.FileResponse("websocketTests/zones.html")
 
 
 app = web.Application()
-app.add_routes([web.get('/', serveConsolePage)])
+app.add_routes([web.get("/", serveConsolePage)])
 
 
 # ===================================
