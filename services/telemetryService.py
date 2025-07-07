@@ -83,7 +83,7 @@ class TelemetryService(object):
         Returns:
             bool: True if any telemetry readings changed and were published, False otherwise.
         """
-        logger.info("==  publish MQTT Readings  ==")
+        logger.debug("==  publish MQTT Readings  ==")
         # only send mqtt messages for the changed i/o - not all as previous message
         onlyPublishMQTTOnChange = cfg.getItemValueFromConfig("onlyPublishMQTTOnChange")
         anyChanges = False
@@ -178,7 +178,7 @@ class TelemetryService(object):
     #! send telemetry periodically
     # long intervasl mqtt messages of low priority, e.g rssi, online, ventOn/Off Deltas etc
     def pubMQTTTele(self, current_millis, MQTTClient, ctl1):
-        logger.info("==  publish MQTT Telemetry  ==")
+        logger.debug("==  publish MQTT Telemetry  ==")
 
         # check for first run
 

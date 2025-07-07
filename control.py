@@ -8,6 +8,7 @@ import datetime
 import datetime as dt
 import json
 import logging
+# import coloredlogs
 import os
 import pprint
 import random
@@ -19,7 +20,7 @@ from datetime import timedelta
 
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
-import requests  # allows us to send HTML POST request to IFTTT
+# import requests  # allows us to send HTML POST request to IFTTT
 import RPi.GPIO as GPIO
 import websockets
 import yaml
@@ -49,9 +50,8 @@ from version import VERSION
 # logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 # logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
 # logging.basicConfig(level=logging.WARNING)
-# logging.basicConfig(level=logging.INFO)  # set to INFO for normal operation, DEBUG for debug
-logging.basicConfig(level=logging.DEBUG)
-# logging.basicConfig(format='[%(filename)s:%(lineno)s - %(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)  # set to INFO for normal operation, DEBUG for debug
+# coloredlogs.install(level='DEBUG', fmt='%(asctime)s [%(filename)s:%(lineno)s - %(funcName)s()] %(levelname)s: %(message)s')
 
 # ===================general imports=====================================
 
@@ -301,8 +301,8 @@ async def control():
     currentWSDisplayRow = 1
 
     while True:
-        logger.info("=main while loop=")
-        logger.info("current time: %s", ctl1.timer1.current_time)
+        # logger.info("=main while loop=")
+        logger.debug("current time: %s", ctl1.timer1.current_time)
         ctl1.timer1.updateClocks()
         current_millis = ctl1.timer1.current_millis
 
@@ -329,10 +329,10 @@ async def control():
 
         # Target temperature
         if lightState == ON:
-            logger.info("=LOn=")
+            logger.debug("=LOn=")
             target_temp = cfg.getItemValueFromConfig("tempSPLOn")
         else:
-            logger.info("=LOff=")
+            logger.debug("=LOff=")
             target_temp = cfg.getItemValueFromConfig("tempSPLOff")
         logger.debug(target_temp)
 
@@ -362,8 +362,8 @@ async def control():
                 await txwebsocket(ctl1.stateMonitor.getDisplayHeaderString())
                 currentWSDisplayRow = 0
             currentWSDisplayRow += 1
-            logger.warning("XXXXXX  DATA to send:%s", currentStatusString)
-            logger.warning(
+            logger.debug("XXXXXX  DATA to send:%s", currentStatusString)
+            logger.debug(
                 "XXXXXX  values temperature: %s, humidity: %s,  light: %s, heater: %s, fan: %s, vent: %s, ventSpeed: %s",
                 humidity, temperature, lightState, heaterState, fanState, ventState, ventSpeedState
             )
@@ -384,13 +384,13 @@ async def control():
         )
 
         if stateChanged:
-            logger.warning(">>>>>>>>>>>>>>>>>>>>>>>QQQQ Publishing MQTT messages...")
+            logger.info("stateChanged Publishing MQTT messages...")
             logger.debug("======== start state changed main list ======")
             MessageService.alertAbnormalTemps(temperature)
             location = cfg.getItemValueFromConfig("locationDisplayName")
             systemUpTime = ctl1.timer1.getSystemUpTimeFromProc()
             ipAddress = get_ip_address()
-            logger.info("======== process uptime: %s ======", processUptime)
+            logger.debug("======== process uptime: %s ======", processUptime)
             import psutil
             mem = psutil.virtual_memory()
             logger.debug(
@@ -398,7 +398,7 @@ async def control():
                 ((float(mem.available) / float(mem.total))) * 100,
             )
             currentStatusString = ctl1.stateMonitor.getDisplayStatusString()
-            logger.warning("DATA to send:%s", currentStatusString)
+            logger.debug("DATA to send:%s", currentStatusString)
 
 
 # wsClients = set()

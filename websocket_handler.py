@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import websockets
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,9 @@ class WebSocketManager:
                 try:
                     msg = await asyncio.wait_for(websocket.recv(), timeout=20)
                     logger.warning("WS RX message")
+                except websockets.exceptions.ConnectionClosed:
+                    logger.warning("Client connection closed normally.")
+                    break
                 except asyncio.TimeoutError:
                     try:
                         logger.warning(

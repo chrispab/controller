@@ -124,8 +124,8 @@ class sensor(object):
         
         self.temperature = round(self.temperature, 1)
         self.humidity = round(self.humidity, 1)
-        logger.info("_rs temp: %s" % self.temperature)
-        logger.info("_rs humi: %s" % self.humidity)
+        logger.debug("_rs temp: %s" % self.temperature)
+        logger.debug("_rs humi: %s" % self.humidity)
             
     def _enableSafeMode(self):
         #TODO safe mode should also put fan on full speed
@@ -144,7 +144,7 @@ class sensor(object):
     def _read_sensor(self):
         if self.platformName == "RPi2":
             #sensor = Adafruit_DHT.DHT22
-            logger.info("in RPi2 _read_sensor about to read sensor")
+            logger.debug("in RPi2 _read_sensor about to read sensor")
 
             #self.humidity, self.temperature = Adafruit_DHT.read_retry(self.sensorType, self.sensorPin, 1,0)
             #store last good h and t
@@ -190,16 +190,16 @@ class sensor(object):
         #sleep(cfg.getItemValueFromConfig('readDelay'))
         #timeToGo = timeGap < time.delta(seconds-3)
         if (timeGap < timedelta(seconds=self.delay)):
-            logger.info("** JUMPING OUT OF AQUISITION -Too early to read sensor **")
+            logger.debug("** JUMPING OUT OF AQUISITION -Too early to read sensor **")
             return self.humidity, self.temperature, self.sensorMessage
 
-        logger.info("** AQUIring **")
+        logger.debug("** AQUIring **")
         time1 = datetime.datetime.now()
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
         time2 = datetime.datetime.now()
         duration = time2 - time1
         print("->-")
-        logger.info("TTTTTT - sensor read duration : %s" % (duration))
+        logger.debug("TTTTTT - sensor read duration : %s" % (duration))
         
         
         #repeat read until valid data or too many errorserror
@@ -238,16 +238,16 @@ class sensor(object):
             elif ( abs(self.temperature - self.prevTemp) < 10) and ( (self.humidity >= 0)
                 and (self.humidity <= 100)) : #if temp diff smallish, assume good sample
                 #print( "..read sensor SUCCESS" )
-                logger.info("..read sensor success at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
+                logger.debug("..read sensor success at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
                 
                 self.prevReadTime = datetime.datetime.now()
-                logger.info("Prev read time: %s" % self.prevReadTime)
+                logger.debug("Prev read time: %s" % self.prevReadTime)
                 
                 #self.prevTempHumiMillis = self.currentMillis
                 self.temperature = round(self.temperature, 1)
                 self.humidity = round(self.humidity, 1)
 
-                logger.warning('Temp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
+                logger.debug('Temp: %2.1f, Humi: %2.1f' %(self.temperature, self.humidity))
 
             else:
                 #bad sample even though good crc

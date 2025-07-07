@@ -356,7 +356,7 @@ class Logger(object):
         self.current_time = current_time
 
         self.state_changed = False
-        logger.info("== Checking for changes ==")
+        logger.debug("== Checking for changes ==")
 
         # Check for any state change
         if (
@@ -431,7 +431,7 @@ class Logger(object):
         """
         return
         # Log that readings have changed and databases are being updated
-        logger.warning("Readings have changed - updating local and remote dbs")
+        logger.debug("Readings have changed - updating local and remote dbs")
         # logger.warning("DataChanged Time: %s", str(datetime.datetime.now()))
         # logger.warning("DataChanged Time: %s", str(datetime.datetime.now()))
         # Write data to CSV (twice, which might be a bug or intentional for some reason)
@@ -463,7 +463,7 @@ class Logger(object):
             list: A list containing the formatted data for CSV writing.
         """
 
-        logger.info("=== _write_to_CSV data record ===")
+        logger.debug("=== _write_to_CSV data record ===")
         data = ["time", "temp", "humi", "heaterstate", "ventstate", "fanstate"]
         # round timestamp to nearest second
         #        data[0] = self.current_time
