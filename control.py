@@ -2,38 +2,40 @@
 # control.py
 # control for HVAC controller
 
-from services.MessageService import MessageService
-from services.telemetryService import TelemetryService
+import asyncio
+import csv
+import datetime
+import datetime as dt
+import json
+import logging
+import os
+import pprint
+import random
+import socket  # to get hostname
+import subprocess
+import sys  # for stdout print
+import time
+from datetime import timedelta
+
+import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
+import requests  # allows us to send HTML POST request to IFTTT
+import RPi.GPIO as GPIO
+import websockets
+import yaml
 from aiohttp import web
+
+import hardware as hw
 import version
 from componentClasses import *  # components of controller board
-from support import round_time as round_time
-import hardware as hw
 from ConfigObject import cfg  # singleton global
 from DatabaseObject import db  # singleton global
-import os
-import subprocess
-import RPi.GPIO as GPIO
-import pprint
 from Logger import Logger
 from myemail import MyEmail
-import json
-import requests  # allows us to send HTML POST request to IFTTT
-import websockets
-import random
-import asyncio
-import paho.mqtt.publish as publish
-import paho.mqtt.client as mqtt
-import socket  # to get hostname
-import sys  # for stdout print
-import datetime as dt
-import yaml
-from datetime import timedelta
-import time
-import datetime
-import csv
+from services.MessageService import MessageService
+from services.telemetryService import TelemetryService
+from support import round_time as round_time
 from version import VERSION
-import logging
 
 # logger options
 ###############
@@ -46,14 +48,15 @@ import logging
 # logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s',filename='myenvctl.log', filemode='w', level=logging.DEBUG)
 # logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', filename='myenvctl.log', filemode='w',level=logging.WARNING)
 # logging.basicConfig(format='%(levelname)s:%(asctime)s %(message)s', level=logging.INFO)
-logging.basicConfig(level=logging.WARNING)
+# logging.basicConfig(level=logging.WARNING)
 # logging.basicConfig(level=logging.INFO)  # set to INFO for normal operation, DEBUG for debug
+logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(format='[%(filename)s:%(lineno)s - %(funcName)s() ]%(levelname)s:%(asctime)s %(message)s', level=logging.DEBUG)
 
 # ===================general imports=====================================
 
 #! import services
 from websocket_handler import WebSocketManager
-
 
 MQTTBroker = "192.168.0.100"
 # sub_topic = "/zone1/instructions"    # receive messages on this topic
@@ -115,6 +118,7 @@ class Controller(object):
         self.radioLink1 = RadioLink()
         self.stateMonitor = Logger()
         self.timer1 = system_timer()
+
     def get_all_states(self):
         """Read all relevant states from controller."""
         lightState = self.light.getLightState()
@@ -233,21 +237,22 @@ def on_publish(mosq, obj, mid):
 async def control():
     global emailzone
 
-    def publish_initial_mqtt(MQTTClient, ctl1, zoneName, ackMessage):
-        """Publish all I/O states to MQTT broker on startup."""
-        lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature = ctl1.get_all_states()
-        MQTTClient.publish(zoneName + "/HeartBeat", ackMessage)
-        MQTTClient.publish(zoneName + "/TemperatureStatus", temperature)
-        MQTTClient.publish(zoneName + "/HumidityStatus", humidity)
-        MQTTClient.publish(zoneName + "/FanStatus", fanState)
-        MQTTClient.publish(zoneName + "/VentStatus", ventState)
-        MQTTClient.publish(zoneName + "/HeaterStatus", heaterState)
-        MQTTClient.publish(zoneName + "/VentSpeedStatus", ventSpeedState)
-        MQTTClient.publish(zoneName + "/VentValue", ventState + ventSpeedState)
-        ventPercent = ventState * ((ventSpeedState + 1) * 50)
-        MQTTClient.publish(zoneName + "/VentPercent", ventPercent)
-        MQTTClient.publish(zoneName + "/LightStatus", lightState)
+    # def publish_initial_mqtt(MQTTClient, ctl1, zoneName, ackMessage):
+    #     """Publish all I/O states to MQTT broker on startup."""
+    #     lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature = ctl1.get_all_states()
+    #     MQTTClient.publish(zoneName + "/HeartBeat", ackMessage)
+    #     MQTTClient.publish(zoneName + "/TemperatureStatus", temperature)
+    #     MQTTClient.publish(zoneName + "/HumidityStatus", humidity)
+    #     MQTTClient.publish(zoneName + "/FanStatus", fanState)
+    #     MQTTClient.publish(zoneName + "/VentStatus", ventState)
+    #     MQTTClient.publish(zoneName + "/HeaterStatus", heaterState)
+    #     MQTTClient.publish(zoneName + "/VentSpeedStatus", ventSpeedState)
+    #     MQTTClient.publish(zoneName + "/VentValue", ventState + ventSpeedState)
+    #     ventPercent = ventState * ((ventSpeedState + 1) * 50)
+    #     MQTTClient.publish(zoneName + "/VentPercent", ventPercent)
+    #     MQTTClient.publish(zoneName + "/LightStatus", lightState)
 
+        
     # def get_all_states(ctl1):
     #     """Read all relevant states from controller."""
     #     lightState = ctl1.light.getLightState()
@@ -288,8 +293,9 @@ async def control():
         zoneName,
     )
 
-    logger.warning("----+++====  SENDING INITIAL MQTT ===+++++-------")
-    publish_initial_mqtt(MQTTClient, ctl1, zoneName, ackMessage)
+    logger.warning("SENDING INITIAL MQTT")
+    # publish_initial_mqtt(MQTTClient, ctl1, zoneName, ackMessage)
+    teleService.publish_all_states(MQTTClient, ctl1)
 
     maxWSDisplayRows = 5
     currentWSDisplayRow = 1

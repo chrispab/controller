@@ -92,7 +92,7 @@ class RadioLink(object):
 
         ticks = millis()
         if (((ticks) - self.lastHeartBeatSentMillis) >= self.heartBeatInterval):  # ready to send
-            logger.warning(
+            logger.debug(
                 '..sending RF24 radio heartbeat message : %s' % self.ackMessage)
             # logger.warning(self.ackMessage)
             self.lastHeartBeatSentMillis = millis()
@@ -103,7 +103,7 @@ class RadioLink(object):
 
     ##########################################
     def try_read_data(self, channel=0):
-        logger.warning('checking for nRF ping from arduino')
+        logger.debug('checking for nRF ping from arduino')
 
         self.radio.startListening()
 

@@ -25,6 +25,31 @@ class TelemetryService(object):
         )
         self.ackMessage = cfg.getItemValueFromConfig("ackMessage")
 
+    def publish_all_states(self, MQTTClient, ctl1):
+        """Publish all I/O states to MQTT broker."""
+        lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature = ctl1.get_all_states()
+        MQTTClient.publish(self.zoneName + "/HeartBeat", self.ackMessage)
+        logger.debug("%s MQTT published HeartBeat: %s", self.zoneName, self.ackMessage)
+        MQTTClient.publish(self.zoneName + "/TemperatureStatus", temperature)
+        logger.debug("%s MQTT published TemperatureStatus: %f", self.zoneName, temperature)
+        MQTTClient.publish(self.zoneName + "/HumidityStatus", humidity)
+        logger.debug("%s MQTT published HumidityStatus: %f", self.zoneName, humidity)
+        MQTTClient.publish(self.zoneName + "/FanStatus", fanState)
+        logger.debug("%s MQTT published FanStatus: %d", self.zoneName, fanState)
+        MQTTClient.publish(self.zoneName + "/VentStatus", ventState)
+        logger.debug("%s MQTT published VentStatus: %d", self.zoneName, ventState)
+        MQTTClient.publish(self.zoneName + "/HeaterStatus", heaterState)
+        logger.debug("%s MQTT published HeaterStatus: %d", self.zoneName, heaterState)
+        MQTTClient.publish(self.zoneName + "/VentSpeedStatus", ventSpeedState)
+        logger.debug("%s MQTT published VentSpeedStatus: %d", self.zoneName, ventSpeedState)
+        MQTTClient.publish(self.zoneName + "/VentValue", ventState + ventSpeedState)
+        ventPercent = ventState * ((ventSpeedState + 1) * 50)
+        MQTTClient.publish(self.zoneName + "/VentPercent", ventPercent)
+        logger.debug("%s MQTT published VentPercent: %d", self.zoneName, ventPercent)
+        MQTTClient.publish(self.zoneName + "/LightStatus", lightState)
+        logger.debug("%s MQTT published LightStatus: %d", self.zoneName, lightState)
+
+
     def pubMQTTReadings(
         self,
         MQTTClient,
