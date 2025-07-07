@@ -1,1 +1,1 @@
-VERSION = "3.25 refactor1: refactor websockets"
+VERSION = "3.26 refactor1: "

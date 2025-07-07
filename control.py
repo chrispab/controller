@@ -226,10 +226,10 @@ async def control():
 
     global emailzone
 
-    try:
-        MQTTClient = mqtt.Client()
-    except:
-        print("MQTT CANNOT CONNECT!!!")
+    # try:
+    MQTTClient = mqtt.Client()
+    # except:
+        # print("MQTT CANNOT CONNECT!!!")
 
     MQTTClient.on_connect = on_connect
     MQTTClient.on_message = on_message
@@ -241,8 +241,8 @@ async def control():
         MQTTClient.connect(MQTTBroker, 1883, 60)
 
         MQTTClient.loop_start()
-    except:
-        print("MQTT CANNOT CONNECT!!!")
+    except Exception as e:
+        print("MQTT CANNOT CONNECT!!!", e)
     print("Subscribing to topic", "Outside_Sensor/tele/SENSOR")
 
     # call to systemd watchdog to hold off restart
