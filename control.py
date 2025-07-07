@@ -223,159 +223,113 @@ def on_publish(mosq, obj, mid):
 
 #
 async def control():
-
     global emailzone
 
-    # try:
-    MQTTClient = mqtt.Client()
-    # except:
-        # print("MQTT CANNOT CONNECT!!!")
+    def publish_initial_mqtt(MQTTClient, ctl1, zoneName, ackMessage):
+        """Publish all I/O states to MQTT broker on startup."""
+        lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature = get_all_states(ctl1)
+        MQTTClient.publish(zoneName + "/HeartBeat", ackMessage)
+        MQTTClient.publish(zoneName + "/TemperatureStatus", temperature)
+        MQTTClient.publish(zoneName + "/HumidityStatus", humidity)
+        MQTTClient.publish(zoneName + "/FanStatus", fanState)
+        MQTTClient.publish(zoneName + "/VentStatus", ventState)
+        MQTTClient.publish(zoneName + "/HeaterStatus", heaterState)
+        MQTTClient.publish(zoneName + "/VentSpeedStatus", ventSpeedState)
+        MQTTClient.publish(zoneName + "/VentValue", ventState + ventSpeedState)
+        ventPercent = ventState * ((ventSpeedState + 1) * 50)
+        MQTTClient.publish(zoneName + "/VentPercent", ventPercent)
+        MQTTClient.publish(zoneName + "/LightStatus", lightState)
 
-    MQTTClient.on_connect = on_connect
-    MQTTClient.on_message = on_message
-    try:
-        #    MQTTClient.will_set(zoneName + "/LWT", "Offline", 0, True)
-        zoneName = cfg.getItemValueFromConfig("zoneName")
-        MQTTClient.will_set(zoneName + "/LWT", "Offline", 0, False)
-
-        MQTTClient.connect(MQTTBroker, 1883, 60)
-
-        MQTTClient.loop_start()
-    except Exception as e:
-        print("MQTT CANNOT CONNECT!!!", e)
-    print("Subscribing to topic", "Outside_Sensor/tele/SENSOR")
-
-    # call to systemd watchdog to hold off restart
-    ctl1.timer1.holdOffWatchdog(0, True)
-
-    # start_time = time.time()
-    humidity, temperature, sensorMessage = ctl1.sensor1.read()
-
-    zoneName = cfg.getItemValueFromConfig("zoneName")
-    zoneNumber = cfg.getItemValueFromConfig("zoneNumber")
-    location = cfg.getItemValueFromConfig("locationDisplayName")
-    mqttPublishIntervalMillis = cfg.getItemValueFromConfig("mqttPublishIntervalMillis")
-    # mqttPublishTeleIntervalMillis = cfg.getItemValueFromConfig('mqttPublishTeleIntervalMillis')
-    lastMqttPublishHeartBeatMillis = ctl1.timer1.current_millis - 50000
-    # lastMqttPublishTeleMillis = ctl1.timer1.current_millis - 100000
-
-    ackMessage = cfg.getItemValueFromConfig("ackMessage")
-
-    #    MQTTClient.will_set(zoneName + "/LWT", "Offline", 0, True)
-    # publish(topic, payload=None, qos=0, retain=False)
-    MQTTClient.publish(zoneName + "/LWT", "Online", 0, True)
-
-    message = zoneName
-    # if just booted
-    if ctl1.timer1.secsSinceBoot() < 120:
-        emailzone = "Zone " + zoneNumber + " REBOOTED "
-
-    # emailMe.sendemail( zoneName + ' ' + location + ' - Process Started', message)
-    emailObj.send(
-        "Zone "
-        + zoneNumber
-        + " "
-        + emailzone
-        + location
-        + " - Controller Process Started",
-        message,
-    )
-
-    maxWSDisplayRows = 5  # ! TODO FIX THIS - display issue
-    currentWSDisplayRow = 1
-
-    # ! publish all I/O to broker on start up
-    logger.warning("----+++====  SENDING INITIAL MQTT ===+++++-------")
-
-    lightState = ctl1.light.getLightState()
-    heaterState = ctl1.heater1.heaterState
-    ventState = ctl1.vent1.ventState
-    fanState = ctl1.fan1.fanState
-    ventSpeedState = ctl1.vent1.speed_state
-    humidity, temperature, sensorMessage = ctl1.sensor1.read()
-
-    MQTTClient.publish(zoneName + "/HeartBeat", ackMessage)
-    MQTTClient.publish(zoneName + "/TemperatureStatus", temperature)
-    MQTTClient.publish(zoneName + "/HumidityStatus", humidity)
-    MQTTClient.publish(zoneName + "/FanStatus", fanState)
-    MQTTClient.publish(zoneName + "/VentStatus", ventState)
-    MQTTClient.publish(zoneName + "/HeaterStatus", heaterState)
-    MQTTClient.publish(zoneName + "/VentSpeedStatus", ventSpeedState)
-    MQTTClient.publish(zoneName + "/VentValue", ventState + ventSpeedState)
-    ventPercent = ventState * ((ventSpeedState + 1) * 50)
-    MQTTClient.publish(zoneName + "/VentPercent", ventPercent)
-
-    MQTTClient.publish(zoneName + "/LightStatus", lightState)
-    # MQTTClient.publish(zoneName+"/VentPercent", ventPercent)
-
-    while 1:
-        logger.info("=main while loop=")
-        logger.info("current time: %s" % (ctl1.timer1.current_time))
-        ctl1.timer1.updateClocks()
-        current_millis = ctl1.timer1.current_millis
-
-        #! send telemetry periodically
-        teleService.pubMQTTTele(current_millis, MQTTClient, ctl1)
-        teleService.pubMQTTHeartBeat(current_millis, MQTTClient)
-
-        # call to systemd watchdog to hold off restart
-        ctl1.timer1.holdOffWatchdog(current_millis)
-
-        # hold off wireless watchdog
-        # check radio link for a ping from watchdog, and respond to indicate alive
-        ctl1.radioLink1.holdOffWatchdog()
-
-        await asyncio.sleep(0)
-
-        # startT = time.time()
-
-        humidity, temperature, sensorMessage = ctl1.sensor1.read()
-        if sensorMessage:
-            subject = (
-                "Zone "
-                + zoneNumber
-                + " "
-                + emailzone
-                + location
-                + " - : bad sensor reads  - PowerCycle"
-            )
-            emailObj.send(subject, sensorMessage)
-
-        # endT = time.time()
-        # duration = endT-startT
-
-        # get all current states
+    def get_all_states(ctl1):
+        """Read all relevant states from controller."""
         lightState = ctl1.light.getLightState()
         heaterState = ctl1.heater1.heaterState
         ventState = ctl1.vent1.ventState
         fanState = ctl1.fan1.fanState
         ventSpeedState = ctl1.vent1.speed_state
+        humidity, temperature, _ = ctl1.sensor1.read()
+        return lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature
 
+    # --- MQTT Setup ---
+    MQTTClient = mqtt.Client()
+    MQTTClient.on_connect = on_connect
+    MQTTClient.on_message = on_message
+    try:
+        zoneName = cfg.getItemValueFromConfig("zoneName")
+        MQTTClient.will_set(zoneName + "/LWT", "Offline", 0, False)
+        MQTTClient.connect(MQTTBroker, 1883, 60)
+        MQTTClient.loop_start()
+    except Exception as e:
+        print("MQTT CANNOT CONNECT!!!", e)
+        return
+
+    ctl1.timer1.holdOffWatchdog(0, True)
+    humidity, temperature, sensorMessage = ctl1.sensor1.read()
+    zoneName = cfg.getItemValueFromConfig("zoneName")
+    zoneNumber = cfg.getItemValueFromConfig("zoneNumber")
+    location = cfg.getItemValueFromConfig("locationDisplayName")
+    ackMessage = cfg.getItemValueFromConfig("ackMessage")
+
+    MQTTClient.publish(zoneName + "/LWT", "Online", 0, True)
+
+    # Email on boot
+    if ctl1.timer1.secsSinceBoot() < 120:
+        emailzone = "Zone " + zoneNumber + " REBOOTED "
+    emailObj.send(
+        f"Zone {zoneNumber} {emailzone}{location} - Controller Process Started",
+        zoneName,
+    )
+
+    logger.warning("----+++====  SENDING INITIAL MQTT ===+++++-------")
+    publish_initial_mqtt(MQTTClient, ctl1, zoneName, ackMessage)
+
+    maxWSDisplayRows = 5
+    currentWSDisplayRow = 1
+
+    while True:
+        logger.info("=main while loop=")
+        logger.info("current time: %s", ctl1.timer1.current_time)
+        ctl1.timer1.updateClocks()
+        current_millis = ctl1.timer1.current_millis
+
+        # Telemetry
+        teleService.pubMQTTTele(current_millis, MQTTClient, ctl1)
+        teleService.pubMQTTHeartBeat(current_millis, MQTTClient)
+
+        # Watchdogs
+        ctl1.timer1.holdOffWatchdog(current_millis)
+        ctl1.radioLink1.holdOffWatchdog()
+
+        await asyncio.sleep(0)
+
+        # Sensor read and alert
+        humidity, temperature, sensorMessage = ctl1.sensor1.read()
+        if sensorMessage:
+            subject = (
+                f"Zone {zoneNumber} {emailzone}{location} - : bad sensor reads  - PowerCycle"
+            )
+            emailObj.send(subject, sensorMessage)
+
+        # Get all current states
+        lightState, heaterState, ventState, fanState, ventSpeedState, _, _ = get_all_states(ctl1)
+
+        # Target temperature
         if lightState == ON:
             logger.info("=LOn=")
             target_temp = cfg.getItemValueFromConfig("tempSPLOn")
-        else:  # off
+        else:
             logger.info("=LOff=")
             target_temp = cfg.getItemValueFromConfig("tempSPLOff")
         logger.debug(target_temp)
 
+        # Control hardware
         ctl1.fan1.control(current_millis)
-        ctl1.vent1.control(
-            temperature, humidity, target_temp, lightState, current_millis
-        )
-
-        # ctl1.heater1.controlv2(temperature, target_temp,
-        #                        lightState, current_millis, outsideTemp)
-
-        ctl1.heater1.control(
-            temperature, target_temp, lightState, current_millis, outsideTemp
-        )
-        #
-
+        ctl1.vent1.control(temperature, humidity, target_temp, lightState, current_millis)
+        ctl1.heater1.control(temperature, target_temp, lightState, current_millis, outsideTemp)
         ctl1.fan1.control(current_millis)
-        # switch relays according to State vars
         ctl1.board1.switch_relays(heaterState, ventState, fanState, ventSpeedState)
 
+        # Publish readings if changed
         anyChanges = teleService.pubMQTTReadings(
             MQTTClient,
             ctl1,
@@ -388,23 +342,21 @@ async def control():
             ventSpeedState,
         )
 
-        # # only send mqtt messages for the changed i/o - not all as previous message
         if anyChanges:
             currentStatusString = ctl1.stateMonitor.getDisplayStatusString()
             if currentWSDisplayRow >= maxWSDisplayRows:
                 await txwebsocket(ctl1.stateMonitor.getDisplayHeaderString())
                 currentWSDisplayRow = 0
-            currentWSDisplayRow = currentWSDisplayRow + 1
-
+            currentWSDisplayRow += 1
             logger.warning("XXXXXX  DATA to send:%s", currentStatusString)
-            logger.warning("XXXXXX  values temperature: %s, humidity: %s,  light: %s, heater: %s, fan: %s, vent: %s, ventSpeed: %s", humidity, temperature, lightState, heaterState, fanState, ventState, ventSpeedState)
-            
-
-
-            # logger.warning("
+            logger.warning(
+                "XXXXXX  values temperature: %s, humidity: %s,  light: %s, heater: %s, fan: %s, vent: %s, ventSpeed: %s",
+                humidity, temperature, lightState, heaterState, fanState, ventState, ventSpeedState
+            )
             await txwebsocket(currentStatusString)
             await asyncio.sleep(0)
 
+        # State change handling
         stateChanged = ctl1.stateMonitor.checkForChanges(
             temperature,
             humidity,
@@ -415,47 +367,23 @@ async def control():
             lightState,
             current_millis,
             ctl1.timer1.current_time,
-        )  # write to csv/db etc if any state changes
+        )
 
         if stateChanged:
             logger.warning(">>>>>>>>>>>>>>>>>>>>>>>QQQQ Publishing MQTT messages...")
-
             logger.debug("======== start state changed main list ======")
-            # check for alarm levels etc
-            MessageService.alertAbnormalTemps(temperature)  # alert if abnormal temps
-
+            MessageService.alertAbnormalTemps(temperature)
             location = cfg.getItemValueFromConfig("locationDisplayName")
-            # logger.debug("Location : %s" % (location))
-
-            # end_time = time.time()
-            # processUptime = end_time - start_time
-            # processUptime = str(timedelta(seconds=int(processUptime)))
-            # cfg.setConfigItemInLocalDB('processUptime', processUptime)
             systemUpTime = ctl1.timer1.getSystemUpTimeFromProc()
-            # cfg.setConfigItemInLocalDB('systemUpTime', systemUpTime)
-            # cfg.setConfigItemInLocalDB('miscMessage', location)
-            # cfg.setConfigItemInLocalDB('systemMessage', systemMessage)
             ipAddress = get_ip_address()
-            # cfg.setConfigItemInLocalDB('controllerMessage', "V: " + VERSION + ", IP: " + "<a href=" +
-            #                            "https://" + ipAddress + ":10000" + ' target="_blank"' + ">" + ipAddress + "</a>")
-            # cfg.setConfigItemInLocalDB('lightState', int(lightState))
-            # execAndTimeFunc(cfg.updateCentralConfigTable)
-
             logger.info("======== process uptime: %s ======", processUptime)
+            import psutil
             mem = psutil.virtual_memory()
-            # logger.warning("MMMMMM total memory       : %s MMMMMM",mem.total)
-
-            # logger.warning("MMMMMM memory available   : %s MMMMMM",mem.available)
             logger.debug(
                 "MMMMMM memory pc.available: %0.2f MMMMMM",
                 ((float(mem.available) / float(mem.total))) * 100,
             )
-            # logger.warning("======== % memory available: %s ======",mem.percent)
-
             currentStatusString = ctl1.stateMonitor.getDisplayStatusString()
-            # currentStatusString = currentStatusString + \
-            #     ", " + str(lightState)
-
             logger.warning("DATA to send:%s", currentStatusString)
 
 
