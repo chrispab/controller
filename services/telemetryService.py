@@ -89,13 +89,11 @@ class TelemetryService(object):
             ventStateChanged = ctl1.stateMonitor.checkForChangeInVentState(ventState)
             if ventStateChanged:
                 MQTTClient.publish(self.zoneName + "/VentStatus", ventState)
-                logger.warning("++++++++++++++++ Vent state change MQTT published")
+                # logger.warning("Vent state change MQTT published")
                 MQTTClient.publish(
                     self.zoneName + "/VentValue", ventState + ventSpeedState
                 )
-                logger.warning(
-                    "++++++++++++++++ Vent value 0,1,2 change MQTT published"
-                )
+                logger.warning("Vent value 0,1,2 change MQTT published")
                 anyChanges = True
 
             ventSpeedChanged = ctl1.stateMonitor.checkForChangeInVentSpeedState(

@@ -115,7 +115,15 @@ class Controller(object):
         self.radioLink1 = RadioLink()
         self.stateMonitor = Logger()
         self.timer1 = system_timer()
-
+    def get_all_states(self):
+        """Read all relevant states from controller."""
+        lightState = self.light.getLightState()
+        heaterState = self.heater1.heaterState
+        ventState = self.vent1.ventState
+        fanState = self.fan1.fanState
+        ventSpeedState = self.vent1.speed_state
+        humidity, temperature, _ = self.sensor1.read()
+        return lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature
 
 # main routine
 #############
@@ -227,7 +235,7 @@ async def control():
 
     def publish_initial_mqtt(MQTTClient, ctl1, zoneName, ackMessage):
         """Publish all I/O states to MQTT broker on startup."""
-        lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature = get_all_states(ctl1)
+        lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature = ctl1.get_all_states()
         MQTTClient.publish(zoneName + "/HeartBeat", ackMessage)
         MQTTClient.publish(zoneName + "/TemperatureStatus", temperature)
         MQTTClient.publish(zoneName + "/HumidityStatus", humidity)
@@ -240,15 +248,15 @@ async def control():
         MQTTClient.publish(zoneName + "/VentPercent", ventPercent)
         MQTTClient.publish(zoneName + "/LightStatus", lightState)
 
-    def get_all_states(ctl1):
-        """Read all relevant states from controller."""
-        lightState = ctl1.light.getLightState()
-        heaterState = ctl1.heater1.heaterState
-        ventState = ctl1.vent1.ventState
-        fanState = ctl1.fan1.fanState
-        ventSpeedState = ctl1.vent1.speed_state
-        humidity, temperature, _ = ctl1.sensor1.read()
-        return lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature
+    # def get_all_states(ctl1):
+    #     """Read all relevant states from controller."""
+    #     lightState = ctl1.light.getLightState()
+    #     heaterState = ctl1.heater1.heaterState
+    #     ventState = ctl1.vent1.ventState
+    #     fanState = ctl1.fan1.fanState
+    #     ventSpeedState = ctl1.vent1.speed_state
+    #     humidity, temperature, _ = ctl1.sensor1.read()
+    #     return lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature
 
     # --- MQTT Setup ---
     MQTTClient = mqtt.Client()
@@ -311,7 +319,7 @@ async def control():
             emailObj.send(subject, sensorMessage)
 
         # Get all current states
-        lightState, heaterState, ventState, fanState, ventSpeedState, _, _ = get_all_states(ctl1)
+        lightState, heaterState, ventState, fanState, ventSpeedState, _, _ = ctl1.get_all_states()
 
         # Target temperature
         if lightState == ON:
