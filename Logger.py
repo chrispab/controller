@@ -94,209 +94,45 @@ class Logger(object):
         return s
 
     def checkForChangeInTemperature(self, temperature):
-
-        self.state_changed = False
-
-        if temperature != self.previous_temperature:  # any change
-            self.state_changed = True
+        changed = temperature != self.previous_temperature
         self.previous_temperature = temperature
-
-        return self.state_changed
+        return changed
 
     def checkForChangeInHumidity(self, humidity):
-
-        self.state_changed = False
-
-        if humidity != self.previous_humidity:  # any change
-            self.state_changed = True
+        changed = humidity != self.previous_humidity
         self.previous_humidity = humidity
-
-        return self.state_changed
-
-    # def checkForChangeInFanState(self, fanState):
-
-    #     self.state_changed = False
-
-    #     if fanState != self.previous_fan_state:  # any change
-    #         self.state_changed = True
-    #     self.previous_fan_state = fanState
-
-    #     return self.state_changed
+        return changed
 
     def checkForChangeInFanState(self, fanState):
         changed = fanState != self.previous_fan_state
         self.previous_fan_state = fanState
         return changed
-        # Repeat for other checkForChangeIn* methods
 
     def checkForChangeInVentState(self, ventState):
-
-        self.state_changed = False
-
-        if ventState != self.previous_vent_state:  # any change
-            self.state_changed = True
+        changed = ventState != self.previous_vent_state
         self.previous_vent_state = ventState
-
-        return self.state_changed
+        return changed
 
     def checkForChangeInHeaterState(self, heaterState):
-        self.state_changed = False
-        if heaterState != self.previous_heater_state:  # any change
-            self.state_changed = True
+        changed = heaterState != self.previous_heater_state
         self.previous_heater_state = heaterState
-        return self.state_changed
+        return changed
 
     def checkForChangeInVentSpeedState(self, ventSpeedState):
-        self.state_changed = False
-        if ventSpeedState != self.previous_vent_speed_state:  # any change
-            self.state_changed = True
+        changed = ventSpeedState != self.previous_vent_speed_state
         self.previous_vent_speed_state = ventSpeedState
-        return self.state_changed
+        return changed
 
     def checkForChangeInLightState(self, lightState):
-        self.state_changed = False
-        if lightState != self.previous_light_state:  # any change
-            self.state_changed = True
+        changed = lightState != self.previous_light_state
         self.previous_light_state = lightState
-        return self.state_changed
+        return changed
 
     def checkForChangeInVentPercent(self, ventPercent):
-        self.state_changed = False
-        if ventPercent != self.previous_vent_percent:  # any change
-            self.state_changed = True
+        changed = ventPercent != self.previous_vent_percent
         self.previous_vent_percent = ventPercent
-        return self.state_changed
+        return changed
 
-    # def checkForChanges(
-    #     self,
-    #     temperature,
-    #     humidity,
-    #     vent_state,
-    #     fan_state,
-    #     heater_state,
-    #     vent_speed_state,
-    #     light_state,
-    #     current_millis,
-    #     current_time,
-    # ):
-
-    #     self.temperature = temperature
-    #     self.humidity = humidity
-    #     self.vent_state = vent_state
-    #     self.fan_state = fan_state
-    #     self.heater_state = heater_state
-    #     self.vent_speed_state = vent_speed_state
-    #     self.light_state = light_state
-    #     self.current_millis = current_millis
-    #     self.current_time = current_time
-    #     self.state_changed = False
-    #     logger.info("== Checking for changes ==")
-
-    #     # check each for state change and set new prewrite states
-    #     if self.vent_state != self.previous_vent_state:  # any change in vent
-    #         if self.previous_vent_state == OFF:  # must be going OFF to ON
-    #             # write a low record immediately before hi record
-    #             logger.info("--new prevvent low row appended to CSV -----")
-    #             self.vent_state = OFF
-    #             self.state_changed = True
-    #         else:  # if self.previous_vent_state == ON:  # must be going ON TO OFF
-    #             # write a on record immediately before hi record
-    #             logger.info("-- new prevvent hi row appended to CSV -----")
-    #             self.vent_state = ON
-    #             self.state_changed = True
-
-    #     if (
-    #         self.vent_speed_state != self.previous_vent_speed_state
-    #     ):  # any change in vent speed
-    #         if self.previous_vent_speed_state == OFF:  # was lo speed
-    #             # write a low record immediately before hi record
-    #             logger.info("-- new prevvspeed low row appended to CSV -----")
-    #             self.vent_speed_state = OFF
-    #             self.state_changed = True
-    #         else:  # was hi speed going low
-    #             # write a on record immediately before hi record
-    #             logger.info("-- new prevvspeed hi row appended to CSV -----")
-    #             self.vent_speed_state = ON
-    #             self.state_changed = True
-
-    #     if self.fan_state != self.previous_fan_state:  # any change in vent
-    #         if self.previous_fan_state == OFF:  # must be going OFF to ON
-    #             # write a low record immediately before hi record
-    #             logger.info("-- new prevfanstate low row appended to CSV -----")
-    #             self.fan_state = OFF
-    #             self.state_changed = True
-    #         else:  # must be going ON TO OFF
-    #             # write a on record immediately before hi record
-    #             logger.info("-- new  prevfanstate hi row appended to CSV -----")
-    #             self.fan_state = ON
-    #             self.state_changed = True
-
-    #     if (
-    #         self.heater_state != self.previous_heater_state
-    #     ):  # any change in heater state
-    #         if self.previous_heater_state == OFF:  # must be going OFF to ON
-    #             # write a low record immediately before hi record
-    #             logger.info("-- new heaterstate low row appended to CSV -----")
-    #             self.heater_state = OFF
-    #             self.state_changed = True
-    #         else:  # must be going ON TO OFF
-    #             # write a on record immediately before hi record
-    #             logger.info("-- new  heaterstate hi row appended to CSV -----")
-    #             self.heater_state = ON
-    #             self.state_changed = True
-
-    #     # if ((self.temperature != self.previous_temperature)):  # any change
-    #     # self.state_changed = True
-
-    #     if self.state_changed == True:
-    #         logger.debug("-- O/P State Change - OLD state --")
-    #         self.dataHasChangedUpdateDb()  # write modded old change state(s)
-    #         # restore new vals from original params
-    #         self.vent_state = vent_state
-    #         self.vent_speed_state = vent_speed_state
-    #         self.heater_state = heater_state
-    #         self.fan_state = fan_state
-
-    #         logger.debug("-- O/P State Change - NEW state --")
-    #         # write new states
-    #         self.dataHasChangedUpdateDb()  # write modded post change state(s)
-
-    #         # processUptime = cfg.getConfigItemFromLocalDB('processUptime')
-    #         # systemMessage = cfg.getConfigItemFromLocalDB('systemMessage')
-    #         # logger.debug('=Process uptime: %s' % (processUptime))
-    #         # logger.debug('=System message: %s' % (systemMessage))
-    #         # cfg.updateCentralConfigTable()
-
-    #         self.previous_CSV_write_millis = self.current_millis  # reset timer
-    #     else:  # no state change check temp change or and timer csv write interval done
-    #         if (
-    #             self.current_millis
-    #             > (self.previous_CSV_write_millis + self.min_CSV_write_interval)
-    #         ) or (
-    #             self.temperature != self.previous_temperature
-    #         ):  # any change
-    #             if self.current_millis > (
-    #                 self.previous_CSV_write_millis + self.min_CSV_write_interval
-    #             ):
-    #                 logger.debug(
-    #                     "..min interval passed with no new samples..time for new CSV write"
-    #                 )
-    #             else:
-    #                 logger.debug("..new data row generated.. new temp")
-    #             self.dataHasChangedUpdateDb()
-
-    #             self.previous_CSV_write_millis = self.current_millis  # reset timer
-    #             self.state_changed = True
-    #     self.previous_temperature = self.temperature
-    #     self.previous_humidity = self.humidity
-    #     self.previous_heater_state = self.heater_state
-    #     self.previous_vent_state = self.vent_state
-    #     self.previous_fan_state = self.fan_state
-    #     self.previous_vent_speed_state = self.vent_speed_state
-    #     # self.previous_proc_temp = self.proc_temp
-
-    #     return self.state_changed
-    
 
     def checkForChanges(
         self,
@@ -360,7 +196,8 @@ class Logger(object):
 
         # Check for any state change
         if (
-            old_states["vent_state"] != vent_state
+            old_states["light_state"] != light_state
+            or old_states["vent_state"] != vent_state
             or old_states["vent_speed_state"] != vent_speed_state
             or old_states["fan_state"] != fan_state
             or old_states["heater_state"] != heater_state
@@ -368,6 +205,9 @@ class Logger(object):
             self.state_changed = True
             logger.debug("-- O/P State Change - OLD state --")
             # Temporarily set states to old for writing
+            self.temperature = old_states["temperature"]
+            self.humidity = old_states["humidity"]
+            self.light_state = old_states["light_state"]
             self.vent_state = old_states["vent_state"]
             self.vent_speed_state = old_states["vent_speed_state"]
             self.heater_state = old_states["heater_state"]
@@ -375,6 +215,9 @@ class Logger(object):
             self.dataHasChangedUpdateDb()  # write old state
 
             # Restore new states
+            self.temperature = temperature
+            self.humidity = humidity
+            self.light_state = light_state
             self.vent_state = vent_state
             self.vent_speed_state = vent_speed_state
             self.heater_state = heater_state

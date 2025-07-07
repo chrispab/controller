@@ -126,8 +126,9 @@ class Controller(object):
         ventState = self.vent1.ventState
         fanState = self.fan1.fanState
         ventSpeedState = self.vent1.speed_state
-        humidity, temperature, _ = self.sensor1.read()
-        return lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature
+        temperature = self.sensor1.temperature
+        humidity = self.sensor1.humidity
+        return lightState, heaterState, ventState, fanState, ventSpeedState, temperature, humidity
 
 # main routine
 #############
@@ -237,32 +238,6 @@ def on_publish(mosq, obj, mid):
 async def control():
     global emailzone
 
-    # def publish_initial_mqtt(MQTTClient, ctl1, zoneName, ackMessage):
-    #     """Publish all I/O states to MQTT broker on startup."""
-    #     lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature = ctl1.get_all_states()
-    #     MQTTClient.publish(zoneName + "/HeartBeat", ackMessage)
-    #     MQTTClient.publish(zoneName + "/TemperatureStatus", temperature)
-    #     MQTTClient.publish(zoneName + "/HumidityStatus", humidity)
-    #     MQTTClient.publish(zoneName + "/FanStatus", fanState)
-    #     MQTTClient.publish(zoneName + "/VentStatus", ventState)
-    #     MQTTClient.publish(zoneName + "/HeaterStatus", heaterState)
-    #     MQTTClient.publish(zoneName + "/VentSpeedStatus", ventSpeedState)
-    #     MQTTClient.publish(zoneName + "/VentValue", ventState + ventSpeedState)
-    #     ventPercent = ventState * ((ventSpeedState + 1) * 50)
-    #     MQTTClient.publish(zoneName + "/VentPercent", ventPercent)
-    #     MQTTClient.publish(zoneName + "/LightStatus", lightState)
-
-        
-    # def get_all_states(ctl1):
-    #     """Read all relevant states from controller."""
-    #     lightState = ctl1.light.getLightState()
-    #     heaterState = ctl1.heater1.heaterState
-    #     ventState = ctl1.vent1.ventState
-    #     fanState = ctl1.fan1.fanState
-    #     ventSpeedState = ctl1.vent1.speed_state
-    #     humidity, temperature, _ = ctl1.sensor1.read()
-    #     return lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature
-
     # --- MQTT Setup ---
     MQTTClient = mqtt.Client()
     MQTTClient.on_connect = on_connect
@@ -300,14 +275,14 @@ async def control():
     maxWSDisplayRows = 5
     currentWSDisplayRow = 1
 
+    previousTemperature = 0
     while True:
-        # logger.info("=main while loop=")
         logger.debug("current time: %s", ctl1.timer1.current_time)
         ctl1.timer1.updateClocks()
         current_millis = ctl1.timer1.current_millis
 
         # Telemetry
-        teleService.pubMQTTTele(current_millis, MQTTClient, ctl1)
+        teleService.pubMQTTTeleIfDue(current_millis, MQTTClient, ctl1)
         teleService.pubMQTTHeartBeat(current_millis, MQTTClient)
 
         # Watchdogs
@@ -318,6 +293,11 @@ async def control():
 
         # Sensor read and alert
         humidity, temperature, sensorMessage = ctl1.sensor1.read()
+        if temperature != previousTemperature:
+            logger.warning("Temperature changed: %s", temperature)
+            previousTemperature = temperature
+
+
         if sensorMessage:
             subject = (
                 f"Zone {zoneNumber} {emailzone}{location} - : bad sensor reads  - PowerCycle"
@@ -325,7 +305,7 @@ async def control():
             emailObj.send(subject, sensorMessage)
 
         # Get all current states
-        lightState, heaterState, ventState, fanState, ventSpeedState, _, _ = ctl1.get_all_states()
+        lightState, heaterState, ventState, fanState, ventSpeedState, temperature, humidity = ctl1.get_all_states()
 
         # Target temperature
         if lightState == ON:
@@ -384,7 +364,7 @@ async def control():
         )
 
         if stateChanged:
-            logger.info("stateChanged Publishing MQTT messages...")
+            logger.debug("stateChanged Publishing MQTT messages...")
             logger.debug("======== start state changed main list ======")
             MessageService.alertAbnormalTemps(temperature)
             location = cfg.getItemValueFromConfig("locationDisplayName")
@@ -394,7 +374,7 @@ async def control():
             import psutil
             mem = psutil.virtual_memory()
             logger.debug(
-                "MMMMMM memory pc.available: %0.2f MMMMMM",
+                "memory pc.available: %0.2f",
                 ((float(mem.available) / float(mem.total))) * 100,
             )
             currentStatusString = ctl1.stateMonitor.getDisplayStatusString()
@@ -409,87 +389,6 @@ async def txwebsocket(message):
     await ws_manager.broadcast(message)
 
 
-# Remove old wsClients, txwebsocket, register, unregister, MyWSHandler
-
-# async def txwebsocket(message):
-#     removeMe = False
-#     for clientConn in wsClients:
-#         logger.warning("DDDD Sending DATA SENT to websocket(s)")
-#         # logger.warning(clientConn)
-#         try:
-#             if clientConn.open:
-#                 await asyncio.wait([clientConn.send(message)])
-#                 # await clientConn.send(message)
-
-#                 logger.info("EEEE message sent to ws Client EEEE")
-#             else:  # websockets.ConnectionClosed:
-#                 logger.warning("UUUU1 unregging a wsconn UUUU")
-#                 removeMe = clientConn
-#                 # await unregister(clientConn)
-#                 # wsClients.remove(clientConn)
-#         except:
-#             logger.warning("UUUU2 unregging a wsconn UUUU")
-#             # await unregister(clientConn)
-#             removeMe = clientConn
-
-#     # if wsocket marked for removal
-#     if removeMe:
-#         wsClients.remove(removeMe)
-#         # await unregister(clientConn)
-#     return
-
-
-# async def register(websocket):
-#     wsClients.add(websocket)
-
-
-# async def unregister(websocket):
-#     wsClients.remove(websocket)
-
-
-# async def MyWSHandler(websocket, path):
-#     wsClients.add(websocket)
-
-#     logger.warning("CCCCCC CONNECTION MADE CCCCCC")
-#     # now = str(datetime.datetime.now())
-#     initialMessage = "websocket server connected from " + \
-#         cfg.getItemValueFromConfig('zoneName')
-
-#     initialMessage = "Version : " + VERSION
-#     await websocket.send(initialMessage)
-#     # header = "Timestamp               T     H     H  V  F  S  L  VT"
-#     await websocket.send(ctl1.stateMonitor.getDisplayHeaderString())
-
-#     # try ping socket # if response cont
-#     # if no response remove websocket from set
-#     while True:
-#         try:
-#             msg = await asyncio.wait_for(websocket.recv(), timeout=20)
-#             # logger.warning("WS RX message : %s", msg)
-#             logger.warning("WS RX message")
-#         except asyncio.TimeoutError:
-#             # No data in 20 seconds, check the connection.
-#             try:
-#                 logger.warning(
-#                     "No data in 20 secs from client- checking connection")
-#                 # await unregister(websocket)
-#                 # break
-#                 pong_waiter = await websocket.ping()
-#                 await asyncio.wait_for(pong_waiter, timeout=10)
-#                 logger.warning("PPPPP ping rxed - client aliveb PPPP")
-#             except:  # asyncio.TimeoutError:
-#                 # No response to ping in 10 seconds, disconnect.
-#                 logger.warning(
-#                     "RRRR no ping response - Remove dead client websocet RRRR")
-
-#                 await unregister(websocket)
-#                 break
-#         else:
-#             logger.warning(
-#                 "msg RXED from client - still connected do nothing")
-
-#         # do something with msg?
-#     logger.warning("DDDDD drop our of onConnect handler DDDDDD")
 
 
 async def main():

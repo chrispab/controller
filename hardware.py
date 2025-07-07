@@ -61,8 +61,8 @@ class sensor(object):
             self.sensorType = Adafruit_DHT.DHT22
             
             
-        self.humidity = 50.0
-        self.temperature = 21.0
+        self._humidity = 50.0
+        self._temperature = 21.0
         #self.prevTempHumiMillis = 0   #last time sensor read
         self.proc_temp = 0       # processed, filter temp reading
         self.currentTime = 0
@@ -86,6 +86,24 @@ class sensor(object):
         self.message = ""
         self.sensorMessage = ""
         self.maxSensorReadErrors = cfg.getItemValueFromConfig('maxSensorReadErrors')
+        
+    @property
+    def temperature(self):
+        """The temperature value."""
+        return self._temperature
+
+    @temperature.setter
+    def temperature(self, value):
+        self._temperature = value
+
+    @property
+    def humidity(self):
+        """The humidity value."""
+        return self._humidity
+
+    @humidity.setter
+    def humidity(self, value):
+        self._humidity = value
         
         
         
@@ -193,7 +211,7 @@ class sensor(object):
             logger.debug("** JUMPING OUT OF AQUISITION -Too early to read sensor **")
             return self.humidity, self.temperature, self.sensorMessage
 
-        logger.debug("** AQUIring **")
+        logger.error("** AQUISITION **")
         time1 = datetime.datetime.now()
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
         time2 = datetime.datetime.now()

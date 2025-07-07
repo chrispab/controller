@@ -27,7 +27,7 @@ class TelemetryService(object):
 
     def publish_all_states(self, MQTTClient, ctl1):
         """Publish all I/O states to MQTT broker."""
-        lightState, heaterState, ventState, fanState, ventSpeedState, humidity, temperature = ctl1.get_all_states()
+        lightState, heaterState, ventState, fanState, ventSpeedState, temperature, humidity  = ctl1.get_all_states()
         MQTTClient.publish(self.zoneName + "/HeartBeat", self.ackMessage)
         logger.debug("%s MQTT published HeartBeat: %s", self.zoneName, self.ackMessage)
         MQTTClient.publish(self.zoneName + "/TemperatureStatus", temperature)
@@ -94,13 +94,17 @@ class TelemetryService(object):
             )
             if temperatureChanged:
                 MQTTClient.publish(self.zoneName + "/TemperatureStatus", temperature)
+                logger.info("Temp changed MQTT published temp: %s", temperature)
                 MQTTClient.publish(self.zoneName + "/HumidityStatus", humidity)
-                logger.debug("Temp change MQTT published temp and humi")
+                logger.info("Humidity changed MQTT published humi: %s", humidity)
                 anyChanges = True
 
             fanChanged = ctl1.stateMonitor.checkForChangeInFanState(fanState)
             if fanChanged:
                 MQTTClient.publish(self.zoneName + "/FanStatus", fanState)
+                logger.info("Fan state change MQTT published: %s", fanState)
+
+                # logger.debug("Fan state change MQTT published: %s", fanState)
                 # logger.warning(
                 #     '++++++++++++++++================================')
                 # logger.warning(
@@ -114,11 +118,12 @@ class TelemetryService(object):
             ventStateChanged = ctl1.stateMonitor.checkForChangeInVentState(ventState)
             if ventStateChanged:
                 MQTTClient.publish(self.zoneName + "/VentStatus", ventState)
-                # logger.warning("Vent state change MQTT published")
+                logger.debug("Vent state change MQTT published: %s", ventState)
+
                 MQTTClient.publish(
                     self.zoneName + "/VentValue", ventState + ventSpeedState
                 )
-                logger.debug("Vent value 0,1,2 change MQTT published")
+                logger.info("Vent value 0,1,2 change MQTT published: %s", ventState + ventSpeedState)
                 anyChanges = True
 
             ventSpeedChanged = ctl1.stateMonitor.checkForChangeInVentSpeedState(
@@ -126,9 +131,7 @@ class TelemetryService(object):
             )
             if ventSpeedChanged:
                 MQTTClient.publish(self.zoneName + "/VentSpeedStatus", ventSpeedState)
-                logger.debug(
-                    "++++++++++++++++ Vent Speed state change MQTT published"
-                )
+                logger.info("Vent speed state change MQTT published: %s", ventSpeedState)
                 anyChanges = True
 
             ventPercent = ventState * ((ventSpeedState + 1) * 50)
@@ -137,7 +140,7 @@ class TelemetryService(object):
             )
             if ventPercentChanged:
                 MQTTClient.publish(self.zoneName + "/VentPercent", ventPercent)
-                logger.debug("++++++++++++++++ Vent percent change MQTT published")
+                logger.info("Vent percent change MQTT published: %s", ventPercent)
                 anyChanges = True
 
             heaterStateChangeed = ctl1.stateMonitor.checkForChangeInHeaterState(
@@ -145,13 +148,13 @@ class TelemetryService(object):
             )
             if heaterStateChangeed:
                 MQTTClient.publish(self.zoneName + "/HeaterStatus", heaterState)
-                logger.debug("++++++++++++++++ Heater state change MQTT published")
+                logger.info("Heater state change MQTT published: %s", heaterState)
                 anyChanges = True
 
             lightChanged = ctl1.stateMonitor.checkForChangeInLightState(lightState)
             if lightChanged:
                 MQTTClient.publish(self.zoneName + "/LightStatus", lightState)
-                logger.debug("++++++++++++++++ Light state change MQTT published")
+                logger.info("Light state change MQTT published: %s", lightState)
                 anyChanges = True
 
             return anyChanges  # return if changes or not are detected
@@ -177,7 +180,7 @@ class TelemetryService(object):
 
     #! send telemetry periodically
     # long intervasl mqtt messages of low priority, e.g rssi, online, ventOn/Off Deltas etc
-    def pubMQTTTele(self, current_millis, MQTTClient, ctl1):
+    def pubMQTTTeleIfDue(self, current_millis, MQTTClient, ctl1):
         logger.debug("==  publish MQTT Telemetry  ==")
 
         # check for first run

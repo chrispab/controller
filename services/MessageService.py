@@ -41,7 +41,7 @@ class MessageService(object):
             
     #! send telemetry periodically
     # long intervasl mqtt messages of low priority, e.g rssi, online, ventOn/Off Deltas etc
-    def pubMQTTTele(self, current_millis, MQTTClient):
+    def pubMQTTTeleIfDue(self, current_millis, MQTTClient):
         logger.info('==  publish MQTT Telemetry  ==')
 
         if current_millis - self.lastMqttPublishTeleMillis > self.mqttPublishTeleIntervalMillis:
