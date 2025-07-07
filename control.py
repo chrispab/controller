@@ -144,7 +144,7 @@ MessageService = MessageService()
 # MQTTClient.subscribe
 def on_connect(MQTTClient, userdata, flags, rc):
     print("Connected with result code " + str(rc))
-    logger.warning(" - MQTT CONNECTED - MMMMM")
+    logger.debug(" - MQTT CONNECTED - MMMMM")
     # MQTTClient.subscribe(sub_topic)
     zoneName = cfg.getItemValueFromConfig("zoneName")
 
@@ -163,12 +163,12 @@ def on_message(MQTTClient, userdata, msg):
     global outsideTemp
 
     message = str(msg.payload.decode("utf-8"))
-    logger.warning("MMMMMM: subscibed message rxed topic : %s" % (msg.topic))
-    logger.warning("MMMMMM: subscibed message rxed payload : %s" % (message))
+    logger.debug("MMMMMM: subscibed message rxed topic : %s" % (msg.topic))
+    logger.debug("MMMMMM: subscibed message rxed payload : %s" % (message))
     # logger.warning("subscribed message rxed : %s" % str(message)) )
 
     zoneName = cfg.getItemValueFromConfig("zoneName")
-    logger.warning("MMMMMM: subscibed message rxedm, zone name used : %s" % (zoneName))
+    logger.debug("MMMMMM: subscibed message rxedm, zone name used : %s" % (zoneName))
 
     # logger.warning(" MRMRMRMRMR- MQTT rx - MRMRMRMRMRMRMRMRMRMR")
 
@@ -180,12 +180,12 @@ def on_message(MQTTClient, userdata, msg):
     except:
         logger.error("<====---- outside temp mqtt in temp error redoing payload")
 
-    logger.warning(
+    logger.debug(
         "<====---- subscibed message rxed from outside sensor: %s" % (outsideTemp)
     )
 
-    logger.warning(msg.topic + " :: " + message)
-    logger.warning(
+    logger.debug(msg.topic + " :: " + message)
+    logger.debug(
         zoneName + "/vent_on_delta_secs/set!!!" + " ::: " + msg.topic + " :: " + message
     )
 
@@ -193,36 +193,36 @@ def on_message(MQTTClient, userdata, msg):
     if msg.topic == (zoneName + "/vent_on_delta_secs/set"):
         # vent on time rxed in secs, convert to ms - used in code
         cfg.setItemValueToConfig("ventOnDelta", int(msg.payload) * 1000)
-        logger.warning(zoneName + "/vent_on_delta_secs/set!!!")
+        logger.debug(zoneName + "/vent_on_delta_secs/set!!!")
         cfg.writeConfigToFile()
 
     if msg.topic == (zoneName + "/vent_off_delta_secs/set"):
         cfg.setItemValueToConfig(
             "ventOffDelta", int(msg.payload) * 1000
         )  # vent on time
-        logger.warning(zoneName + "/vent_off_delta_secs/set!!!")
+        logger.debug(zoneName + "/vent_off_delta_secs/set!!!")
         cfg.writeConfigToFile()
 
     # vent deltas when light off
     if msg.topic == (zoneName + "/vent_off_delta_dark_secs/set"):
         cfg.setItemValueToConfig("ventDarkOffDelta", int(msg.payload) * 1000)
-        logger.warning(zoneName + "/vent_off_delta_dark_secs/set!!!")
+        logger.debug(zoneName + "/vent_off_delta_dark_secs/set!!!")
         cfg.writeConfigToFile()
 
     if msg.topic == (zoneName + "/vent_on_delta_dark_secs/set"):
         cfg.setItemValueToConfig("ventDarkOnDelta", int(msg.payload) * 1000)
-        logger.warning(zoneName + "/vent_on_delta_dark_secs/set!!!")
+        logger.debug(zoneName + "/vent_on_delta_dark_secs/set!!!")
         cfg.writeConfigToFile()
 
     # setpoints
     if msg.topic == (zoneName + "/low_setpoint/set"):
         cfg.setItemValueToConfig("tempSPLOff", float(msg.payload))
-        logger.warning(zoneName + "/low_setpoint/set!!!")
+        logger.debug(zoneName + "/low_setpoint/set!!!")
         cfg.writeConfigToFile()
 
     if msg.topic == (zoneName + "/high_setpoint/set"):
         cfg.setItemValueToConfig("tempSPLOn", float(msg.payload))  # vent on time
-        logger.warning(zoneName + "/high_setpoint/set!!!")
+        logger.debug(zoneName + "/high_setpoint/set!!!")
         cfg.writeConfigToFile()
 
 

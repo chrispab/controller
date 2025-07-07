@@ -118,7 +118,7 @@ class TelemetryService(object):
                 MQTTClient.publish(
                     self.zoneName + "/VentValue", ventState + ventSpeedState
                 )
-                logger.warning("Vent value 0,1,2 change MQTT published")
+                logger.debug("Vent value 0,1,2 change MQTT published")
                 anyChanges = True
 
             ventSpeedChanged = ctl1.stateMonitor.checkForChangeInVentSpeedState(
@@ -126,7 +126,7 @@ class TelemetryService(object):
             )
             if ventSpeedChanged:
                 MQTTClient.publish(self.zoneName + "/VentSpeedStatus", ventSpeedState)
-                logger.warning(
+                logger.debug(
                     "++++++++++++++++ Vent Speed state change MQTT published"
                 )
                 anyChanges = True
@@ -137,7 +137,7 @@ class TelemetryService(object):
             )
             if ventPercentChanged:
                 MQTTClient.publish(self.zoneName + "/VentPercent", ventPercent)
-                logger.warning("++++++++++++++++ Vent percent change MQTT published")
+                logger.debug("++++++++++++++++ Vent percent change MQTT published")
                 anyChanges = True
 
             heaterStateChangeed = ctl1.stateMonitor.checkForChangeInHeaterState(
@@ -145,13 +145,13 @@ class TelemetryService(object):
             )
             if heaterStateChangeed:
                 MQTTClient.publish(self.zoneName + "/HeaterStatus", heaterState)
-                logger.warning("++++++++++++++++ Heater state change MQTT published")
+                logger.debug("++++++++++++++++ Heater state change MQTT published")
                 anyChanges = True
 
             lightChanged = ctl1.stateMonitor.checkForChangeInLightState(lightState)
             if lightChanged:
                 MQTTClient.publish(self.zoneName + "/LightStatus", lightState)
-                logger.warning("++++++++++++++++ Light state change MQTT published")
+                logger.debug("++++++++++++++++ Light state change MQTT published")
                 anyChanges = True
 
             return anyChanges  # return if changes or not are detected
@@ -168,9 +168,9 @@ class TelemetryService(object):
 
             MQTTClient.publish(self.zoneName + "/HeartBeat", self.ackMessage)
 
-            logger.warning(self.zoneName + " MQTT published HeartBeat")
-            logger.warning(self.zoneName + "/HeartBeat:" + self.ackMessage)
-            logger.warning(self.zoneName + "/LWT:" + "Online")
+            logger.debug(self.zoneName + " MQTT published HeartBeat")
+            logger.debug(self.zoneName + "/HeartBeat:" + self.ackMessage)
+            logger.debug(self.zoneName + "/LWT:" + "Online")
             self.lastMqttPublishHeartBeatMillis = current_millis
             # anyChanges = True
 
@@ -186,7 +186,7 @@ class TelemetryService(object):
             current_millis - self.lastMqttPublishTeleMillis
             > self.mqttPublishTeleIntervalMillis
         ) or (self.lastMqttPublishTeleMillis == -1):
-            logger.warning("---> publish MQTT TELE info")
+            logger.debug("---> publish MQTT TELE info")
 
             MQTTClient.publish(
                 self.zoneName + "/vent_on_delta_secs",
@@ -217,29 +217,29 @@ class TelemetryService(object):
 
             lightState = ctl1.light.getLightState()
             MQTTClient.publish(self.zoneName + "/LightStatus", lightState)
-            logger.warning("===---> " + self.zoneName + "/LightStatus : ")
+            logger.debug("===---> " + self.zoneName + "/LightStatus : ")
             MQTTClient.publish(self.zoneName + "/version", VERSION)
 
-            logger.warning(
+            logger.debug(
                 "===---> "
                 + self.zoneName
                 + "/vent_on_delta_secs : "
                 + str(int(cfg.getItemValueFromConfig("ventOnDelta") / 1000))
             )
-            logger.warning(
+            logger.debug(
                 "===---> "
                 + self.zoneName
                 + "/vent_off_delta_secs : "
                 + str(int(cfg.getItemValueFromConfig("ventOffDelta") / 1000))
             )
 
-            logger.warning(
+            logger.debug(
                 "===---> "
                 + self.zoneName
                 + "/vent_on_delta_dark_secs : "
                 + str(int(cfg.getItemValueFromConfig("ventDarkOnDelta") / 1000))
             )
-            logger.warning(
+            logger.debug(
                 "===---> "
                 + self.zoneName
                 + "/vent_off_delta_dark_secs : "
@@ -247,7 +247,7 @@ class TelemetryService(object):
             )
 
             # logger.warning('==-> ' + zone + "/LWT:" + "Online")
-            logger.warning("===---> " + self.zoneName + "/version : " + VERSION)
+            logger.debug("===---> " + self.zoneName + "/version : " + VERSION)
 
             MQTTClient.publish(self.zoneName + "/rssi", self.getRSSI())
             MQTTClient.publish(self.zoneName + "/LWT", "Online", 0, True)
