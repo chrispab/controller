@@ -268,6 +268,7 @@ async def control():
         zoneName,
     )
 
+    ctl1.sensor1._power_cycle()  # power cycle sensor to reset it
     logger.warning("SENDING INITIAL MQTT")
     # publish_initial_mqtt(MQTTClient, ctl1, zoneName, ackMessage)
     teleService.publish_all_states(MQTTClient, ctl1)

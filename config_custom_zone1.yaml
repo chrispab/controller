@@ -28,7 +28,7 @@ heater_sp_offset: 0
 id: g
 led2: 4
 locationDisplayName: GRG
-maxSensorReadErrors: 3
+maxSensorReadErrors: 5
 min_CSV_write_interval: 6000000
 mqttPublishIntervalMillis: 60000
 mqttPublishTeleIntervalMillis: 120000

@@ -29,23 +29,23 @@ if cfg.getItemValueFromConfig('platform_name') == "RPi2": #rpi platform
     import Adafruit_DHT
     sensor = Adafruit_DHT.DHT22
 
-elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":    # pcduino platform
-    import gpio
-    import dht22 as dht22
-    #=================hardware dependant pins values etc====================
-    #Make sure the GPIO pins are ready:
-    #GPIO.setmode(GPIO.BCM)
-    #GPIO.setwarnings(False)
-    #dht22.setup()               #init dht22 pins etc
-    #----pin assignments----
-    led1_pin = "gpio0"
-    led2_pin = "gpio1"
-    powerPin = "gpio2"
-    relaypins = ("gpio3","gpio4","gpio5","gpio6")
-    heaterRelay = "gpio3"
-    ventRelay = "gpio4"
-    fanRelay = "gpio5"
-    relay4 = "gpio6"
+# elif cfg.getItemValueFromConfig('platform_name') == "PCDuino":    # pcduino platform
+#     import gpio
+#     import dht22 as dht22
+#     #=================hardware dependant pins values etc====================
+#     #Make sure the GPIO pins are ready:
+#     #GPIO.setmode(GPIO.BCM)
+#     #GPIO.setwarnings(False)
+#     #dht22.setup()               #init dht22 pins etc
+#     #----pin assignments----
+#     led1_pin = "gpio0"
+#     led2_pin = "gpio1"
+#     powerPin = "gpio2"
+#     relaypins = ("gpio3","gpio4","gpio5","gpio6")
+#     heaterRelay = "gpio3"
+#     ventRelay = "gpio4"
+#     fanRelay = "gpio5"
+#     relay4 = "gpio6"
 
 
 
@@ -160,34 +160,22 @@ class sensor(object):
     
     # take a single sample, return values or NULL
     def _read_sensor(self):
-        if self.platformName == "RPi2":
-            #sensor = Adafruit_DHT.DHT22
-            logger.debug("in RPi2 _read_sensor about to read sensor")
 
-            #self.humidity, self.temperature = Adafruit_DHT.read_retry(self.sensorType, self.sensorPin, 1,0)
-            #store last good h and t
-            oldHumidity = self.humidity
-            oldTemperature = self.temperature
+        logger.debug("in RPi2 _read_sensor about to read sensor")
 
-            self.humidity, self.temperature = Adafruit_DHT.read(self.sensorType, self.sensorPin)
-            if self.humidity is None or self.temperature is None:
-                 self.humidity = oldHumidity
-                 self.temperature = oldTemperature
-                 logger.warning("!!!! BAD SENSOR READ - USING OLD READINGS !!!!")
+        #self.humidity, self.temperature = Adafruit_DHT.read_retry(self.sensorType, self.sensorPin, 1,0)
+        #store last good h and t
+        oldHumidity = self.humidity
+        oldTemperature = self.temperature
 
-        elif self.platformName == "PCDuino":
-            if dht22.getth() == 0:
-                self.temperature = round(dht22.cvar.temperature, 1)
-                self.humidity = round(dht22.cvar.humidity, 1)
-            else:
-                self.temperature = None
-                self.humidity = None
+        self.humidity, self.temperature = Adafruit_DHT.read(self.sensorType, self.sensorPin)
+        if self.humidity is None or self.temperature is None:
+                # self.humidity = oldHumidity
+                # self.temperature = oldTemperature
+                logger.warning("!!!! BAD SENSOR READ - USING OLD READINGS !!!!")
 
         return self.humidity, self.temperature
-        
-        
-        
-        
+
 
     def read(self):
         #read till ret 0-ok. timeout if no valid data after timeout
@@ -196,7 +184,6 @@ class sensor(object):
         logger.debug("...try to read sensor at: %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
         self.readErrs = 0    #reset err count
         self.sensorMessage = ""   #reset err message
-        
         
         #save previous values if reqd later
         self.prevTemp = self.temperature
@@ -211,12 +198,12 @@ class sensor(object):
             logger.debug("** JUMPING OUT OF AQUISITION -Too early to read sensor **")
             return self.humidity, self.temperature, self.sensorMessage
 
-        logger.error("** AQUISITION **")
+        # logger.error("** AQUISITION **")
         time1 = datetime.datetime.now()
         self.humidity, self.temperature = self._read_sensor()    # get temp, humi
         time2 = datetime.datetime.now()
         duration = time2 - time1
-        print("->-")
+        # print("->-")
         logger.debug("TTTTTT - sensor read duration : %s" % (duration))
         
         
